@@ -1,6 +1,6 @@
 // EXAMPLE (reference only, do not run as-is): the 'Maya' finance video the user loved (5 min, US audience, built before intro/outro existed).
 // Study the LEVEL OF DETAIL per area (props, lighting, small story objects), not the exact code. Newer videos use illus.js charB + kit helpers + intro()/outro().
-// WARNING: it contains a red screen-edge vignette (SCREEN overlays section) — NEVER copy that; the user hates vignettes.
+// NOTE: its red vignette flash at 'financial emergency' (~1 s) is the allowed use: only at a real emergency moment, never a permanent dark edge.
 // ================== PREMIUM: remaining areas (41s -> end) ==================
 const IPX = {
   apt: c => `<rect x="24" y="10" width="52" height="82" rx="4" fill="${c}"/>${[0, 1, 2, 3].map(r => [0, 1].map(q => `<rect x="${33 + q * 20}" y="${20 + r * 17}" width="12" height="10" fill="#0b1020"/>`).join('')).join('')}`,
