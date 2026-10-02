@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>%%TITLE%%</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+:root{--acc:#34d399;--acc2:#22d3ee;--good:#34d399;--bad:#f87171;--c5:#fb923c;--c6:#60a5fa;--bg:#060a13;--ink:#e8eefc;--dim:#8b97b5;--red:#f87171;--gold:#fbbf24;--cyan:#22d3ee;--card:rgba(255,255,255,.045);--line:rgba(255,255,255,.14)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+#root{position:relative;width:1920px;height:1080px;overflow:hidden;font-family:Poppins,'Segoe UI',sans-serif;color:var(--ink);
+  background:radial-gradient(1200px 800px at 15% 5%,#0f1d3a 0%,transparent 60%),radial-gradient(1000px 700px at 90% 95%,#0b2b25 0%,transparent 60%),var(--bg)}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:60px 60px}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.28}
+#stage{position:absolute;inset:0}
+.scene{position:absolute;inset:0}
+.a{position:absolute}
+.cx{position:absolute;left:0;right:0;margin:auto;width:fit-content;text-align:center;white-space:nowrap}
+.h1{font-size:88px;font-weight:800;letter-spacing:-1px;line-height:1.1}
+.h2{font-size:58px;font-weight:700;line-height:1.15}
+.h3{font-size:40px;font-weight:600;line-height:1.2}
+.tx{font-size:32px;line-height:1.3}
+.sm{font-size:26px;color:var(--dim);line-height:1.3}
+.mono{font-family:'JetBrains Mono',monospace}
+.card{position:absolute;background:var(--card);border:2px solid var(--line);border-radius:26px;padding:26px 32px}
+.chip{position:absolute;display:inline-flex;align-items:center;gap:12px;padding:12px 26px;border-radius:999px;font-size:28px;font-weight:600;background:rgba(14,20,34,.92);border:2px solid var(--line);white-space:nowrap}
+.badge{position:absolute;display:inline-flex;align-items:center;gap:12px;padding:12px 26px;border-radius:16px;border:3px solid;font-size:32px;font-weight:700;background:rgba(10,14,25,.94);white-space:nowrap}
+.tok{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:14px;font-size:30px;font-weight:600;background:rgba(255,255,255,.06);border:2px solid var(--line);white-space:nowrap}
+.sq{position:absolute;border-radius:10px}
+.ln{position:absolute;height:14px;border-radius:7px;background:rgba(255,255,255,.18)}
+svg.full{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:visible}
+.ic{display:inline-flex}
+.c-red{color:var(--red)}.c-gold{color:var(--gold)}.c-dim{color:var(--dim)}.c-cyan{color:var(--cyan)}
+.ib{display:inline-block}
+.acc{color:var(--acc)}.acc2{color:var(--acc2)}
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="%%DUR%%" data-width="1920" data-height="1080">
+  <div class="grid-bg"></div>
+  <div id="orb1" class="orb" style="left:-200px;top:-150px;width:700px;height:700px;background:#2563eb"></div>
+  <div id="orb2" class="orb" style="left:1300px;top:600px;width:800px;height:800px;background:#059669"></div>
+  <div id="orb3" class="orb" style="left:800px;top:200px;width:500px;height:500px;background:#7c3aed;opacity:.16"></div>
+  <div id="stage"></div>
+  <audio id="voiceover" data-start="%%HEAD%%" data-duration="%%AUD%%" data-track-index="0" data-volume="1" src="assets/%%AUDIO%%"></audio>
+</div>
+<script>
+%%JS%%
+</script>
+</body>
+</html>
