@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=1920, height=1080">
+<meta name="viewport" content="width=%%W%%, height=%%H%%">
 <title>%%TITLE%%</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,8 +11,8 @@
 <style>
 :root{--acc:#34d399;--acc2:#22d3ee;--good:#34d399;--bad:#f87171;--c5:#fb923c;--c6:#60a5fa;--bg:#060a13;--ink:#e8eefc;--dim:#8b97b5;--red:#f87171;--gold:#fbbf24;--cyan:#22d3ee;--card:rgba(255,255,255,.045);--line:rgba(255,255,255,.14)}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
-#root{position:relative;width:1920px;height:1080px;overflow:hidden;font-family:Poppins,'Segoe UI',sans-serif;color:var(--ink);
+html,body{width:%%W%%px;height:%%H%%px;overflow:hidden;background:var(--bg)}
+#root{position:relative;width:%%W%%px;height:%%H%%px;overflow:hidden;font-family:Poppins,'Segoe UI',sans-serif;color:var(--ink);
   background:radial-gradient(1200px 800px at 15% 5%,#0f1d3a 0%,transparent 60%),radial-gradient(1000px 700px at 90% 95%,#0b2b25 0%,transparent 60%),var(--bg)}
 .grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:60px 60px}
 .orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.28}
@@ -40,7 +40,7 @@ svg.full{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:visi
 </style>
 </head>
 <body>
-<div id="root" data-composition-id="main" data-start="0" data-duration="%%DUR%%" data-width="1920" data-height="1080">
+<div id="root" data-composition-id="main" data-start="0" data-duration="%%DUR%%" data-width="%%W%%" data-height="%%H%%">
   <div class="grid-bg"></div>
   <div id="orb1" class="orb" style="left:-200px;top:-150px;width:700px;height:700px;background:#2563eb"></div>
   <div id="orb2" class="orb" style="left:1300px;top:600px;width:800px;height:800px;background:#059669"></div>

@@ -12,7 +12,7 @@ for t in sorted(ims):
     c=(ims[t]>95).mean()*100; p=ims.get(round(t-4,1)); df=np.abs(ims[t]-p).mean() if p is not None else 99
     if c<0.3 or df<0.6: print(f'  {t:6.1f} content={c:.2f}% diff4s={df:.2f}', 'EMPTY' if c<0.3 else 'STATIC')
 sc=[s[1] for s in d['scn']]; ts=[round((sc[i+1] if i+1<len(sc) else end)-.6,1) for i in range(len(sc))]
-W,H=640,360
+W,H=(640,360) if Image.open(next(iter(fs.values()))).width>Image.open(next(iter(fs.values()))).height else (270,480)
 for k in range(0,len(ts),9):
     g=ts[k:k+9]; sh=Image.new('RGB',(W*3,H*((len(g)+2)//3)))
     for i,t in enumerate(g):

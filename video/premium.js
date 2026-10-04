@@ -9,14 +9,16 @@ function pill(par, x, y, txt, bg, fg, id, fs = 30) { const g = S('g', { id }, pa
 function XM(par, cx, cy, r, id) { const g = S('g', { id }, par); S('path', { d: `M${cx - r} ${cy - r} L${cx + r} ${cy + r} M${cx + r} ${cy - r} L${cx - r} ${cy + r}`, stroke: P.bad, 'stroke-width': Math.max(8, r * .2), 'stroke-linecap': 'round' }, g); return g; }
 function QM(par, cx, cy, size, col, id) { const g = S('g', { id }, par); wtext(g, cx, cy + size * .36, '?', size, col, 'middle', 800); return g; }
 const rnd = i => { const v = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return v - Math.floor(v); };   // deterministic "random"
-const AO = i => [(i % 4) * 2400, Math.floor(i / 4) * 1400];   // area i origin; each area is a 1920x1080 "room" of the world
+// LONG = 1920x1080 frame, SHORT (VERT, build.py --short) = 1080x1920 frame. FW/FH = frame size.
+const FW = (typeof VERT !== 'undefined' && VERT) ? 1080 : 1920, FH = FW === 1080 ? 1920 : 1080;
+const AO = i => FW === 1080 ? [(i % 4) * 1500, Math.floor(i / 4) * 2400] : [(i % 4) * 2400, Math.floor(i / 4) * 1400];   // area i origin; each area is a FWxFH "room" of the world
 // ---- phrase timing relative to the current area: go('first words of area') sets ST; W('later words') looks from ST on
 let ST = 0;
 const go = p => { const t = findp(p, ST - .06); if (t !== null) ST = t; return ST; };
 const W = p => { const t = findp(p, ST - .06); return t === null ? ST : t; };
 // ---- camera on #world (transformOrigin 0 0): centre (cx,cy) at zoom z. Visible half-size = 960/z x 540/z.
-const CAM = (t, cx, cy, z, d = 1.3, e = 'power3.inOut') => { tl.to('#world', { x: 960 - cx * z, y: 540 - cy * z, scale: z, duration: d, ease: e }, t); B(t); };
-const CUT = (t, cx, cy, z) => tl.set('#world', { x: 960 - cx * z, y: 540 - cy * z, scale: z }, t);   // area change = CUT zoomed-in, then CAM out ("cut + push")
+const CAM = (t, cx, cy, z, d = 1.3, e = 'power3.inOut') => { tl.to('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z, duration: d, ease: e }, t); B(t); };
+const CUT = (t, cx, cy, z) => tl.set('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z }, t);   // area change = CUT zoomed-in, then CAM out ("cut + push")
 // ---- hidden-until-cue elements: hid(el) at build, tl.set(HID,{autoAlpha:0},0) first thing in beats; DR = draw-on that also un-hides
 const HID = []; const hid = e => { HID.push(e); return e; };
 const hidId = id => hid(document.getElementById(id));
@@ -25,7 +27,7 @@ const ARW = (par, x1, y1, x2, y2, col, id, w = 6) => S('path', { id, class: 'dra
 const CRV = (par, d, col, id, w = 6) => S('path', { id, class: 'draw', d, stroke: col, 'stroke-width': w, fill: 'none', 'stroke-linecap': 'round' }, par);
 // ---- world setup: call first inside the custom build. cols x rows areas. BG group is BELOW content group G.
 function makeWorld(s, cols = 4, rows = 2) {
-  const world = H('div', 'a', 'left:0;top:0;width:1920px;height:1080px', null, s, 'world');
+  const world = H('div', 'a', `left:0;top:0;width:${FW}px;height:${FH}px`, null, s, 'world');
   const sv = S('svg', { width: cols * 2400, height: rows * 1400, viewBox: `0 0 ${cols * 2400} ${rows * 1400}`, style: 'position:absolute;left:0;top:0;overflow:visible' }, world);
   const defs = S('defs', {}, sv);
   grad(defs, 'gTech', [[0, '#0b1226'], [1, '#111a33']]); grad(defs, 'gWall', [[0, '#25305a'], [1, '#161d38']]); grad(defs, 'gFloor', [[0, '#4a3426'], [1, '#2a1d15']]);

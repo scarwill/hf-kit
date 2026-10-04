@@ -4,7 +4,8 @@ const src = process.argv[2] || 'index.html';
 const html = fs.readFileSync(src, 'utf8').replace(/<script src="https:\/\/cdn\.jsdelivr[^>]*><\/script>/, `<script src="${path.join(__dirname, 'gsap-shim.js')}"></script>`).replace(/<link [^>]*fonts[^>]*>/g, '');
 fs.writeFileSync('test.html', html); fs.mkdirSync('out', { recursive: true });
 (async () => {
-  const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1920, height: 1080 } });
+  const vw = +(html.match(/data-width="(\d+)"/) || [0, 1920])[1], vh = +(html.match(/data-height="(\d+)"/) || [0, 1080])[1];
+  const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: vw, height: vh } });
   const logs = []; p.on('console', m => logs.push(m.type() + ': ' + m.text())); p.on('pageerror', e => logs.push('PAGEERROR: ' + e.message));
   await p.goto('file://' + path.resolve('test.html'));
   const info = await p.evaluate(() => ({ beats: window.__BEATS, scn: window.__SCN, dur: window.__timelines.main.duration(), end: END }));

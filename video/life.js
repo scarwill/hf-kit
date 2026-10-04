@@ -1,11 +1,11 @@
 // ===================== LIFE (premium add-on) =====================
 // camera breathing, transition flash/streak, small effects. Backgrounds stay the dark techBg (no per-area colours). NO vignette, NO floating particles/bubbles (user hates all three).
 // call once after makeWorld (before anything else is added to s): wraps #world in #drift and adds screen overlays
-function addLife(s) { const w = document.getElementById('world'); const d = H('div', 'a', 'left:0;top:0;width:1920px;height:1080px', null, s, 'drift'); d.appendChild(w);
-  H('div', 'a', 'left:0;top:0;width:1920px;height:1080px;pointer-events:none;background:radial-gradient(circle at center,rgba(253,230,138,.5),rgba(255,255,255,0) 70%)', '', s, 'flash');
-  H('div', 'a', 'left:-700px;top:-200px;width:500px;height:1500px;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(253,230,138,.32),rgba(255,255,255,0))', '', s, 'streak');
-  H('div', 'a', 'left:0;top:0;width:1920px;height:1080px;background:#000;pointer-events:none', '', s, 'fadeEnd');
-  H('div', 'a', 'left:0;top:0;width:1920px;height:1080px;background:#000;pointer-events:none', '', s, 'fadeIn'); }
+function addLife(s) { const w = document.getElementById('world'); const d = H('div', 'a', `left:0;top:0;width:${FW}px;height:${FH}px`, null, s, 'drift'); d.appendChild(w);
+  H('div', 'a', `left:0;top:0;width:${FW}px;height:${FH}px;pointer-events:none;background:radial-gradient(circle at center,rgba(253,230,138,.5),rgba(255,255,255,0) 70%)`, '', s, 'flash');
+  H('div', 'a', `left:-700px;top:-200px;width:500px;height:${FH + 700}px;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(253,230,138,.32),rgba(255,255,255,0))`, '', s, 'streak');
+  H('div', 'a', `left:0;top:0;width:${FW}px;height:${FH}px;background:#000;pointer-events:none`, '', s, 'fadeEnd');
+  H('div', 'a', `left:0;top:0;width:${FW}px;height:${FH}px;background:#000;pointer-events:none`, '', s, 'fadeIn'); }
 // call inside beats: area-start times get a flash + light streak; camera breathes the whole video
 function lifeBeats(times) { tl.set(['#flash', '#streak'], { autoAlpha: 0 }, 0); tl.set('#streak', { rotation: 18 }, 0);
   tl.to('#drift', { scale: 1.035, x: -18, y: 10, transformOrigin: '50% 50%', duration: 8, yoyo: true, repeat: Math.max(0, Math.floor(END / 8) - 1), ease: 'sine.inOut' }, 0);
