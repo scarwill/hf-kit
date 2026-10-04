@@ -59,9 +59,10 @@ function charB(par, x, y, s, p, o = {}) {
 }
 // mood(p, t, 'happy'|'worried'|'tired'|'surprised'|'neutral')
 function mood(p, t, m) {
-  const show = { happy: 'mS', worried: 'mW', tired: 'mN', surprised: 'mO', neutral: 'mN' }[m];
+  const show = { happy: 'mS', worried: 'mW', angry: 'mW', tired: 'mN', surprised: 'mO', neutral: 'mN' }[m];
   ['mS', 'mW', 'mO', 'mN'].forEach(k => tl.to('#' + p + k, { opacity: k === show ? 1 : 0, duration: .25 }, t));
-  const br = m === 'worried' ? 14 : 0; tl.to('#' + p + 'bL', { rotation: br, transformOrigin: '100% 50%', y: m === 'surprised' ? -8 : 0, duration: .3 }, t); tl.to('#' + p + 'bR', { rotation: -br, transformOrigin: '0% 50%', y: m === 'surprised' ? -8 : 0, duration: .3 }, t);
+  // worried = inner brow ends UP (sad), angry = inner ends down
+  const br = m === 'worried' ? -14 : m === 'angry' ? 14 : 0; tl.to('#' + p + 'bL', { rotation: br, transformOrigin: '100% 50%', y: m === 'surprised' ? -8 : 0, duration: .3 }, t); tl.to('#' + p + 'bR', { rotation: -br, transformOrigin: '0% 50%', y: m === 'surprised' ? -8 : 0, duration: .3 }, t);
   tl.to('#' + p + 'E', { scaleY: m === 'tired' ? .45 : m === 'surprised' ? 1.2 : 1, transformOrigin: '50% 50%', duration: .3 }, t); B(t);
 }
 const blink = (p, ts) => ts.forEach(t => tl.to('#' + p + 'eL,#' + p + 'eR', { scaleY: .1, transformOrigin: '50% 50%', duration: .08, yoyo: true, repeat: 1 }, t));

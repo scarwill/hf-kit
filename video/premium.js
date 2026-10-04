@@ -17,8 +17,8 @@ let ST = 0;
 const go = p => { const t = findp(p, ST - .06); if (t !== null) ST = t; return ST; };
 const W = p => { const t = findp(p, ST - .06); return t === null ? ST : t; };
 // ---- camera on #world (transformOrigin 0 0): centre (cx,cy) at zoom z. Visible half-size = 960/z x 540/z.
-const CAM = (t, cx, cy, z, d = 1.3, e = 'power3.inOut') => { tl.to('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z, duration: d, ease: e }, t); B(t); };
-const CUT = (t, cx, cy, z) => tl.set('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z }, t);   // area change = CUT zoomed-in, then CAM out ("cut + push")
+const CAM = (t, cx, cy, z, d = 1.3, e = 'power3.inOut') => { tl.to('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z, duration: d, ease: e }, t); if (typeof FGP === 'function') FGP(t, cx, cy, d, e); B(t); };
+const CUT = (t, cx, cy, z) => { tl.set('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z }, t); if (typeof FGP === 'function') FGP(t, cx, cy); };   // area change = CUT zoomed-in, then CAM out ("cut + push")
 // ---- hidden-until-cue elements: hid(el) at build, tl.set(HID,{autoAlpha:0},0) first thing in beats; DR = draw-on that also un-hides
 const HID = []; const hid = e => { HID.push(e); return e; };
 const hidId = id => hid(document.getElementById(id));
