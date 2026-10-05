@@ -12,13 +12,7 @@ function lgr(defs, stops, x2 = 0, y2 = 1) { const id = 'lg' + (++_gi); grad(defs
 const ROOM_THEMES = { lab: [[['#1e3a8a', '#0f172a'], ['#1e293b', '#020617']], [['#312e81', '#0f0a2e'], ['#1e1b4b', '#020617']], [['#334155', '#0f172a'], ['#1e293b', '#020617']], [['#134e4a', '#042f2e'], ['#0f172a', '#020617']]] };
 const LAB = { acc: '#22d3ee', model: '#a855f7', data: '#3b82f6', bad: '#ef4444', good: '#22c55e', warn: '#f59e0b' };   // fixed DSML role colours
 let ROOMS = null; const useTheme = n => { ROOMS = ROOM_THEMES[n] || null; };
-// ROOM THEMES. DSML videos: call useTheme('lab') once right after makeWorld -> every scene() ignores its own colours and uses the
-// fixed "Midnight Lab" palette (navy / indigo / slate / dark teal rooms, dark floors; cyan accent LAB.acc). Finance: no theme (bright rooms).
-const ROOM_THEMES = { lab: [[['#1e3a8a', '#0f172a'], ['#1e293b', '#020617']], [['#312e81', '#0f0a2e'], ['#1e1b4b', '#020617']], [['#334155', '#0f172a'], ['#1e293b', '#020617']], [['#134e4a', '#042f2e'], ['#0f172a', '#020617']]] };
-const LAB = { acc: '#22d3ee', model: '#a855f7', data: '#3b82f6', bad: '#ef4444', good: '#22c55e', warn: '#f59e0b' };   // fixed DSML role colours
-let ROOMS = null; const useTheme = n => { ROOMS = ROOM_THEMES[n] || null; };
 function scene(BG, defs, ox, oy, wall, floor, fy) {
-  if (ROOMS) { const px = FW === 1080 ? 1500 : 2400, py = FW === 1080 ? 2400 : 1400, i = Math.round(ox / px) + 4 * Math.round(oy / py); [wall, floor] = ROOMS[i % ROOMS.length]; }
   if (ROOMS) { const px = FW === 1080 ? 1500 : 2400, py = FW === 1080 ? 2400 : 1400, i = Math.round(ox / px) + 4 * Math.round(oy / py); [wall, floor] = ROOMS[i % ROOMS.length]; }
   if (FW === 1080) { fy = fy ?? 1500;
     S('rect', { x: ox - 210, y: oy - 240, width: 1500, height: fy + 240, fill: lgr(defs, [[0, wall[0]], [1, wall[1]]]) }, BG);
