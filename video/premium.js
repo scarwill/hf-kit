@@ -17,8 +17,12 @@ let ST = 0;
 const go = p => { const t = findp(p, ST - .06); if (t !== null) ST = t; return ST; };
 const W = p => { const t = findp(p, ST - .06); return t === null ? ST : t; };
 // ---- camera on #world (transformOrigin 0 0): centre (cx,cy) at zoom z. Visible half-size = 960/z x 540/z.
-const CAM = (t, cx, cy, z, d = 1.3, e = 'power3.inOut') => { tl.to('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z, duration: d, ease: e }, t); if (typeof FGP === 'function') FGP(t, cx, cy, d, e); B(t); };
-const CUT = (t, cx, cy, z) => { tl.set('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z }, t); if (typeof FGP === 'function') FGP(t, cx, cy); };   // area change = CUT zoomed-in, then CAM out ("cut + push")
+// clampV: keep the camera inside the painted room around (cx,cy) so the next room never shows at the frame edge (LONG and SHORT)
+function clampV(cx, cy, z) { const L = FW !== 1080, px = L ? 2400 : 1500, py = L ? 1400 : 2400, mx0 = L ? 240 : 210, mx1 = L ? 2160 : 1290, my0 = L ? 160 : 240, my1 = L ? 1240 : 2160;
+  const ax = Math.round((cx - FW / 2) / px) * px, ay = Math.round((cy - FH / 2) / py) * py, hw = FW / 2 / z + 40, hh = FH / 2 / z + 30;
+  const cl = (v, a, b) => a > b ? (a + b) / 2 : Math.min(Math.max(v, a), b); return [cl(cx, ax - mx0 + hw, ax + mx1 - hw), cl(cy, ay - my0 + hh, ay + my1 - hh)]; }
+const CAM = (t, cx, cy, z, d = 1.3, e = 'power3.inOut') => { [cx, cy] = clampV(cx, cy, z); tl.to('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z, duration: d, ease: e }, t); if (typeof FGP === 'function') FGP(t, cx, cy, d, e); B(t); };
+const CUT = (t, cx, cy, z) => { [cx, cy] = clampV(cx, cy, z); tl.set('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z }, t); if (typeof FGP === 'function') FGP(t, cx, cy); };   // area change = CUT zoomed-in, then CAM out ("cut + push")
 // ---- hidden-until-cue elements: hid(el) at build, tl.set(HID,{autoAlpha:0},0) first thing in beats; DR = draw-on that also un-hides
 const HID = []; const hid = e => { HID.push(e); return e; };
 const hidId = id => hid(document.getElementById(id));

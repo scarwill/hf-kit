@@ -11,6 +11,11 @@ LONG vs SHORT: same kit. Short = `python3 build.py all.js audio.m4a index.html -
 Build: `cat ~/hf-kit/{premium.js,illus.js,life.js,helpers.js,icons.js,scenes.js,extras.js} video.js > all.js && python3 ~/hf-kit/build.py all.js audio.m4a [index.html --short]`
 - `thumb/` — premium (video-kit) thumbnails: thumbx.js, tshot.js (example: examples/thumb-premium-example.js); old style: thumb.js, shot.js, page.html
 
+Kit safety built in (no per-video code needed):
+- `CAM` / `CUT` / `WHIP` (and so `ZOOMIN`, `intro`, `outro`) clamp the camera inside the painted room (`clampV`) -> the next room never shows at a frame edge.
+- `talk()` is queued and run by `outro()` (or `flushTalks()`): it uses the mouth of the mood active at that moment (`MOODLOG` from `mood()`) -> never two mouths.
+- `say(par, sx, sy, w, h, text, id, fs, td)` (illus.js): speech bubble whose tail tip lands on the speaker (sx, sy just above the head). Use it instead of `bubble()` for people/robots talking.
+
 New chat setup:
 
 ```bash

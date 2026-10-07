@@ -58,7 +58,8 @@ function charB(par, x, y, s, p, o = {}) {
   return M;
 }
 // mood(p, t, 'happy'|'worried'|'tired'|'surprised'|'neutral')
-function mood(p, t, m) {
+const MOODLOG = {};   // per character: [[t, mood]] (used by talk)
+function mood(p, t, m) { (MOODLOG[p] = MOODLOG[p] || []).push([t, m]);
   const show = { happy: 'mS', worried: 'mW', angry: 'mW', tired: 'mN', surprised: 'mO', neutral: 'mN' }[m];
   ['mS', 'mW', 'mO', 'mN'].forEach(k => tl.to('#' + p + k, { opacity: k === show ? 1 : 0, duration: .25 }, t));
   // worried = inner brow ends UP (sad), angry = inner ends down
@@ -69,6 +70,9 @@ const blink = (p, ts) => ts.forEach(t => tl.to('#' + p + 'eL,#' + p + 'eR', { sc
 const breathe = (p, t0, n = 7, d = 1.5) => tl.to('#' + p + 'B', { y: -6, duration: d, yoyo: true, repeat: n, ease: 'sine.inOut' }, t0);
 const wave = (p, t, side = 'aR') => tl.to('#' + p + side, { rotation: side === 'aR' ? -120 : 120, transformOrigin: '50% 0%', duration: .35, yoyo: true, repeat: 3 }, t);
 function bubble(par, x, y, w, h, txt, id, fs = 36, tailDx = -0.35) { const g = S('g', { id, filter: 'url(#fSh)' }, par); S('rect', { x, y, width: w, height: h, rx: h / 2, fill: '#f8fafc' }, g); S('path', { d: `M${x + w / 2 + tailDx * w - 20} ${y + h - 6} L${x + w / 2 + tailDx * w - 50} ${y + h + 60} L${x + w / 2 + tailDx * w + 30} ${y + h - 4} Z`, fill: '#f8fafc' }, g); if (txt) wtext(g, x + w / 2, y + h / 2 + fs * .36, txt, fs, '#0f172a', 'middle', 700); return g; }
+// say(): speech bubble whose tail TIP lands on (sx, sy) = just above / beside the speaker's head (use instead of bubble for people talking).
+// td < 0: bubble sits to the right of the tail, td > 0: to the left. Hidden until cue (hidId). Returns the bubble centre [cx, cy].
+function say(par, sx, sy, w, h, text, id, fs = 34, td = -.25) { const x = sx + 50 - w / 2 - td * w, y = sy - 60 - h; bubble(par, x, y, w, h, text, id, fs, td); if (typeof hidId === 'function') hidId(id); return [x + w / 2, y + h / 2]; }
 function thought(par, x, y, w, h, id, fromX, fromY) { const g = S('g', { id }, par); if (fromX != null) [[.25, 10], [.55, 16], [.85, 22]].forEach(([f, r]) => S('circle', { cx: fromX + (x + w * .25 - fromX) * f, cy: fromY + (y + h - fromY) * f, r, fill: '#f8fafc' }, g)); S('rect', { x, y, width: w, height: h, rx: Math.min(h / 2, 120), fill: '#f8fafc' }, g); return g; }
 // ---------- money objects ----------
 function coin(g, x, y, r, id) { const c = S('g', id ? { id } : {}, g); S('circle', { cx: x, cy: y + r * .12, r, fill: '#b45309' }, c); S('circle', { cx: x, cy: y, r, fill: '#fbbf24' }, c); S('circle', { cx: x, cy: y, r: r * .72, fill: 'none', stroke: '#f59e0b', 'stroke-width': r * .1 }, c); wtext(c, x, y + r * .36, '$', r * 1.05, '#92400e', 'middle', 800); return c; }

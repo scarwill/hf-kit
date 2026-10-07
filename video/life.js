@@ -16,7 +16,7 @@ function gauge(par, cx, cy, r, col, id) { const g = S('g', { id }, par); S('path
 function glowRing(par, cx, cy, r, col, id, w = 8) { return S('circle', { id, cx, cy, r, fill: 'none', stroke: col, 'stroke-width': w, opacity: .9 }, par); }
 // ENDING (every video): call last inside beats. Camera eases back to (cx,cy,z) as the last words finish, focus (selector of the final
 // visual) gets a pulse, then the screen fades to black. build.py makes the video TAIL s longer than the audio.
-function outro(cx, cy, z = .9, focus) { const T2 = END + (typeof TAIL === 'number' ? TAIL : 3.1); tl.set('#fadeEnd', { autoAlpha: 0 }, 0);
+function outro(cx, cy, z = .9, focus) { if (typeof flushTalks === 'function') flushTalks(); const T2 = END + (typeof TAIL === 'number' ? TAIL : 3.1); tl.set('#fadeEnd', { autoAlpha: 0 }, 0);
   CAM(END - .4, cx, cy, z, 2.8, 'sine.inOut');
   if (focus) tl.to(focus, { scale: 1.12, transformOrigin: '50% 50%', duration: .6, yoyo: true, repeat: 3, ease: 'sine.inOut' }, END + .1);
   tl.fromTo('#fadeEnd', { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.3, ease: 'power1.in' }, T2 - 1.4); tl.set({}, {}, T2); }

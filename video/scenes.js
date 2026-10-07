@@ -62,10 +62,16 @@ function bookPile(par, x, y, n) { const cols = ['#ef4444', '#3b82f6', '#22c55e',
 
 // ===== PRO LIFE: talking mouths, gestures, close-ups, background life (works on charB people and botB robots) =====
 // talk(p, from, to, base): mouth opens on every spoken word between two times (TW word timings). base = mouth to return to ('mS' happy, 'mW' worried, 'mN' neutral).
-function talk(p, t0, t1, base = 'mS') { const ws = TW.filter(w => w[0] >= t0 - .01 && w[0] < t1);
+// talk() is QUEUED and run by outro() (or flushTalks()) after all beats: it then picks the mouth of the mood active at t0
+// (happy mS, worried/angry mW, tired/neutral mN; surprised -> switches to happy) and stops at the next mood change -> never two mouths.
+function talkNow(p, t0, t1, base = 'mS') { const ws = TW.filter(w => w[0] >= t0 - .01 && w[0] < t1);
   ws.forEach((w, i) => { const nx = i + 1 < ws.length ? ws[i + 1][0] : w[0] + .3, op = Math.min(.17, Math.max(.07, (nx - w[0]) * .55));
     tl.set('#' + p + 'mO', { opacity: 1, scaleY: [1, .7, 1.2][i % 3], transformOrigin: '50% 50%' }, w[0]); tl.set('#' + p + base, { opacity: 0 }, w[0]);
     tl.set('#' + p + 'mO', { opacity: 0, scaleY: 1 }, w[0] + op); tl.set('#' + p + base, { opacity: 1 }, w[0] + op); }); B(t0); }
+const TALKQ = []; function talk(p, t0, t1, base) { TALKQ.push([p, t0, t1, base]); B(t0); }
+function flushTalks() { TALKQ.splice(0).forEach(([p, a, b, base]) => { const L = (MOODLOG[p] || []).slice().sort((x, y) => x[0] - y[0]); const prev = L.filter(x => x[0] <= a + .05).pop(), next = L.find(x => x[0] > a + .05);
+  let m = prev ? prev[1] : 'happy'; if (m === 'surprised') { mood(p, a, 'happy'); m = 'happy'; }
+  talkNow(p, a, next ? Math.min(b, next[0] - .05) : b, base || ({ happy: 'mS', worried: 'mW', angry: 'mW', tired: 'mN', neutral: 'mN' }[m] || 'mS')); }); }
 const HD = p => { let e = document.getElementById(p + 'H'); if (!e) { e = document.getElementById(p + 'E').parentNode; e.id = p + 'H'; } return '#' + p + 'H'; };
 const nod = (p, t, n = 2) => tl.to(HD(p), { rotation: 7, transformOrigin: '50% 100%', duration: .16, yoyo: true, repeat: n * 2 - 1, ease: 'sine.inOut' }, t);
 const shake = (p, t, n = 2) => { tl.to(HD(p), { x: -8, duration: .1, ease: 'sine.out' }, t); tl.to(HD(p), { x: 8, duration: .16, yoyo: true, repeat: n * 2 - 1, ease: 'sine.inOut' }, t + .1); tl.to(HD(p), { x: 0, duration: .1 }, t + .1 + .16 * n * 2); };
@@ -100,7 +106,7 @@ function fgBox(par, x, y, w, h, col = '#451a03') { const g = fgG(par); S('rect',
 // Transitions into a new area (use at the area's first phrase t INSTEAD of CUT; then FULL/CAM out as usual):
 // WHIP(t, cx,cy,z): fast pan from wherever the camera is to the new area's first shot (+ motion blur).
 // ZOOMIN(t, fx,fy, cx,cy,z): dive into an object (fx,fy) of the OLD area, then cut to the new area's first shot.
-function WHIP(t, cx, cy, z, d = .55) { tl.to('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z, duration: d, ease: 'power4.inOut' }, t - d + .05); FGP(t - d + .05, cx, cy, d, 'power4.inOut');
+function WHIP(t, cx, cy, z, d = .55) { [cx, cy] = clampV(cx, cy, z); tl.to('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z, duration: d, ease: 'power4.inOut' }, t - d + .05); FGP(t - d + .05, cx, cy, d, 'power4.inOut');
   tl.to('#world', { filter: 'blur(14px)', duration: d * .45, ease: 'power2.in' }, t - d + .05); tl.to('#world', { filter: 'blur(0px)', duration: d * .55, ease: 'power2.out' }, t - d * .55 + .05); B(t); }
 function ZOOMIN(t, fx, fy, cx, cy, z, d = .45) { tl.to('#world', { x: FW / 2 - fx * 7, y: FH / 2 - fy * 7, scale: 7, duration: d, ease: 'power3.in' }, t - d - .05); CUT(t - .05, cx, cy, z); B(t); }
 // Bouncy landing (squash & stretch) for props / people that drop or pop in

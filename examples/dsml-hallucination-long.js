@@ -1,4 +1,5 @@
 // Example LONG (1920x1080) DSML video — "Human vs AI hallucination" (6:44, 18 rooms). Uses extras.js. Build: cat premium illus life helpers icons scenes extras + this > all.js; python3 build.py all.js <audio>
+// Shows: say() bubbles aimed at the speaker, talk() + mood() mixing (kit picks the right mouth), lying person (charB in rotate(-90)), seated man with legs in front of the chair.
 // Human vs AI hallucination — LONG, Midnight Lab, Infographics-Show rooms. Hero = the robot AI + its fake paper; human side = the old man / brain.
 const ROSE = '#f472b6', AMB = LAB.warn, BLU = LAB.data, RED = LAB.bad, GRN = LAB.good, VIO = LAB.model, CYA = LAB.acc;
 // ---------- local drawing helpers ----------
@@ -36,6 +37,8 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
     S('rect', { x: X(570), y: Y(640), width: 380, height: 170, rx: 26, fill: '#9a3412' }, G); S('rect', { x: X(570), y: Y(640), width: 380, height: 26, rx: 13, fill: '#c2410c' }, G);
     S('rect', { x: X(545), y: Y(560), width: 90, height: 250, rx: 36, fill: '#7c2d12' }, G); S('rect', { x: X(885), y: Y(560), width: 90, height: 250, rx: 36, fill: '#7c2d12' }, G);
     S('rect', { x: X(590), y: Y(805), width: 30, height: 20, fill: '#451a03' }, G); S('rect', { x: X(900), y: Y(805), width: 30, height: 20, fill: '#451a03' }, G);
+    const lgs = S('g', { id: 'manLg' }, G); S('ellipse', { cx: X(724), cy: Y(668), rx: 34, ry: 26, fill: '#1f2a44' }, lgs); S('ellipse', { cx: X(796), cy: Y(668), rx: 34, ry: 26, fill: '#1f2a44' }, lgs);
+    [724, 796].forEach(x => { S('rect', { x: X(x - 18), y: Y(670), width: 36, height: 128, rx: 16, fill: '#1f2a44' }, lgs); S('ellipse', { cx: X(x + (x < 760 ? -8 : 8)), cy: Y(800), rx: 32, ry: 13, fill: '#0b1222' }, lgs); });
     S('path', { id: 'gl0', d: `M${X(732)} ${Y(415)} L${X(744)} ${Y(405)}`, stroke: '#fff', 'stroke-width': 5, 'stroke-linecap': 'round' }, G); hidId('gl0');
     // eyesight meter
     const es = S('g', { id: 'eyeS' }, G); S('rect', { x: X(600), y: Y(232), width: 330, height: 76, rx: 38, fill: '#0f172a', stroke: '#334155', 'stroke-width': 4 }, es); eyeBig(es, X(650), Y(270), .32, 'eyeSi'); S('rect', { x: X(705), y: Y(258), width: 200, height: 24, rx: 12, fill: '#1e293b' }, es); S('rect', { id: 'eyeSb', x: X(705), y: Y(258), width: 200, height: 24, rx: 12, fill: BLU }, es); hidId('eyeS');
@@ -46,7 +49,7 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
       else S('path', { d: 'M-80 -560 Q0 -690 80 -560 Z', fill: '#fde68a' }, M);
       hidId('tp' + k + 'B'); });
     // for the revisit: thought bubble with brain + fading eye signal
-    const tb = thought(G, X(930), Y(50), 440, 320, 'tb0', X(830), Y(380));
+    const tb = thought(G, X(930), Y(50), 440, 320, 'tb0', X(825), Y(370));
     eyeBig(tb, X(1290), Y(150), .42, 'tbEye'); S('path', { id: 'tbCab', d: `M${X(1245)} ${Y(158)} Q${X(1200)} ${Y(190)} ${X(1150)} ${Y(185)}`, stroke: BLU, 'stroke-width': 9, fill: 'none', 'stroke-dasharray': '18 10' }, tb);
     brainG(tb, X(1060), Y(190), .55, 'tbBr', false);
     flowerG(tb, X(1000), Y(320), 22, '#f472b6', 'tbI0'); faceSk(tb, X(1110), Y(300), .55, 'tbI1'); S('rect', { x: X(1060), y: Y(280), width: 100, height: 0, fill: 'none' }, tb); ic(tb, 'user', X(1230), Y(310), 50, '#fbbf24', 'tbI2');
@@ -54,6 +57,7 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
     pill(G, X(430), Y(70), 'CHARLES BONNET SYNDROME', '#fde68a', C.ink, 'cbs0', 30); hidId('cbs0');
     plant(G, X(1880), Y(820), 1.1); fgLeaves(G, X(-60), Y(1080), 1.2, 1); fgBox(G, X(1650), Y(990), 360, 200, '#3f1d0b');
     BT.push(() => {
+      tl.fromTo('#manLg', { autoAlpha: 0, scale: 0, transformOrigin: '50% 0%' }, { autoAlpha: 1, scale: 1, duration: .35, ease: 'back.out(1.8)' }, .9);
       let t = go('a man in his eighties'); CAM(t + .3, X(960), Y(540), 1, 2.4, 'sine.inOut'); breathe('man', t, 9, 1.6); blink('man', [t + 1.2, t + 4.6, t + 9, t + 14]); bgLife();
       t = W('his eyesight has been'); POP('#eyeS', t); BOING('#eyeS', t + .45, '50% 50%'); tl.fromTo('#eyeSb', { scaleX: 1, transformOrigin: '0% 50%' }, { scaleX: .25, duration: 1.6, ease: 'power2.inOut' }, W('fading')); tl.to('#eyeSi', { opacity: .4, duration: 1.2 }, W('fading')); mood('man', W('fading'), 'tired');
       t = W('and then he sees them'); OUT('#eyeS', t); CAM(t - .1, X(760), Y(440), 2.0, .6, 'power3.out'); mood('man', t + .1, 'surprised');
@@ -68,7 +72,7 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
       let t = go('thats exactly whats happening'); WHIP(t, X(960), Y(540), 1); mood('man', t, 'neutral'); blink('man', [t + 1, t + 6, t + 11]);
       t = W('charles bonnet'); POP('#cbs0', t - .2); BOING('#cbs0', t + .3, '50% 50%');
       t = W('lose a lot of their vision'); CAM(t - .3, X(900), Y(400), 1.2, 1.0); tl.set('#eyeSb', { scaleX: .25 }, t - .3); POP('#eyeS', t - .2); tl.to('#eyeSb', { scaleX: .06, duration: 1.2, transformOrigin: '0% 50%' }, t + .2);
-      t = W('as the signals from the eyes'); OUT('#eyeS', t - .2); POP('#tb0', t - .1); CAM(t, X(1100), Y(260), 1.45, 1.0); tl.to('#tbCab', { opacity: .15, duration: 1.8 }, W('fade') - .2); tl.to('#tbEye', { opacity: .35, duration: 1.4 }, W('fade') - .2);
+      t = W('as the signals from the eyes'); OUT('#eyeS,#cbs0', t - .2); POP('#tb0', t - .1); CAM(t, X(1100), Y(260), 1.45, 1.0); tl.to('#tbCab', { opacity: .15, duration: 1.8 }, W('fade') - .2); tl.to('#tbEye', { opacity: .35, duration: 1.4 }, W('fade') - .2);
       t = W('dont go quiet'); RING('tbR', t - .3, 3); PULSE('#tbBr', t, { s: 1.1, r: 3 });
       t = W('producing images'); ['tbI0', 'tbI1', 'tbI2'].forEach((id, k) => { tl.fromTo('#' + id, { autoAlpha: 0, x: -60 + k * 40, y: -110, scale: .3, transformOrigin: '50% 50%' }, { autoAlpha: 1, x: 0, y: 0, scale: 1, duration: .6, ease: 'back.out(1.6)' }, t + k * .3); }); B(t);
       CAM(t + 1.2, X(1000), Y(470), 1.0, 1.4); PULSE('#cf0,#cf1', t + 1.3, { s: 1.12 }); BOB('#tp0B,#tp1B,#tp2B,#tp3B', t + 1.4, 2, -14, .3);
@@ -85,7 +89,7 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
     chat(G, X(880), Y(150), 460, 70, BLU, 'ub1', '#fff', 'Papers on coffee & sleep?', 30, 'r'); hidId('ub1');
     const rows = [['Caffeine and Deep Sleep', 'Hart & Cole · 2019 · pp. 112–128'], ['Coffee Timing and REM', 'J. Moreno · 2021 · pp. 45–61'], ['Evening Espresso Study', 'Lind et al. · 2017 · pp. 9–22']];
     rows.forEach(([a, b], k) => { const y = Y(250 + k * 128); const g = S('g', { id: 'pr1' + k, filter: 'url(#fSh)' }, G); S('rect', { x: X(590), y, width: 640, height: 110, rx: 16, fill: '#fff' }, g); S('rect', { x: X(590), y, width: 12, height: 110, rx: 6, fill: CYA }, g); ic(g, 'paper', X(650), y + 55, 70, '#94a3b8'); txt(g, X(700), y + 48, a, 32, C.ink, 'start', 800); txt(g, X(700), y + 88, b, 24, '#64748b', 'start', 600); hidId('pr1' + k); });
-    stamp(G, X(1010), Y(440), 'DOES NOT EXIST', RED, 'st1a', 430, 44); stamp(G, X(1010), Y(568), 'DOES NOT EXIST', RED, 'st1b', 430, 44); hidId('st1a'); hidId('st1b');
+    stamp(G, X(930), Y(433), 'DOES NOT EXIST', RED, 'st1a', 380, 40); stamp(G, X(930), Y(561), 'DOES NOT EXIST', RED, 'st1b', 380, 40); hidId('st1a'); hidId('st1b');
     // woman at desk with laptop
     charB(G, X(250), Y(830), .78, 'u1', { hair: 'long', hairC: '#eab308', skin: SKIN[0], top: '#0ea5e9', topType: 'hoodie' });
     table(G, X(60), Y(640), 470, oy, '#78350f'); laptop(G, X(170), Y(470), .55, 'lp1'); S('rect', { x: X(195), y: Y(495), width: 180, height: 110, rx: 6, fill: '#1e3a8a' }, G);
@@ -93,7 +97,7 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
     S('rect', { x: X(440), y: Y(590), width: 46, height: 52, rx: 8, fill: '#f8fafc' }, G); S('path', { d: `M${X(486)} ${Y(600)} Q${X(510)} ${Y(615)} ${X(486)} ${Y(630)}`, stroke: '#f8fafc', 'stroke-width': 7, fill: 'none' }, G);
     // the robot AI
     botB(G, X(1600), Y(840), .72, 'b1');
-    bubble(G, X(1380), Y(250), 300, 90, '100% sure!', 'bb1', 38, .25); hidId('bb1'); sparkH(G, X(1600), Y(360), 1.2, '#fde047', 'sk1');
+    say(G, X(1530), Y(430), 300, 90, '100% sure!', 'bb1', 38, .3); sparkH(G, X(1720), Y(420), 1.1, '#fde047', 'sk1');
     fgLeaves(G, X(-60), Y(1080), 1.2, 1); fgBox(G, X(1550), Y(1000), 420, 200);
     BT.push(() => {
       let t = go('now somewhere else'); WHIP(t, X(960), Y(540), 1); blink('u1', [t + 1, t + 6.5, t + 12]); blink('b1', [t + 2, t + 8, t + 13]); breathe('b1', t, 9, 1.6);
@@ -164,8 +168,9 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
     // world outside
     const wg = S('g', { id: 'wd4' }, G); treeG(wg, X(220), Y(600), 1.1); sunG(wg, X(160), Y(170), 40); S('rect', { x: X(300), y: Y(700), width: 110, height: 100, rx: 10, fill: '#f8fafc' }, wg); S('path', { d: `M${X(410)} ${Y(720)} Q${X(450)} ${Y(750)} ${X(410)} ${Y(780)}`, stroke: '#f8fafc', 'stroke-width': 10, fill: 'none' }, wg);
     // head profile
+    const headD = `M${X(1000)} ${Y(800)} L${X(1000)} ${Y(700)} Q${X(820)} ${Y(690)} ${X(830)} ${Y(560)} L${X(780)} ${Y(520)} L${X(830)} ${Y(470)} Q${X(800)} ${Y(140)} ${X(1150)} ${Y(110)} Q${X(1520)} ${Y(110)} ${X(1530)} ${Y(430)} Q${X(1530)} ${Y(620)} ${X(1390)} ${Y(700)} L${X(1390)} ${Y(800)} Z`;
     S('path', { d: `M${X(1000)} ${Y(800)} L${X(1000)} ${Y(700)} Q${X(820)} ${Y(690)} ${X(830)} ${Y(560)} L${X(780)} ${Y(520)} L${X(830)} ${Y(470)} Q${X(800)} ${Y(140)} ${X(1150)} ${Y(110)} Q${X(1520)} ${Y(110)} ${X(1530)} ${Y(430)} Q${X(1530)} ${Y(620)} ${X(1390)} ${Y(700)} L${X(1390)} ${Y(800)} Z`, fill: '#0b1020', stroke: '#64748b', 'stroke-width': 10 }, G);
-    brainG(G, X(1180), Y(390), .95, 'br4'); S('rect', { id: 'dk4', x: X(880), y: Y(130), width: 640, height: 560, fill: '#020617', opacity: 0 }, G);
+    brainG(G, X(1180), Y(390), .95, 'br4'); S('path', { id: 'dk4', d: headD, fill: '#020617', opacity: 0 }, G);
     // sensors + wires
     eyeBig(G, X(640), Y(250), .45, 'se0'); earG(G, X(640), Y(440), 1, '#fca5a5', 'se1'); handG(G, X(640), Y(630), 1, '#fca5a5', 'se2');
     const wy = [250, 440, 630]; wy.forEach((y, k) => { S('path', { id: 'wr4' + k, class: 'draw', d: `M${X(700)} ${Y(y)} Q${X(860)} ${Y(y + (k - 1) * -40)} ${X(1020)} ${Y(390 + (k - 1) * 60)}`, stroke: BLU, 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' }, G); hidId('wr4' + k); dots(G, X(700), Y(y), 3, '#93c5fd', 'wd4' + k, 11); hidId('wd4' + k); });
@@ -214,7 +219,7 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
       let t = go('based on everything'); ZOOMIN(t, AO(4)[0] + 1180, AO(4)[1] + 90, X(430), Y(470), 1.4); CAM(t + .1, X(700), Y(470), 1.05, 1.6, 'power2.out'); eyes('#br5E', [t + 1, t + 5, t + 9, t + 13]);
       t = W('experienced before'); [0, 1, 2, 3].forEach(k => { POP('#mm5' + k, t + k * .15); tl.to('#mm5' + k, { x: [300, 130, -130, -270][k], y: [310, 350, 330, 210][k], scale: .2, autoAlpha: 0, transformOrigin: '50% 50%', duration: .7, ease: 'power2.in' }, t + 1.1 + k * .15); }); B(t);
       t = W('it constantly guesses'); DR('#ga5', t, { d: .5 }); POP('#gc5', t + .4); BOING('#gc5', t + .9, '50% 50%'); RING('rg5', t + .6, 1);
-      t = W('then it checks'); CAM(t - .2, X(1200), Y(430), 1.05, 1.2); POP('#ey5', t); DR('#sa5', t + .3, { d: .4 }); POP('#sg5', W('signals coming'));
+      t = W('then it checks'); CAM(t - .2, X(1000), Y(450), 1, 1.2); POP('#ey5', t); DR('#sa5', t + .3, { d: .4 }); POP('#sg5', W('signals coming'));
       t = W('when the guess and the signal match'); POP('#eq5', t + .2); t = W('you see the world'); POP('#ck5', t - .2); FADE('#wv5', t, { d: .6 }); glow(t); SPK('sk5', t);
       t = W('when they dont'); OUT('#eq5,#ck5', t - .2); FADE('#sh5', t, { d: .4 }); POP('#nq5', t + .3, { s: 2 }); SHAKE('#gc5', t + .4); tl.to('#wv5', { opacity: .3, duration: .4 }, t);
       t = W('updates its guess'); OUT('#nq5', t); tl.fromTo('#gp5', { autoAlpha: 0, scale: .5, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: .5, ease: 'back.out(1.7)' }, t + .1); B(t); POP('#ck5', t + .7); glow(t + .7);
@@ -240,26 +245,25 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
     // meters
     [[1630, 'SIGNAL', BLU, 'ms6'], [1790, 'GUESS', AMB, 'mg6']].forEach(([x, l, c, id]) => { const g = S('g', { id: id + 'G' }, G); S('rect', { x: X(x - 40), y: Y(300), width: 80, height: 380, rx: 20, fill: '#0f172a', stroke: '#334155', 'stroke-width': 5 }, g); S('rect', { id, x: X(x - 30), y: Y(310), width: 60, height: 360, rx: 14, fill: c }, g); txt(g, X(x), Y(730), l, 30, c, 'middle', 800); hidId(id + 'G'); });
     ghostG(G, X(1400), Y(600), .9, 'gh6'); hidId('gh6');
-    plant(G, X(1880), Y(820), 1); fgHeads(G, X(-60), Y(1010), 1); fgBox(G, X(1620), Y(1000), 360, 200);
+    plant(G, X(640), Y(820), 1); fgHeads(G, X(-60), Y(1010), 1); fgBox(G, X(1620), Y(1000), 360, 200);
     BT.push(() => {
-      let t = go('many neuroscientists'); WHIP(t, X(960), Y(540), 1); nod('n6a', t + .4); nod('n6b', t + .7); point('n6a', t + .5, 'aR', -110, 2); blink('n6a', [t + 2, t + 9, t + 17]); blink('n6b', [t + 3, t + 11, t + 22]); talk('n6b', t, t + 2.5);
+      let t = go('many neuroscientists'); WHIP(t, X(960), Y(540), 1); nod('n6a', t + .4); nod('n6b', t + .7); point('n6a', t + .5, 'aL', 150, 2); blink('n6a', [t + 2, t + 9, t + 17]); blink('n6b', [t + 3, t + 11, t + 22]); talk('n6b', t, t + 2.5);
       t = W('direct recording'); POP('#rc6', t - .4); tl.to('#rc6 circle', { opacity: .3, duration: .3, yoyo: true, repeat: 3 }, t); POP('#xr6', t + .5, { s: 2 });
       t = W('best guess'); OUT('#rc6,#xr6', t - .4); POP('#bw6', t - .2); BOING('#bw6', t + .3); BOB('#bl6', t + .5, 12, -14, .9); CAM(t, X(1150), Y(470), 1.15, 1.2);
       t = W('kept in check by your'); DR('#rp6', t, { d: .5 }); POP('#an6', t + .3); BOING('#an6', t + .8);
       t = W('generating the world'); [0, 1, 2, 3].forEach(k => { POP('#gw6' + k, t - .2 + k * .2); BOING('#gw6' + k, t + .3 + k * .2, '50% 50%'); });
       t = W('anchored to whats'); RING('rg6', t, 3); PULSE('#an6', t + .2, { s: 1.08 }); glow(t + .2);
-      t = W('when that anchor slips'); CAM(t - .6, X(1200), Y(480), 1.0, 1.0); OUT('#gw60,#gw61,#gw62,#gw63', t - .5); OUT('#rp6', t); tl.set('#rb6', { autoAlpha: 1 }, t); tl.to('#bw6', { y: -150, rotation: 6, transformOrigin: '50% 100%', duration: 2.4, ease: 'power1.out' }, t); dim(t, 1.5); mood('n6a', t, 'surprised'); B(t);
+      t = W('when that anchor slips'); CAM(t - .6, X(1200), Y(440), .95, 1.0); OUT('#gw60,#gw61,#gw62,#gw63', t - .5); OUT('#rp6', t); tl.set('#rb6', { autoAlpha: 1 }, t); tl.to('#bw6', { y: -60, rotation: 6, transformOrigin: '50% 100%', duration: 2.4, ease: 'power1.out' }, t); dim(t, 1.5); mood('n6a', t, 'surprised'); B(t);
       t = W('signals become weak'); FADE('#ms6G,#mg6G', t - .8); tl.fromTo('#ms6', { scaleY: 1, transformOrigin: '50% 100%' }, { scaleY: .2, duration: 1.2, ease: 'power2.inOut' }, t); tl.to('#an6', { opacity: .35, duration: 1 }, t);
       t = W('become too strong'); tl.fromTo('#mg6', { scaleY: .5, transformOrigin: '50% 100%' }, { scaleY: 1, duration: 1.0, ease: 'power2.out' }, t - .3); tl.to('#bl6', { scale: 1.25, transformOrigin: '50% 50%', duration: 1, ease: 'back.out(1.5)' }, t - .2); B(t);
       t = W('guesses can take over'); PULSE('#mg6G', t, { s: 1.06 }); SHAKE('#bw6', t);
-      t = W('you perceive something'); POP('#gh6', t); tl.to('#gh6', { y: -16, duration: .7, yoyo: true, repeat: 3, ease: 'sine.inOut' }, t + .5); mood('n6b', t + .2, 'surprised'); CAM(t, X(1250), Y(470), 1.0, .9);
+      t = W('you perceive something'); POP('#gh6', t); tl.to('#gh6', { y: -16, duration: .7, yoyo: true, repeat: 3, ease: 'sine.inOut' }, t + .5); mood('n6b', t + .2, 'surprised'); CAM(t, X(1250), Y(440), .95, .9);
     });
   }
   // =============== AREA 7: bedroom — other causes, and healthy people too ===============
   { const [ox, oy] = AO(7); const X = v => ox + v, Y = v => oy + v;
     scene(BG, defs, ox, oy);
     windowPane(G, X(590), Y(390), 230, 210, 'url(#gNight)'); S('circle', { cx: X(650), cy: Y(440), r: 22, fill: '#e0f2fe' }, G);
-    S('ellipse', { cx: X(330), cy: Y(560), rx: 190, ry: 250, fill: '#93c5fd', opacity: .08 }, G);
     // cause panels
     const pan = (k, lab) => { const x = X(140 + k * 420), g = S('g', { id: 'cz7' + k }, G); S('rect', { x, y: Y(70), width: 330, height: 260, rx: 18, fill: '#0f172a', stroke: ['#818cf8', '#94a3b8', ROSE, AMB][k], 'stroke-width': 6 }, g); txt(g, x + 165, Y(310), lab, 28, '#e2e8f0', 'middle', 800); hidId('cz7' + k); return [g, x + 165]; };
     { const [g, cx] = pan(0, 'NO SLEEP'); S('path', { d: `M${cx - 50} ${Y(120)} A60 60 0 1 0 ${cx - 10} ${Y(240)} A48 48 0 1 1 ${cx - 50} ${Y(120)} Z`, fill: '#fde68a' }, g); clock(g, cx + 70, Y(180), 44, 'ck7'); }
@@ -277,7 +281,7 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
     const cr = S('g', { id: 'cr7' }, G); S('rect', { x: X(322), y: Y(420), width: 16, height: 400, fill: '#78350f' }, cr); S('rect', { x: X(260), y: Y(805), width: 140, height: 16, rx: 8, fill: '#78350f' }, cr); S('path', { d: `M${X(330)} ${Y(440)} L${X(250)} ${Y(500)} L${X(240)} ${Y(720)} L${X(420)} ${Y(720)} L${X(410)} ${Y(500)} Z`, fill: '#92400e' }, cr); S('rect', { x: X(280), y: Y(395), width: 100, height: 30, rx: 8, fill: '#1f2937' }, cr); S('rect', { x: X(300), y: Y(365), width: 60, height: 40, rx: 6, fill: '#1f2937' }, cr); hidId('cr7');
     const shp = S('g', { id: 'sh7' }, G); person(shp, X(330), Y(820), 1.2, '#020617'); [-22, 22].forEach(dx => S('circle', { cx: X(330 + dx), cy: Y(545), r: 8, fill: '#f87171' }, shp)); hidId('sh7');
     [0, 1, 2].forEach(k => { S('path', { id: 'sw7' + k, d: `M${X(1180 - k * 30)} ${Y(560 - k * 25)} Q${X(1150 - k * 30)} ${Y(600)} ${X(1180 - k * 30)} ${Y(640 + k * 25)}`, stroke: '#fde68a', 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' }, G); hidId('sw7' + k); });
-    bubble(G, X(900), Y(400), 260, 90, 'Sam…?', 'nm7', 40, .3); hidId('nm7');
+    txt(G, X(1010), Y(500), '"Sam…?"', 48, '#fde68a', 'middle', 800, 'nm7'); hidId('nm7');
     fgBox(G, X(1640), Y(1000), 380, 200, '#1e1b4b'); fgLeaves(G, X(-60), Y(1080), 1.1, 1);
     BT.push(() => {
       let t = go('something similar can happen'); ZOOMIN(t, AO(0)[0] + 1060, AO(0)[1] + 190, X(960), Y(250), 1.25); CAM(t + .1, X(960), Y(540), 1, 1.5, 'power2.out'); breathe('p7', t, 10, 1.4);
@@ -300,9 +304,9 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
     charB(G, X(820), Y(830), .8, 'k8', { hair: 'long', hairC: '#c2410c', skin: SKIN[0], top: '#a855f7', topType: 'blazer' });
     ringH(G, X(820), Y(580), 290, '#fde68a', 'rg8');
     const sense = (cx, cy, id, f) => { const g = S('g', { id }, G); S('circle', { cx, cy, r: 82, fill: '#0f172a', stroke: BLU, 'stroke-width': 6 }, g); f(g); hidId(id); };
-    sense(X(480), Y(300), 'sn80', g => eyeBig(g, X(480), Y(300), .55)); sense(X(820), Y(150), 'sn81', g => earG(g, X(820), Y(150), .9, '#fca5a5')); sense(X(1160), Y(300), 'sn82', g => handG(g, X(1160), Y(300), 1, '#fca5a5'));
+    sense(X(480), Y(340), 'sn80', g => eyeBig(g, X(480), Y(340), .55)); sense(X(820), Y(200), 'sn81', g => earG(g, X(820), Y(200), .9, '#fca5a5')); sense(X(1160), Y(340), 'sn82', g => handG(g, X(1160), Y(340), 1, '#fca5a5'));
     ghostG(G, X(1420), Y(560), 1, 'gh8'); hidId('gh8'); XM(G, X(1420), Y(560), 100, 'x8'); hidId('x8');
-    check(G, X(560), Y(330), 46, 'ok8'); hidId('ok8');
+    check(G, X(560), Y(360), 46, 'ok8'); hidId('ok8');
     heads(G, X(-100), X(2020), Y(1010), 13); plant(G, X(1840), Y(830), 1.1);
     BT.push(() => {
       let t = go('and heres the key detail'); WHIP(t, X(960), Y(540), 1); blink('k8', [t + 1.2, t + 6, t + 10]); breathe('k8', t, 6);
@@ -341,41 +345,41 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
   // =============== AREA 10: training — predict the next word ===============
   { const [ox, oy] = AO(10); const X = v => ox + v, Y = v => oy + v;
     scene(BG, defs, ox, oy);
-    shelf(G, X(30), Y(160), 300, 660, 'shA10'); shelf(G, X(1610), Y(160), 290, 660, 'shB10');
+    shelf(G, X(30), Y(160), 300, 660, 'shA10'); shelf(G, X(1700), Y(160), 210, 660, 'shB10');
     botB(G, X(960), Y(830), .62, 'b10');
     const bd = S('g', { id: 'bd10' }, G); S('rect', { x: X(420), y: Y(60), width: 1080, height: 350, rx: 20, fill: '#f8fafc', stroke: '#475569', 'stroke-width': 6, filter: 'url(#fSh)' }, bd); hidId('bd10');
     const words = [['The', '#fca5a5'], ['cat', '#fdba74'], ['sat', '#86efac'], ['on', '#93c5fd'], ['the', '#d8b4fe'], ['mat', '#fde047'], ['and', '#5eead4'], ['purred', '#f9a8d4']]; let tx = X(452);
     words.forEach(([w, c], k) => { const ww = w.length * 21 + 44; token(bd, tx + ww / 2, Y(130), w, c, 'tw10' + k); if (k >= 5) hidId('tw10' + k); else hidId('tw10' + k); if (k === 5) { S('rect', { id: 'slot10', x: tx, y: Y(94), width: ww, height: 72, rx: 16, fill: 'none', stroke: AMB, 'stroke-width': 5, 'stroke-dasharray': '12 8' }, bd); hidId('slot10'); } tx += ww + 14; });
     const pp = S('g', { id: 'pp10' }, bd); [['mat', .72, GRN], ['floor', .18, BLU], ['moon', .03, '#a855f7']].forEach(([w, v, c], k) => { const y = Y(215 + k * 62); txt(pp, X(640), y + 36, w, 34, C.ink, 'end', 700); S('rect', { x: X(670), y: y + 8, width: 560, height: 38, rx: 12, fill: '#e2e8f0' }, pp); S('rect', { id: 'pb10' + k, x: X(670), y: y + 8, width: 560 * v, height: 38, rx: 12, fill: c }, pp); txt(pp, X(670) + 560 * v + 14, y + 38, Math.round(v * 100) + '%', 30, C.ink, 'start', 700); }); hidId('pp10');
-    ['#ef4444', '#3b82f6', '#22c55e', '#eab308', '#a855f7', '#f97316'].forEach((c, k) => { book(G, k < 3 ? X(250) : X(1690), Y(300 + (k % 3) * 160), c, 'bk10' + k); hidId('bk10' + k); });
+    ['#ef4444', '#3b82f6', '#22c55e', '#eab308', '#a855f7', '#f97316'].forEach((c, k) => { book(G, k < 3 ? X(250) : X(1760), Y(300 + (k % 3) * 160), c, 'bk10' + k); hidId('bk10' + k); });
     ringH(G, X(960), Y(560), 150, CYA, 'rg10');
     // what it learns to produce
     const fc = card(G, X(400), Y(470), 360, 190, 'fc10', '#f8fafc'); ['The results show a', 'clear and lasting', 'effect on memory.'].forEach((l, k) => { tln(fc, X(425), Y(530 + k * 48), l, 30, C.ink, 'fl10', 'start', false, 600); }); hidId('fc10');
     const mg = S('g', { id: 'mg10' }, G); S('path', { d: `M${X(860)} ${Y(560)} L${X(790)} ${Y(520)} L${X(790)} ${Y(640)} L${X(860)} ${Y(600)} Z`, fill: '#fde047', stroke: C.ink, 'stroke-width': 5 }, mg); [0, 1].forEach(k => S('path', { d: `M${X(770 - k * 24)} ${Y(540 - k * 10)} Q${X(750 - k * 24)} ${Y(580)} ${X(770 - k * 24)} ${Y(620 + k * 10)}`, stroke: '#fde047', 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' }, mg)); hidId('mg10');
-    [['Citation', ['Hart, J.', '(2019) p.4'], BLU], ['Legal', ['Section 4', 'therefore'], '#a855f7'], ['Biography', ['Born 1952', 'in Ohio'], AMB]].forEach(([h, l, c], k) => { docSheet(G, X(1100 + k * 165), Y(440), 150, 'dc10' + k, l, c); txt(G, X(1175 + k * 165), Y(470), h, 18, '#fff', 'middle', 800, 'dh10' + k); hidId('dc10' + k); hidId('dh10' + k); });
+    [['CITATION', 'paper', 'Hart (2019)', BLU], ['LEGAL', 'scale', 'Section 4', '#a855f7'], ['BIOGRAPHY', 'badge', 'Born 1952', AMB]].forEach(([h, n, l, c], k) => { const x = X(1055 + k * 205); const g = card(G, x, Y(400), 195, 255, 'dc10' + k, '#f8fafc'); S('rect', { x, y: Y(400), width: 195, height: 54, rx: 18, fill: c }, g); S('rect', { x, y: Y(434), width: 195, height: 20, fill: c }, g); txt(g, x + 97, Y(437), h, 24, '#fff', 'middle', 800); ic(g, n, x + 97, Y(535), 100, c); txt(g, x + 97, Y(628), l, 26, C.ink, 'middle', 700); hidId('dc10' + k); });
     gauge(G, X(1290), Y(800), 70, GRN, 'gg10'); hidId('gg10');
     pill(G, X(650), Y(230), 'SOUNDS RIGHT', AMB, C.ink, 'sr10', 40); pill(G, X(1270), Y(230), 'IS RIGHT', GRN, C.ink, 'ir10', 40); hidId('sr10'); hidId('ir10');
     const ne = S('g', { id: 'ne10' }, G); S('circle', { cx: X(960), cy: Y(230), r: 52, fill: '#fff', stroke: C.ink, 'stroke-width': 6 }, ne); S('path', { d: `M${X(932)} ${Y(216)} L${X(988)} ${Y(216)} M${X(932)} ${Y(246)} L${X(988)} ${Y(246)} M${X(978)} ${Y(192)} L${X(942)} ${Y(268)}`, stroke: RED, 'stroke-width': 9, 'stroke-linecap': 'round' }, ne); hidId('ne10');
     fgHeads(G, X(-60), Y(1010), 1); fgBox(G, X(1650), Y(1000), 360, 200);
     BT.push(() => {
       let t = go('during training'); WHIP(t, X(960), Y(540), 1); blink('b10', [t + 3, t + 9, t + 15, t + 21]); breathe('b10', t, 10);
-      t = W('enormous amount'); [0, 1, 2, 3, 4, 5].forEach(k => { const sx = k < 3 ? 250 : 1690, sy = 300 + (k % 3) * 160; tl.set('#bk10' + k, { autoAlpha: 1 }, t + k * .2); tl.fromTo('#bk10' + k, { x: 0, y: 0, rotation: 0, scale: 1, transformOrigin: '50% 50%' }, { x: 960 - sx, y: 520 - sy, rotation: 360, scale: .3, duration: .8, ease: 'power2.in' }, t + k * .2); tl.set('#bk10' + k, { autoAlpha: 0 }, t + k * .2 + .8); }); RING('rg10', t + .8, 3); B(t);
+      t = W('enormous amount'); [0, 1, 2, 3, 4, 5].forEach(k => { const sx = k < 3 ? 250 : 1760, sy = 300 + (k % 3) * 160; tl.set('#bk10' + k, { autoAlpha: 1 }, t + k * .2); tl.fromTo('#bk10' + k, { x: 0, y: 0, rotation: 0, scale: 1, transformOrigin: '50% 50%' }, { x: 960 - sx, y: 520 - sy, rotation: 360, scale: .3, duration: .8, ease: 'power2.in' }, t + k * .2); tl.set('#bk10' + k, { autoAlpha: 0 }, t + k * .2 + .8); }); RING('rg10', t + .8, 3); B(t);
       t = W('learns one skill'); POP('#bd10', t - .2); CAM(t, X(960), Y(380), 1.1, 1.0);
       t = W('given some words'); [0, 1, 2, 3, 4].forEach(k => POP('#tw10' + k, t + k * .15)); POP('#slot10', t + .9);
       t = W('most likely to come next'); POP('#pp10', t - .4); [0, 1, 2].forEach(k => BAR('#pb10' + k, t - .1 + k * .15, 1, .6)); talk('b10', t - .8, t + 1);
       t = W('come next'); OUT('#slot10', t + .7); POP('#tw105', t + .7); BOING('#tw105', t + 1.2, '50% 50%'); PULSE('#pb100', t + .7);
       t = W('then the next'); POP('#tw106', t + .1); BOING('#tw106', t + .55, '50% 50%'); t = findp('then the next', t + .3) ?? t + 1; POP('#tw107', t + .1); BOING('#tw107', t + .55, '50% 50%');
-      t = W('over time'); OUT('#pp10', t - .2); CAM(t, X(960), Y(560), 1, 1.2); POP('#gg10', t); tl.fromTo('#gg10N', { rotation: -80, transformOrigin: '50% 100%' }, { rotation: 70, duration: 2, ease: 'power2.out' }, t + .4); mood('b10', t + 1.5, 'happy');
+      t = W('over time'); OUT('#pp10,#bd10,#tw100,#tw101,#tw102,#tw103,#tw104,#tw105,#tw106,#tw107', t - .2); CAM(t, X(960), Y(560), 1, 1.2); POP('#gg10', t); tl.fromTo('#gg10N', { rotation: -80, transformOrigin: '50% 100%' }, { rotation: 70, duration: 2, ease: 'power2.out' }, t + .4); mood('b10', t + 1.5, 'happy');
       t = W('fluent sentences'); POP('#fc10', t - .2); tl.fromTo('.fl10', { autoAlpha: 0, x: -20 }, { autoAlpha: 1, x: 0, duration: .3, stagger: .25 }, t);
       t = W('confident tone'); POP('#mg10', t - .2); tl.to('#mg10', { x: -6, duration: .08, yoyo: true, repeat: 7 }, t + .3); jump('b10', t);
-      t = W('research citation'); POP('#dc100,#dh100', t - .1); POP('#dc101,#dh101', W('legal argument') - .1); POP('#dc102,#dh102', W('biography') - .1);
-      t = W('but sounding right'); OUT('#bd10,#tw100,#tw101,#tw102,#tw103,#tw104,#tw105,#tw106,#tw107', t - .3); POP('#sr10', t); POP('#ir10', W('being right')); POP('#ne10', W('not the same'), { s: .3 }); CAM(t, X(960), Y(420), 1.05, 1.0);
+      t = W('research citation'); POP('#dc100', t - .1); BOING('#dc100', t + .35); POP('#dc101', W('legal argument') - .1); BOING('#dc101', W('legal argument') + .35); POP('#dc102', W('biography') - .1); BOING('#dc102', W('biography') + .35);
+      t = W('but sounding right'); POP('#sr10', t); POP('#ir10', W('being right')); POP('#ne10', W('not the same'), { s: .3 }); CAM(t, X(960), Y(420), 1.05, 1.0);
     });
   }
   // =============== AREA 11: known facts vs the made-up paper ===============
   { const [ox, oy] = AO(11); const X = v => ox + v, Y = v => oy + v;
     scene(BG, defs, ox, oy);
-    clock(G, X(140), Y(130), 46); plant(G, X(90), Y(820), 1);
+    clock(G, X(140), Y(130), 46); shelf(G, X(40), Y(420), 240, 400); plant(G, X(800), Y(820), 1); crate(G, X(1180), Y(700), 160, 120); lamp(G, X(1160), Y(60));
     botB(G, X(520), Y(830), .7, 'b11');
     S('ellipse', { id: 'hl11', cx: X(520), cy: Y(375), rx: 80, ry: 16, fill: 'none', stroke: '#fde047', 'stroke-width': 9 }, G); hidId('hl11');
     const qa = card(G, X(860), Y(80), 600, 110, 'qa11', '#1e293b'); txt(qa, X(1160), Y(150), 'Capital of France?', 44, '#f8fafc'); hidId('qa11');
@@ -385,9 +389,9 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
     const qb = card(G, X(860), Y(80), 600, 110, 'qb11', '#1e293b'); txt(qb, X(1160), Y(150), 'Papers on moon coffee?', 40, '#f8fafc'); hidId('qb11');
     [['rare', 960], ['obscure', 1160], ['made up', 1370]].forEach(([w, x], k) => { pill(G, X(x), Y(230), w, '#fde68a', C.ink, 'tg11' + k, 28); hidId('tg11' + k); });
     fakePaper(G, X(860), Y(300), 640, 'fp11', 'Moon Coffee and Memory', 'Dr. Elena Vasquez', 'J. Sleep Sci. · 2018'); ['fp11', 'fp11t', 'fp11a', 'fp11m'].forEach(hidId);
-    [[110, 390, 560, 60], [110, 470, 420, 50], [110, 545, 380, 46]].forEach(([x, y, w, h], k) => { S('rect', { id: 'tp11' + k, x: X(860 + x - 20), y: Y(y - 2), width: w, height: h, rx: 10, fill: 'none', stroke: AMB, 'stroke-width': 5, 'stroke-dasharray': '14 9' }, G); hidId('tp11' + k); });
+    { const px = X(860), py = Y(300), pw = 640, ph = pw * .62; [[.3, .068], [.55, .05], [.78, .045]].forEach(([f, r], k) => { const fs = pw * r, base = py + ph * f; S('rect', { id: 'tp11' + k, x: px + 22, y: base - fs * .82 - 10, width: pw - 44, height: fs * 1.05 + 20, rx: 10, fill: 'none', stroke: AMB, 'stroke-width': 5, 'stroke-dasharray': '14 9' }, G); hidId('tp11' + k); }); }
     S('path', { id: 'tl11b', class: 'draw', d: `M${X(1510)} ${Y(340)} L${X(1600)} ${Y(320)}`, stroke: '#64748b', 'stroke-width': 8, 'stroke-dasharray': '14 10' }, G); hidId('tl11b');
-    thought(G, X(130), Y(200), 200, 140, 'th11', X(420), Y(360)); check(G, X(230), Y(270), 44, 'thc11'); hidId('th11'); hidId('thc11');
+    thought(G, X(130), Y(200), 200, 140, 'th11', X(455), Y(420)); check(G, X(230), Y(270), 44, 'thc11'); hidId('th11'); hidId('thc11');
     const fcb = S('g', { id: 'fcb11' }, G); S('rect', { x: X(1560), y: Y(470), width: 320, height: 300, rx: 24, fill: 'rgba(255,255,255,.04)', stroke: '#64748b', 'stroke-width': 6, 'stroke-dasharray': '22 14' }, fcb); txt(fcb, X(1720), Y(530), 'FACT CHECK', 32, '#94a3b8'); ic(fcb, 'magnify', X(1720), Y(650), 130, '#475569'); hidId('fcb11'); XM(G, X(1720), Y(640), 90, 'xf11'); hidId('xf11');
     fgBox(G, X(-80), Y(1000), 360, 200); fgHeads(G, X(1700), Y(1010), 1);
     BT.push(() => {
@@ -398,7 +402,7 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
       t = W('the model often still'); OUT('#tg110,#tg111,#tg112', t - .2); POP('#fp11', W('plausiblesounding') - .3); talk('b11', t, t + 3.5); liar('b11', W('plausiblesounding'));
       t = W('a research paper title'); POP('#fp11t', t + .2); CAM(t - .2, X(1180), Y(450), 1.3, 1.0);
       t = W('an authors name'); POP('#fp11a', t + .1); t = W('a date that seems'); POP('#fp11m', t + .2);
-      t = W('it isnt lying'); CAM(t - .2, X(560), Y(470), 1.2, 1.0); POP('#hl11', t); BOB('#hl11', t + .4, 3, -8, .4); mood('b11', t, 'happy');
+      t = W('it isnt lying'); CAM(t - .2, X(640), Y(480), 1.1, 1.0); POP('#hl11', t); BOB('#hl11', t + .4, 3, -8, .4); mood('b11', t, 'happy');
       t = W('it doesnt know its wrong'); POP('#th11', t - .1); POP('#thc11', t + .3); nod('b11', t + .2);
       t = W('there isnt a separate part'); OUT('#th11,#thc11,#hl11', t - .2); CAM(t, X(1200), Y(480), 1.0, 1.2); FADE('#fcb11', t + .2); t = W('against reality'); DR('#tl11b', t - .6, { d: .4 }); POP('#xf11', t, { s: 2 }); dim(t, 1.1);
       t = W('simply generating'); CAM(t - .2, X(1180), Y(460), 1.3, 1.0); [0, 1, 2].forEach(k => POP('#tp11' + k, W('fits the pattern') - .3 + k * .15)); PULSE('#fp11', W('fits the pattern') + .5, { s: 1.03 });
@@ -416,12 +420,12 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
     const bz = S('g', { id: 'bz12' }, G); S('ellipse', { cx: X(610), cy: Y(618), rx: 44, ry: 15, fill: '#7f1d1d' }, bz); S('ellipse', { cx: X(610), cy: Y(608), rx: 38, ry: 15, fill: RED }, bz);
     sparkH(G, X(610), Y(580), 1.2, '#fde047', 'sk12'); [0, 1, 2].forEach(k => { pill(G, X(700 + k * 70), Y(520), '+1', '#a3e635', C.ink, 'po12' + k, 40); hidId('po12' + k); });
     // exam
-    const ex = S('g', { id: 'ex12' }, G); S('rect', { x: X(1080), y: Y(60), width: 740, height: 420, rx: 16, fill: '#f8fafc', stroke: '#94a3b8', 'stroke-width': 6, filter: 'url(#fSh)' }, ex); txt(ex, X(1450), Y(118), 'EXAM', 42, C.ink);
+    const ex = S('g', { id: 'ex12' }, G); S('rect', { x: X(1080), y: Y(40), width: 740, height: 370, rx: 16, fill: '#f8fafc', stroke: '#94a3b8', 'stroke-width': 6, filter: 'url(#fSh)' }, ex); txt(ex, X(1450), Y(92), 'EXAM', 40, C.ink);
     const qs = ['Q1  Year of the treaty?', 'Q2  Capital of Peru?', 'Q3  Atomic number of tin?', 'Q4  Author of the poem?'];
-    qs.forEach((q, k) => { const y = Y(185 + k * 78); txt(ex, X(1110), y, q, 30, '#334155', 'start', 700); S('path', { d: `M${X(1560)} ${y + 6} L${X(1720)} ${y + 6}`, stroke: '#94a3b8', 'stroke-width': 4 }, ex); });
+    qs.forEach((q, k) => { const y = Y(155 + k * 70); txt(ex, X(1110), y, q, 30, '#334155', 'start', 700); S('path', { d: `M${X(1560)} ${y + 6} L${X(1720)} ${y + 6}`, stroke: '#94a3b8', 'stroke-width': 4 }, ex); });
     hidId('ex12');
-    [['1648', 0], ['Lima', 1], ['42', 2], ['Keats', 3]].forEach(([a, k]) => { txt(G, X(1640), Y(180 + k * 78), a, 34, '#1d4ed8', 'middle', 800, 'an12' + k); hidId('an12' + k); });
-    [['x', 0], ['c', 1], ['x', 2], ['c', 3]].forEach(([m, k]) => { if (m === 'x') XM(G, X(1775), Y(172 + k * 78), 20, 'mk12' + k); else check(G, X(1775), Y(172 + k * 78), 22, 'mk12' + k); hidId('mk12' + k); });
+    [['1648', 0], ['Lima', 1], ['42', 2], ['Keats', 3]].forEach(([a, k]) => { txt(G, X(1640), Y(150 + k * 70), a, 34, '#1d4ed8', 'middle', 800, 'an12' + k); hidId('an12' + k); });
+    [['x', 0], ['c', 1], ['x', 2], ['c', 3]].forEach(([m, k]) => { if (m === 'x') XM(G, X(1775), Y(143 + k * 70), 20, 'mk12' + k); else check(G, X(1775), Y(143 + k * 70), 22, 'mk12' + k); hidId('mk12' + k); });
     charB(G, X(1450), Y(830), .7, 'st12', { kid: true, hair: 'short', hairC: '#c2410c', skin: SKIN[0], top: '#f97316', topType: 'tshirt' });
     S('rect', { x: X(1270), y: Y(660), width: 360, height: 26, rx: 8, fill: '#a16207' }, G); S('rect', { x: X(1290), y: Y(686), width: 320, height: 134, fill: '#854d0e' }, G);
     const pn = S('g', { id: 'pn12' }, G); ic(pn, 'pen', X(1560), Y(620), 70, AMB); hidId('pn12');
@@ -468,7 +472,7 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
   // =============== AREA 14: confabulation ===============
   { const [ox, oy] = AO(14); const X = v => ox + v, Y = v => oy + v;
     scene(BG, defs, ox, oy);
-    frameP(G, X(80), Y(300), 150, 110, 'dp14', '#ca8a04'); frameP(G, X(80), Y(440), 150, 110, 'dq14', '#ca8a04'); clock(G, X(1820), Y(320), 44); plant(G, X(1860), Y(820), 1);
+    frameP(G, X(80), Y(300), 150, 110, 'dp14', '#ca8a04'); frameP(G, X(80), Y(440), 150, 110, 'dq14', '#ca8a04'); clock(G, X(1500), Y(130), 44); plant(G, X(170), Y(820), 1); windowPane(G, X(1620), Y(100), 240, 230, 'url(#gNight)');
     const wa = card(G, X(620), Y(70), 680, 130, 'wa14', '#1e293b'); txt(wa, X(960), Y(160), 'HALLUCINATION', 66, '#fde68a'); hidId('wa14'); S('path', { id: 'sl14', class: 'draw', d: `M${X(640)} ${Y(140)} L${X(1280)} ${Y(130)}`, stroke: RED, 'stroke-width': 12, 'stroke-linecap': 'round' }, G); hidId('sl14');
     const wb = card(G, X(620), Y(70), 680, 130, 'wb14', '#14532d'); txt(wb, X(960), Y(160), 'CONFABULATION', 66, '#bbf7d0'); hidId('wb14');
     charB(G, X(520), Y(830), .78, 'dr14', { hair: 'short', hairC: '#5b3a29', skin: SKIN[0], top: '#f1f5f9', topType: 'blazer', glasses: true });
@@ -476,9 +480,9 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
     charB(G, X(1100), Y(830), .76, 'pt14', { hair: 'long', hairC: '#d1d5db', skin: SKIN[0], top: '#0d9488', topType: 'tshirt' });
     const bq = S('g', { id: 'bq14' }, G); brainG(bq, X(1460), Y(380), .6, 'pb14', false); S('rect', { id: 'pg14', x: X(1470), y: Y(320), width: 70, height: 70, rx: 8, fill: '#1e1b4b', stroke: '#e2e8f0', 'stroke-width': 4, 'stroke-dasharray': '10 6' }, bq); hidId('bq14');
     const pz = S('g', { id: 'pz14' }, G); S('rect', { x: X(1470), y: Y(320), width: 70, height: 70, rx: 8, fill: AMB }, pz); ico(pz, 'yacht', X(1505), Y(355), 54, '#1e3a8a'); hidId('pz14');
-    bubble(G, X(240), Y(250), 500, 90, 'What did you do yesterday?', 'q14', 30, .2); hidId('q14');
-    bubble(G, X(860), Y(250), 300, 90, "I don't know", 'nk14', 32, .15); hidId('nk14'); XM(G, X(1010), Y(295), 50, 'xk14'); hidId('xk14');
-    bubble(G, X(840), Y(250), 330, 90, 'I went sailing!', 'sv14', 34, .15); hidId('sv14');
+    say(G, X(585), Y(360), 500, 90, 'What did you do yesterday?', 'q14', 30, -.3);
+    { const [cx, cy] = say(G, X(1040), Y(362), 300, 90, "I don't know", 'nk14', 32, .25); XM(G, cx, cy, 50, 'xk14'); hidId('xk14'); }
+    say(G, X(1040), Y(362), 330, 90, 'I went sailing!', 'sv14', 34, .25);
     ico(G, 'heart', X(1240), Y(470), 70, '#f472b6', 'ht14'); hidId('ht14');
     const mk = S('g', { id: 'mk14' }, G); S('path', { d: `M${X(760)} ${Y(500)} Q${X(820)} ${Y(470)} ${X(880)} ${Y(500)} Q${X(880)} ${Y(560)} ${X(820)} ${Y(570)} Q${X(760)} ${Y(560)} ${X(760)} ${Y(500)} Z`, fill: '#e2e8f0' }, mk); [790, 850].forEach(x => S('ellipse', { cx: X(x), cy: Y(515), rx: 14, ry: 9, fill: '#0f172a' }, mk)); XM(mk, X(820), Y(520), 48); hidId('mk14');
     botB(G, X(1720), Y(830), .55, 'b14'); hidId('b14B'); const pp = S('g', { id: 'pp14' }, G); ic(pp, 'paper', X(1630), Y(650), 80, '#f8fafc'); hidId('pp14');
@@ -500,13 +504,13 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
   // =============== AREA 15: still a someone vs nobody inside ===============
   { const [ox, oy] = AO(15); const X = v => ox + v, Y = v => oy + v;
     scene(BG, defs, ox, oy);
-    lamp(G, X(560), Y(90)); clock(G, X(1830), Y(120), 42); plant(G, X(80), Y(820), 1);
+    lamp(G, X(960), Y(90)); clock(G, X(1830), Y(120), 42); plant(G, X(80), Y(820), 1);
     charB(G, X(560), Y(830), .8, 'ps15', { hair: 'short', hairC: '#5b3a29', skin: SKIN[0], top: '#16a34a', topType: 'hoodie' });
     ringH(G, X(560), Y(580), 280, GRN, 'rg15');
     const slot = (cx, cy, id, f, col) => { const g = S('g', { id }, G); S('circle', { cx, cy, r: 78, fill: '#0f172a', stroke: col, 'stroke-width': 6 }, g); if (f) f(g); hidId(id); };
-    slot(X(280), Y(300), 'ex150', g => ic(g, 'star', X(280), Y(300), 100, '#fde047'), '#fde047'); slot(X(560), Y(160), 'ex151', g => ico(g, 'heart', X(560), Y(160), 100, '#f472b6'), '#f472b6'); slot(X(840), Y(300), 'ex152', g => ic(g, 'user', X(840), Y(300), 100, '#60a5fa'), '#60a5fa');
+    slot(X(280), Y(330), 'ex150', g => ic(g, 'star', X(280), Y(330), 100, '#fde047'), '#fde047'); slot(X(560), Y(200), 'ex151', g => ico(g, 'heart', X(560), Y(200), 100, '#f472b6'), '#f472b6'); slot(X(840), Y(330), 'ex152', g => ic(g, 'user', X(840), Y(330), 100, '#60a5fa'), '#60a5fa');
     botB(G, X(1380), Y(830), .72, 'b15');
-    [[1120, 300], [1380, 160], [1640, 300]].forEach(([x, y], k) => { const g = S('g', { id: 'em15' + k }, G); S('circle', { cx: X(x), cy: Y(y), r: 78, fill: 'none', stroke: '#64748b', 'stroke-width': 6, 'stroke-dasharray': '16 12' }, g); hidId('em15' + k); });
+    [[1120, 330], [1380, 200], [1640, 330]].forEach(([x, y], k) => { const g = S('g', { id: 'em15' + k }, G); S('circle', { cx: X(x), cy: Y(y), r: 78, fill: 'none', stroke: '#64748b', 'stroke-width': 6, 'stroke-dasharray': '16 12' }, g); hidId('em15' + k); });
     // x-ray: empty seat inside the robot's head
     const hx = S('g', { id: 'hx15' }, G); S('rect', { x: X(1310), y: Y(452), width: 140, height: 98, rx: 20, fill: '#0b1226', stroke: CYA, 'stroke-width': 4 }, hx); S('rect', { x: X(1355), y: Y(495), width: 50, height: 12, rx: 4, fill: '#64748b' }, hx); S('rect', { x: X(1395), y: Y(465), width: 10, height: 42, rx: 4, fill: '#64748b' }, hx); S('rect', { x: X(1360), y: Y(507), width: 8, height: 30, fill: '#64748b' }, hx); S('rect', { x: X(1393), y: Y(507), width: 8, height: 30, fill: '#64748b' }, hx); hidId('hx15');
     const mg = S('g', { id: 'mg15' }, G); ic(mg, 'magnify', X(1250), Y(470), 120, '#e2e8f0'); hidId('mg15');
@@ -517,7 +521,7 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
       t = W('still a someone'); RING('rg15', t, 3); mood('ps15', t, 'happy'); CAM(t - .2, X(560), Y(480), 1.15, 1.0);
       ['experiences', 'beliefs', 'sense of self'].forEach((w, k) => { POP('#ex15' + k, W(w) - .05); BOING('#ex15' + k, W(w) + .4, '50% 50%'); });
       t = W('the ai has none'); CAM(t - .2, X(1380), Y(480), 1.15, 1.0); [0, 1, 2].forEach(k => POP('#em15' + k, t + k * .15)); mood('b15', t, 'neutral');
-      t = W('when it invents a fact'); POP('#fp15', t); liar('b15', t + .2); OUT('#em150,#em151,#em152', t);
+      t = W('when it invents a fact'); POP('#fp15', t); liar('b15', t + .2); OUT('#em150,#em151,#em152,#ex150,#ex151,#ex152', t);
       t = W('nobody inside is fooled'); CAM(t - .3, X(1380), Y(500), 1.7, 1.0); FADE('#hx15', t - .2, { d: .4 }); POP('#mg15', t); tl.to('#mg15', { x: 160, duration: 1.4, yoyo: true, repeat: 1, ease: 'sine.inOut' }, t + .4); B(t);
       t = W('nobody inside to be'); PULSE('#hx15', t, { s: 1.06 }); eyes('#b15E', [t + .5]);
     });
@@ -525,18 +529,19 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
   // =============== AREA 16: both prediction machines; anchors ===============
   { const [ox, oy] = AO(16); const X = v => ox + v, Y = v => oy + v;
     scene(BG, defs, ox, oy);
-    brainG(G, X(460), Y(290), .8, 'br16'); botB(G, X(1340), Y(830), .6, 'b16');
+    windowPane(G, X(930), Y(80), 320, 250, 'url(#gNight)'); server(G, X(30), Y(560), .45); clock(G, X(1800), Y(110), 44); plant(G, X(800), Y(820), 1); lamp(G, X(1500), Y(70));
+    brainG(G, X(460), Y(290), .95, 'br16'); botB(G, X(1340), Y(830), .68, 'b16');
     gearG(G, X(680), Y(170), .9, '#94a3b8', 'ga16'); gearG(G, X(1570), Y(380), .9, '#94a3b8', 'gb16'); hidId('ga16'); hidId('gb16');
     [[620, 360, 'pza16'], [1510, 470, 'pzb16']].forEach(([x, y, id]) => { const g = S('g', { id }, G); ic(g, 'puzzle', X(x), Y(y), 90, AMB); hidId(id); });
     ic(G, 'warn', X(300), Y(140), 90, RED, 'wa16'); ic(G, 'warn', X(1200), Y(380), 90, RED, 'wb16'); hidId('wa16'); hidId('wb16');
-    S('path', { id: 'rp16', class: 'draw', d: `M${X(460)} ${Y(430)} Q${X(430)} ${Y(560)} ${X(460)} ${Y(680)}`, stroke: '#e2e8f0', 'stroke-width': 8, fill: 'none' }, G); hidId('rp16');
+    S('path', { id: 'rp16', class: 'draw', d: `M${X(460)} ${Y(450)} Q${X(430)} ${Y(560)} ${X(460)} ${Y(680)}`, stroke: '#e2e8f0', 'stroke-width': 8, fill: 'none' }, G); hidId('rp16');
     const an = S('g', { id: 'an16' }, G); anchorG(an, X(460), Y(760), .9, BLU); eyeBig(an, X(345), Y(760), .3); earG(an, X(575), Y(760), .55, '#fca5a5'); hidId('an16');
     // AI anchors
     const posts = [[1000, 'globe', BLU, 'search'], [1140, 'db', '#22d3ee', 'db'], [1540, null, '#a3e635', 'idk'], [1690, 'book', GRN, 'cite']];
-    posts.forEach(([x, n, c, k], i) => { const g = S('g', { id: 'ps16' + i }, G); S('rect', { x: X(x - 6), y: Y(690), width: 12, height: 130, fill: '#64748b' }, g); S('circle', { cx: X(x), cy: Y(630), r: 62, fill: '#0f172a', stroke: c, 'stroke-width': 6 }, g); if (n) ic(g, n, X(x), Y(630), 80, c); else { S('rect', { x: X(x - 52), y: Y(608), width: 104, height: 46, rx: 14, fill: '#f8fafc' }, g); txt(g, X(x), Y(638), "I don't know", 16, C.ink, 'middle', 800); } hidId('ps16' + i);
-      const sx = X(1340), sy = Y(690); S('path', { id: 'rr16' + i, class: 'draw', d: `M${sx} ${sy} Q${(sx + X(x)) / 2} ${Y(560)} ${X(x)} ${Y(570)}`, stroke: '#e2e8f0', 'stroke-width': 6, fill: 'none' }, G); hidId('rr16' + i); });
+    posts.forEach(([x, n, c, k], i) => { const g = S('g', { id: 'ps16' + i }, G); S('rect', { x: X(x - 6), y: Y(690), width: 12, height: 130, fill: '#64748b' }, g); S('circle', { cx: X(x), cy: Y(630), r: 62, fill: '#0f172a', stroke: c, 'stroke-width': 6 }, g); if (n) ic(g, n, X(x), Y(630), 80, c); else { S('rect', { x: X(x - 70), y: Y(604), width: 140, height: 52, rx: 16, fill: '#f8fafc' }, g); txt(g, X(x), Y(637), "I don't know", 20, C.ink, 'middle', 800); } hidId('ps16' + i);
+      const sx = X(1340), sy = Y(665); S('path', { id: 'rr16' + i, class: 'draw', d: `M${sx} ${sy} Q${(sx + X(x)) / 2} ${Y(560)} ${X(x)} ${Y(570)}`, stroke: '#e2e8f0', 'stroke-width': 6, fill: 'none' }, G); hidId('rr16' + i); });
     pill(G, X(1540), Y(510), '+1', '#a3e635', C.ink, 'pr16', 34); hidId('pr16');
-    S('path', { id: 'fr16', d: `M${X(1340)} ${Y(690)} Q${X(1515)} ${Y(560)} ${X(1690)} ${Y(570)}`, stroke: RED, 'stroke-width': 6, fill: 'none', 'stroke-dasharray': '10 16' }, G); hidId('fr16');
+    S('path', { id: 'fr16', d: `M${X(1340)} ${Y(665)} Q${X(1515)} ${Y(560)} ${X(1690)} ${Y(570)}`, stroke: RED, 'stroke-width': 6, fill: 'none', 'stroke-dasharray': '10 16' }, G); hidId('fr16');
     charB(G, X(1840), Y(830), .6, 'en16', { hair: 'short', hairC: '#eab308', skin: SKIN[0], top: '#f59e0b', topType: 'tshirt' }); hidId('en16B');
     ringH(G, X(460), Y(290), 170, ROSE, 'rg16a'); ringH(G, X(1340), Y(560), 190, CYA, 'rg16b'); sparkH(G, X(1340), Y(420), 1.2, '#fde047', 'sk16');
     fgBox(G, X(-80), Y(1000), 340, 200); fgHeads(G, X(1720), Y(1010), 1);
@@ -557,15 +562,15 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
   // =============== AREA 17: ending ===============
   { const [ox, oy] = AO(17); const X = v => ox + v, Y = v => oy + v;
     scene(BG, defs, ox, oy);
-    lamp(G, X(960), Y(80)); plant(G, X(1870), Y(820), 1); clock(G, X(110), Y(110), 40);
+    lamp(G, X(960), Y(80)); plant(G, X(780), Y(820), 1); shelf(G, X(20), Y(420), 160, 400); clock(G, X(110), Y(110), 40);
     brainG(G, X(430), Y(360), .85, 'br17'); ringH(G, X(430), Y(360), 170, ROSE, 'rg17');
     eyeBig(G, X(430), Y(720), .5, 'ey17'); hidId('ey17');
     CRV(G, `M${X(300)} ${Y(470)} Q${X(220)} ${Y(600)} ${X(340)} ${Y(710)}`, BLU, 'lp17a', 9); CRV(G, `M${X(520)} ${Y(710)} Q${X(640)} ${Y(600)} ${X(560)} ${Y(470)}`, AMB, 'lp17b', 9); hidId('lp17a'); hidId('lp17b');
     check(G, X(640), Y(560), 40, 'ck17'); hidId('ck17');
     botB(G, X(1400), Y(830), .66, 'b17');
-    fakePaper(G, X(1500), Y(520), 330, 'fp17', 'Moon Coffee and Memory', 'Dr. Elena Vasquez', '2018'); hidId('fp17');
+    fakePaper(G, X(1480), Y(520), 380, 'fp17', 'Moon Coffee & Memory', 'Dr. Elena Vasquez', '2018'); hidId('fp17');
     ghostG(G, X(930), Y(400), .9, 'gh17'); hidId('gh17'); XM(G, X(930), Y(400), 110, 'xg17'); hidId('xg17');
-    const tc = thought(G, X(780), Y(290), 300, 200, 'tc17', X(1300), Y(420)); sunG(tc, X(880), Y(380), 24); treeG(tc, X(990), Y(370), .5); hidId('tc17'); XM(G, X(930), Y(390), 110, 'xt17'); hidId('xt17');
+    const tc = thought(G, X(780), Y(290), 300, 200, 'tc17', X(1330), Y(455)); sunG(tc, X(880), Y(380), 24); treeG(tc, X(990), Y(370), .5); hidId('tc17'); XM(G, X(930), Y(390), 110, 'xt17'); hidId('xt17');
     const tw = [['The', '#fca5a5'], ['most', '#fdba74'], ['likely', '#86efac'], ['next', '#93c5fd'], ['words', '#d8b4fe']]; let tx = X(720);
     tw.forEach(([w, c], k) => { const ww = w.length * 21 + 44; token(G, tx + ww / 2, Y(120), w, c, 'tk17' + k); tx += ww + 16; hidId('tk17' + k); });
     const cp = S('g', { id: 'cap17' }, G); ico(cp, 'cap', X(1400), Y(380), 170, '#1e293b'); S('path', { d: `M${X(1468)} ${Y(368)} L${X(1480)} ${Y(430)}`, stroke: '#fde047', 'stroke-width': 6 }, cp); S('circle', { cx: X(1480), cy: Y(435), r: 9, fill: '#fde047' }, cp); hidId('cap17');
@@ -576,7 +581,7 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
       t = W('confidently tells you'); POP('#fp17', t); talk('b17', t, t + 1.5); liar('b17', t + .3); mood('b17', t, 'happy');
       t = W('turns out to be false'); SHAKE('#fp17', t); dim(t, 1);
       t = W('it didnt see a ghost'); CAM(t - .3, X(1000), Y(480), 1.1, 1.0); POP('#gh17', t - .2); POP('#xg17', W('a ghost') + .3, { s: 2 });
-      t = W('it didnt imagine'); OUT('#gh17,#xg17', t - .2); POP('#tc17', t - .1); POP('#xt17', W('something') + .2, { s: 2 });
+      t = W('it didnt imagine'); OUT('#gh17,#xg17', t - .2); POP('#tc17', t - .1); POP('#xt17', W('imagine something') + .5, { s: 2 });
       t = W('it did exactly'); OUT('#tc17,#xt17', t - .1); CAM(t, X(1150), Y(420), 1.0, 1.0); t = W('predict the most likely'); tw.forEach((_, k) => tl.fromTo('#tk17' + k, { autoAlpha: 0, x: 600 - k * 120, y: 300, scale: .4, transformOrigin: '50% 50%' }, { autoAlpha: 1, x: 0, y: 0, scale: 1, duration: .55, ease: 'back.out(1.4)' }, t + k * .25)); talk('b17', t, t + 1.8); B(t);
       t = W('the difference is that'); CAM(t - .2, X(560), Y(520), 1.15, 1.1); RING('rg17', t + .3, 1);
       t = W('keeps checking'); POP('#ey17', t - .3); DR('#lp17a', t, { d: .5 }); DR('#lp17b', t + .4, { d: .5 }); POP('#ck17', W('against the world')); glow(W('against the world'));
