@@ -2,7 +2,7 @@
 
 Kit for the HyperFrames explainer videos and YouTube thumbnails.
 
-- `video/` — align.py, build.py, template.html, kit.js, premium.js, life.js, helpers.js, icons.js, illus.js, **scenes.js** (Infographics-style rooms + useTheme("lab") DSML Midnight Lab palette, robot AI `botB`, props, PRO LIFE: talk/nod/shake/point/shrug/jump/walkIn/eyes/bgLife, PRO LOOK: fgHeads/fgLeaves/fgBox parallax, WHIP/ZOOMIN transitions, BOING, moodLayer+dim/glow, liar antenna gag), check.js, check.py, sheets.py, gsap-shim.js
+- `video/` — align.py, build.py, template.html, kit.js, premium.js, life.js, helpers.js, icons.js, illus.js, **scenes.js** (Infographics-style rooms + useTheme("lab") DSML Midnight Lab palette, robot AI `botB`, props, PRO LIFE: talk/nod/shake/point/shrug/jump/walkIn/eyes/bgLife, PRO LOOK: fgHeads/fgLeaves/fgBox parallax, WHIP/ZOOMIN transitions, BOING, moodLayer+dim/glow, liar antenna gag), check.js, check.py, sheets.py, gsap-shim.js, textcheck.js (text sticking out of cards, no screenshots), phrasecheck.py (timing phrases that fire on the wrong word), sheets4.py (one frame every 4 s, 4x4 review sheets after check.js)
 - `video/extras.js` — reusable props + motion shortcuts (load after scenes.js; call `extrasDefs(defs)` once): eyeBig, earG, handG, brainG (pink human brain), ghostG, faceSk, treeG, sunG, flowerG, fakePaper, frameP, anchorG, camG; beats: dots+RUN (signal dots on a wire), ringH+RING, sparkH+SPK, SPIN, BOB, WALKER
 - `examples/` — `dsml-infographics-long.js` (1920x1080), `dsml-infographics-short.js` (1080x1920, same script), `finance-maya-video.js`, `dsml-hallucination-long.js` (uses extras.js)
 
