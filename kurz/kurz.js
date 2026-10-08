@@ -229,3 +229,140 @@ function kSCALE(t, fx, fy, cx, cy, z = 1, d = .7) { tl.to('#world', { x: FW / 2 
   tl.fromTo('#flash', { autoAlpha: 0 }, { autoAlpha: .9, duration: .12 }, t - .15); CUT(t - .05, cx, cy, z * 3); CAM(t - .03, cx, cy, z, 1.1, 'power3.out'); B(t); }
 // grow from nothing with a soft overshoot (cells dividing, planets forming)
 const kGROW = (sel, t, d = .7) => { B(t); return tl.fromTo(sel, { autoAlpha: 0, scale: 0, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: d, ease: 'elastic.out(1, .55)' }, t); };
+
+// ---------- POLISHED HUMANS (user-approved styles; kKid is old, don't use it for new videos) ----------
+// STYLE 1 kHuman — polished normal proportions, front view, ~960 px tall at s=1 (feet at y). Serious / science topics.
+// o = {sex:'m'|'f', skin, hair, hairStyle:'quiff'|'side'|'long'|'bob', top, topType:'blazer'|'sweater'|'blouse'|'jacket', inner, pants, shoes, eyes, glasses, stubble}
+// ids: id+'H' head, id+'E' eyes (blink: eyes('#idE',[t])), id+'bL'/'bR' brows, id+'mS' mouth, id+'mO' open mouth, id+'aL'/'aR' arms (rotate, transformOrigin '50% 0%')
+function kHuman(par, x, y, s, id, o = {}) {
+  const f = o.sex === 'f', sk = o.skin || '#f3cfb3', skD = kMix(sk, '#9c5a3c', .28), skL = kMix(sk, '#ffffff', .35), hc = o.hair || '#5a3522', hD = kDark(hc, .35), hL = kLite(hc, .3);
+  const top = o.top || '#2b4c7e', tD = kDark(top, .3), tL = kLite(top, .22), pants = o.pants || '#273149', shoe = o.shoes || '#1b1f2e', d = kDefs(par);
+  const O = S('g', { transform: `translate(${x},${y}) scale(${s})` }, par), g = S('g', { id }, O);
+  const P = (...a) => a.join(' ');
+  // shadow
+  S('ellipse', { cx: 0, cy: 6, rx: 130, ry: 18, fill: '#000', opacity: .28 }, g);
+  const gL = S('g', { transform: 'scale(1 .84)' }, g), gU = S('g', { transform: 'translate(0 60)' }, g);
+  // back hair (long) — behind everything
+  if (o.hairStyle === 'long') { const bh = S('path', { d: 'M-74 -820 Q-98 -720 -92 -640 Q-96 -590 -70 -560 Q-40 -590 -30 -640 L30 -640 Q40 -590 70 -560 Q96 -590 92 -640 Q98 -720 74 -820 Z', fill: hD }, gU); }
+  // legs
+  const lw = f ? 46 : 52, hipX = f ? 50 : 54;
+  [-1, 1].forEach(sd => { const lg = S('path', { d: `M${sd * 4} -380 L${sd * (hipX + 22)} -380 L${sd * (hipX * .62 + 22)} -24 L${sd * (hipX * .62 - lw + 30)} -24 Z`, fill: pants }, gL); if (sd > 0) S('path', { d: `M${sd * 4} -380 L${sd * (hipX + 22)} -380 L${sd * (hipX * .62 + 22)} -24 L${sd * (hipX * .62 + 6)} -24 Z`, fill: '#000', opacity: .18 }, gL);
+    S('path', { d: `M${sd * (hipX * .62 - 30)} -26 Q${sd * (hipX * .62 - 34)} -6 ${sd * (hipX * .62 - 20)} 0 L${sd * (hipX * .62 + 46)} 0 Q${sd * (hipX * .62 + 50)} -18 ${sd * (hipX * .62 + 24)} -28 Z`, fill: shoe }, gL);
+    S('path', { d: `M${sd * (hipX * .62 - 18)} -22 L${sd * (hipX * .62 + 20)} -24`, stroke: '#fff', 'stroke-width': 3, opacity: .25, 'stroke-linecap': 'round' }, gL); });
+  // torso
+  const sh = f ? 84 : 104, wa = f ? 62 : 82, hp = f ? 82 : 80, ty = -652;
+  const torso = S('path', { d: `M${-sh} ${ty + 34} Q${-sh} ${ty} ${-sh + 34} ${ty - 6} L${sh - 34} ${ty - 6} Q${sh} ${ty} ${sh} ${ty + 34} Q${wa + 6} ${ty + 150} ${wa} ${ty + 190} Q${hp + 4} ${ty + 240} ${hp} -372 L${-hp} -372 Q${-hp - 4} ${ty + 240} ${-wa} ${ty + 190} Q${-wa - 6} ${ty + 150} ${-sh} ${ty + 34} Z`, fill: top }, gU);
+  const tc = S('g', { 'clip-path': kClip(d, torso) }, gU);
+  S('ellipse', { cx: 90, cy: -500, rx: 70, ry: 200, fill: tD, opacity: .55 }, tc); S('ellipse', { cx: -60, cy: -630, rx: 50, ry: 30, fill: tL, opacity: .5 }, tc);
+  // neckline / inner layer
+  if (o.topType === 'blazer') { S('path', { d: `M-34 ${ty - 4} L0 ${ty + 120} L34 ${ty - 4} Z`, fill: o.inner || '#f4f1ea' }, gU); S('path', { d: `M-34 ${ty - 4} L-8 ${ty + 160} L-46 ${ty + 60} L-30 ${ty + 40} Z`, fill: tD }, gU); S('path', { d: `M34 ${ty - 4} L8 ${ty + 160} L46 ${ty + 60} L30 ${ty + 40} Z`, fill: kDark(top, .45) }, gU);
+    [0, 1].forEach(k => S('circle', { cx: 0, cy: ty + 200 + k * 56, r: 6, fill: kDark(top, .5) }, gU)); S('path', { d: `M-60 ${ty + 130} L-34 ${ty + 130}`, stroke: tL, 'stroke-width': 4, 'stroke-linecap': 'round' }, gU); }
+  if (o.topType === 'sweater') { S('path', { d: `M-34 ${ty - 4} Q0 ${ty + 30} 34 ${ty - 4}`, stroke: kDark(top, .25), 'stroke-width': 14, fill: 'none', 'stroke-linecap': 'round' }, gU); S('path', { d: `M${-hp + 6} -392 L${hp - 6} -392`, stroke: kDark(top, .2), 'stroke-width': 16, 'stroke-linecap': 'round' }, gU); }
+  if (o.topType === 'blouse') { S('path', { d: `M-40 ${ty - 4} Q0 ${ty + 70} 40 ${ty - 4} Z`, fill: sk }, gU); S('path', { d: `M-40 ${ty - 4} Q0 ${ty + 70} 40 ${ty - 4}`, stroke: kDark(top, .2), 'stroke-width': 6, fill: 'none' }, gU); S('path', { d: `M${-wa} ${ty + 190} Q0 ${ty + 210} ${wa} ${ty + 190}`, stroke: kDark(top, .3), 'stroke-width': 8, fill: 'none' }, gU); }
+  if (o.topType === 'jacket') { S('path', { d: `M-30 ${ty - 4} L-30 ${ty + 60} Q0 ${ty + 80} 30 ${ty + 60} L30 ${ty - 4} Q0 ${ty + 20} -30 ${ty - 4} Z`, fill: o.inner || '#f4f1ea' }, gU); S('path', { d: `M0 ${ty + 70} L0 -372`, stroke: kDark(top, .4), 'stroke-width': 5 }, gU); S('path', { d: `M-46 ${ty - 2} Q-38 ${ty + 40} -10 ${ty + 60} M46 ${ty - 2} Q38 ${ty + 40} 10 ${ty + 60}`, stroke: tL, 'stroke-width': 10, fill: 'none', 'stroke-linecap': 'round' }, gU); }
+  // arms (ids aL / aR, rotate at the shoulder)
+  [['aL', -1], ['aR', 1]].forEach(([k, sd]) => { const a = S('g', { id: id + k }, gU), ax = sd * (sh - 14);
+    S('path', { d: `M${ax} ${ty + 20} Q${sd * (sh + 14)} ${ty + 140} ${sd * (sh + 6)} ${ty + 262}`, stroke: sd > 0 ? kDark(top, .12) : top, 'stroke-width': f ? 40 : 46, fill: 'none', 'stroke-linecap': 'round' }, a);
+    S('path', { d: `M${sd * (sh + 6) - 16} ${ty + 262} Q${sd * (sh + 6)} ${ty + 272} ${sd * (sh + 6) + 16} ${ty + 262}`, stroke: kDark(top, .3), 'stroke-width': 8, fill: 'none', 'stroke-linecap': 'round' }, a);
+    const hx = sd * (sh + 6), hy = ty + 296, hs = f ? .88 : 1; const hand = S('path', { d: `M${hx - 15 * hs} ${hy - 22 * hs} Q${hx - 20 * hs} ${hy + 6 * hs} ${hx - 12 * hs} ${hy + 22 * hs} Q${hx} ${hy + 32 * hs} ${hx + 12 * hs} ${hy + 22 * hs} Q${hx + 20 * hs} ${hy + 6 * hs} ${hx + 15 * hs} ${hy - 22 * hs} Z`, fill: sk }, a); kShade(a, hand, skD, skL);
+    S('path', { d: `M${hx - sd * 13 * hs} ${hy - 14 * hs} Q${hx - sd * 24 * hs} ${hy} ${hx - sd * 14 * hs} ${hy + 12 * hs}`, stroke: sk, 'stroke-width': 11 * hs, fill: 'none', 'stroke-linecap': 'round' }, a);
+    [-5, 3].forEach(dx => S('path', { d: `M${hx + dx * hs} ${hy + 8 * hs} L${hx + dx * hs} ${hy + 22 * hs}`, stroke: skD, 'stroke-width': 2, opacity: .6, 'stroke-linecap': 'round' }, a)); });
+  // neck
+  S('path', { d: `M-21 -740 L-23 ${ty + 2} Q0 ${ty + 14} 23 ${ty + 2} L21 -740 Z`, fill: sk }, gU); S('path', { d: `M-21 -728 Q0 -700 21 -728 L22 -700 Q0 -690 -22 -700 Z`, fill: skD, opacity: .7 }, gU);
+  // head
+  const HG = S('g', { id: id + 'H' }, gU);
+  [-1, 1].forEach(sd => { S('ellipse', { cx: sd * 62, cy: -794, rx: 13, ry: 20, fill: sd > 0 ? skD : sk }, HG); S('path', { d: `M${sd * 60} -804 Q${sd * 68} -796 ${sd * 61} -784`, stroke: skD, 'stroke-width': 3, fill: 'none' }, HG); });
+  const face = f ? 'M-60 -830 Q-62 -760 -34 -726 Q-14 -704 0 -704 Q14 -704 34 -726 Q62 -760 60 -830 Q58 -892 0 -894 Q-58 -892 -60 -830 Z'
+    : 'M-62 -830 Q-64 -762 -46 -730 Q-26 -704 0 -702 Q26 -704 46 -730 Q64 -762 62 -830 Q60 -894 0 -896 Q-60 -894 -62 -830 Z';
+  const fc = S('path', { d: face, fill: sk }, HG), fcl = S('g', { 'clip-path': kClip(d, fc) }, HG);
+  S('ellipse', { cx: 58, cy: -790, rx: 40, ry: 110, fill: skD, opacity: .35 }, fcl); S('ellipse', { cx: -26, cy: -850, rx: 30, ry: 20, fill: skL, opacity: .45 }, fcl);
+  S('ellipse', { cx: 0, cy: -712, rx: 46, ry: 12, fill: skD, opacity: .2 }, fcl);
+  if (!f && o.stubble) S('path', { d: 'M-56 -778 Q-48 -722 0 -706 Q48 -722 56 -778 Q40 -744 0 -742 Q-40 -744 -56 -778 Z', fill: hc, opacity: .22 }, fcl);
+  // cheeks
+  [-1, 1].forEach(sd => S('ellipse', { cx: sd * 36, cy: -764, rx: 14, ry: 8, fill: '#ff8f8f', opacity: f ? .32 : .16 }, HG));
+  // eyes
+  const E = S('g', { id: id + 'E' }, HG), ec = o.eyes || '#4a7bd0';
+  [-1, 1].forEach(sd => { const cx = sd * 25, cy = -796;
+    const al = S('path', { d: `M${cx - 14} ${cy} Q${cx} ${cy - 12} ${cx + 14} ${cy} Q${cx} ${cy + 9} ${cx - 14} ${cy} Z`, fill: '#fbf7f2' }, E); const ac = S('g', { 'clip-path': kClip(d, al) }, E);
+    S('circle', { cx: cx + 1, cy: cy - 1, r: 8, fill: ec }, ac); S('circle', { cx: cx + 1, cy: cy - 1, r: 8, fill: 'none', stroke: kDark(ec, .4), 'stroke-width': 1.6 }, ac); S('circle', { cx: cx + 1, cy: cy - 1, r: 4, fill: '#141018' }, ac); S('circle', { cx: cx - 2, cy: cy - 4, r: 2.4, fill: '#fff' }, ac);
+    S('path', { d: `M${cx - 14} ${cy - 3} Q${cx - 14} ${cy} ${cx - 15} ${cy}`, fill: 'none' }, E);
+    S('path', { d: `M${cx - 15} ${cy + 1} Q${cx} ${cy - 13} ${cx + 15} ${cy - 1}`, stroke: '#2a1a16', 'stroke-width': f ? 4.2 : 3.2, fill: 'none', 'stroke-linecap': 'round' }, E);
+    if (f) S('path', { d: `M${cx + sd * 13} ${cy - 2} l${sd * 7} -5`, stroke: '#2a1a16', 'stroke-width': 3, 'stroke-linecap': 'round' }, E);
+    S('path', { d: `M${cx - 10} ${cy + 9} Q${cx} ${cy + 12} ${cx + 10} ${cy + 9}`, stroke: skD, 'stroke-width': 2, fill: 'none', opacity: .6 }, E); });
+  // brows
+  const bc = kDark(hc, .2);
+  [-1, 1].forEach(sd => S('path', { id: id + (sd < 0 ? 'bL' : 'bR'), d: f ? `M${sd * 12} -818 Q${sd * 26} -828 ${sd * 42} -820` : `M${sd * 10} -817 Q${sd * 26} -826 ${sd * 44} -820`, stroke: bc, 'stroke-width': f ? 4 : 6.5, fill: 'none', 'stroke-linecap': 'round' }, HG));
+  // nose
+  S('path', { d: 'M5 -800 Q11 -776 6 -764 Q0 -760 -6 -764', stroke: skD, 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }, HG); S('ellipse', { cx: -3, cy: -780, rx: 3, ry: 9, fill: skL, opacity: .6 }, HG);
+  // mouth
+  if (f) { S('path', { id: id + 'mS', d: 'M-17 -740 Q-8 -746 0 -742 Q8 -746 17 -740 Q8 -728 0 -728 Q-8 -728 -17 -740 Z', fill: '#d4626f' }, HG); S('path', { d: 'M-17 -740 Q0 -736 17 -740', stroke: '#9e3a4a', 'stroke-width': 2.4, fill: 'none' }, HG); S('ellipse', { cx: -2, cy: -732, rx: 6, ry: 2, fill: '#fff', opacity: .35 }, HG); }
+  else { S('path', { id: id + 'mS', d: 'M-18 -742 Q0 -728 18 -742', stroke: '#8f3f36', 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round' }, HG); S('path', { d: 'M-8 -728 Q0 -725 8 -728', stroke: skD, 'stroke-width': 2.4, fill: 'none', opacity: .7 }, HG); }
+  S('ellipse', { id: id + 'mO', cx: 0, cy: -738, rx: 11, ry: 9, fill: '#6e2630', opacity: 0 }, HG);
+  // glasses
+  if (o.glasses) { [-1, 1].forEach(sd => S('rect', { x: sd * 25 - 19, y: -811, width: 38, height: 28, rx: 10, fill: '#ffffff', 'fill-opacity': .12, stroke: '#1d2333', 'stroke-width': 4 }, HG)); S('path', { d: 'M-6 -800 Q0 -806 6 -800', stroke: '#1d2333', 'stroke-width': 4, fill: 'none' }, HG); }
+  // hair (front)
+  const hair = {
+    quiff: 'M-64 -810 Q-70 -872 -44 -900 Q-8 -936 34 -922 Q70 -908 66 -846 L64 -808 Q58 -846 44 -858 Q20 -862 0 -872 Q-26 -858 -50 -858 Q-60 -846 -64 -810 Z',
+    side: 'M-64 -806 Q-72 -880 -20 -904 Q34 -920 62 -884 Q70 -860 64 -806 Q58 -840 50 -852 Q10 -846 -24 -866 Q-46 -846 -60 -836 Z',
+    long: 'M-66 -790 Q-76 -880 -18 -904 Q40 -920 66 -880 Q78 -846 70 -780 Q62 -820 56 -840 Q20 -850 -8 -880 Q-30 -844 -60 -836 Z',
+    bob: 'M-70 -740 Q-84 -870 -20 -902 Q44 -920 72 -870 Q84 -820 72 -740 Q64 -752 60 -790 Q58 -830 46 -852 Q6 -854 -12 -882 Q-34 -850 -52 -850 Q-60 -820 -60 -790 Q-62 -756 -70 -740 Z',
+  }[o.hairStyle || 'side'];
+  const hp2 = S('path', { d: hair, fill: hc }, HG); const hcl = S('g', { 'clip-path': kClip(d, hp2) }, HG);
+  S('ellipse', { cx: 70, cy: -830, rx: 60, ry: 90, fill: hD, opacity: .55 }, hcl); S('ellipse', { cx: -20, cy: -900, rx: 40, ry: 16, fill: hL, opacity: .55, transform: 'rotate(-15 -20 -900)' }, hcl);
+  if (o.hairStyle === 'long') { [-1, 1].forEach(sd => { const lk = S('path', { d: `M${sd * 58} -836 Q${sd * 84} -760 ${sd * 72} -690 Q${sd * 68} -640 ${sd * 86} -600 Q${sd * 54} -620 ${sd * 50} -680 Q${sd * 48} -740 ${sd * 52} -800 Z`, fill: sd > 0 ? kDark(hc, .15) : hc }, HG); });
+    S('path', { d: 'M62 -760 Q78 -700 70 -650', stroke: hL, 'stroke-width': 3, fill: 'none', opacity: .4 }, HG); }
+  return O;
+}
+
+// STYLE 3 kSlim — slim elegant fashion-flat, tall, small head, ~900 px tall at s=1. Modern / lifestyle / tech topics.
+// o = {sex, skin, hair, hairStyle:'short'|'wave'|'long'|'bun2', top, coat, pants, shoes}; same ids as kHuman
+function kSlim(par, x, y, s, id, o = {}) {
+  const f = o.sex === 'f', sk = o.skin || '#f1c9ad', skD = kMix(sk, '#9c5a3c', .3), skL = kMix(sk, '#fff', .35), hc = o.hair || '#2d1d16', hD = kDark(hc, .35), hL = kLite(hc, .3), d = kDefs(par);
+  const top = o.top || '#f4efe6', coat = o.coat, pants = o.pants || '#2b3045', shoe = o.shoes || '#f8fafc';
+  const O = S('g', { transform: `translate(${x},${y}) scale(${s})` }, par), g = S('g', { id }, O);
+  S('ellipse', { cx: 0, cy: 6, rx: 110, ry: 14, fill: '#000', opacity: .28 }, g);
+  const HY = -820;
+  if (o.hairStyle === 'long') S('path', { d: `M-46 ${HY - 10} Q-62 ${HY + 80} -52 ${HY + 150} Q-20 ${HY + 160} -10 ${HY + 100} L10 ${HY + 100} Q20 ${HY + 160} 52 ${HY + 150} Q62 ${HY + 80} 46 ${HY - 10} Z`, fill: hD }, g);
+  // legs: wide trousers (f) or slim (m)
+  [-1, 1].forEach(sd => { const lg = f ? S('path', { d: `M${sd * 2} -420 L${sd * 52} -420 L${sd * 66} -24 L${sd * 14} -24 Z`, fill: sd > 0 ? kDark(pants, .15) : pants }, g) : S('path', { d: `M${sd * 3} -420 L${sd * 46} -420 L${sd * 40} -24 L${sd * 14} -24 Z`, fill: sd > 0 ? kDark(pants, .15) : pants }, g);
+    S('rect', { x: sd > 0 ? 6 : -60, y: -28, width: 54, height: 26, rx: 13, fill: shoe }, g); S('rect', { x: sd > 0 ? 6 : -60, y: -8, width: 54, height: 8, rx: 4, fill: kDark(shoe, .3) }, g); if (f) S('rect', { x: sd > 0 ? 18 : -46, y: -40, width: 26, height: 14, rx: 6, fill: sk }, g); });
+  // torso
+  const sh = f ? 58 : 70, wa = f ? 36 : 50;
+  const tor = S('path', { d: `M${-sh} -680 Q${-sh} -712 ${-sh + 24} -716 L${sh - 24} -716 Q${sh} -712 ${sh} -680 L${wa} -520 Q${wa + 6} -470 ${wa + 10} -416 L${-wa - 10} -416 Q${-wa - 6} -470 ${-wa} -520 Z`, fill: top }, g); kShade(g, tor);
+  S('path', { d: f ? 'M-24 -716 Q0 -680 24 -716' : 'M-20 -716 L0 -690 L20 -716', stroke: kDark(top, .2), 'stroke-width': 5, fill: 'none' }, g);
+  if (coat) { [-1, 1].forEach(sd => { const c = S('path', { d: `M${sd * 18} -716 L${sd * (sh + 6)} -704 Q${sd * (sh + 14)} -600 ${sd * (sh + 20)} ${f ? -300 : -360} L${sd * 26} ${f ? -300 : -360} Q${sd * 30} -560 ${sd * 18} -716 Z`, fill: sd > 0 ? kDark(coat, .15) : coat }, g); });
+    [-1, 1].forEach(sd => S('path', { d: `M${sd * 18} -716 L${sd * 44} -640 L${sd * 30} -600`, stroke: kDark(coat, .35), 'stroke-width': 5, fill: 'none', 'stroke-linejoin': 'round' }, g)); }
+  // arms (long, slim)
+  const ac = coat || top;
+  [['aL', -1], ['aR', 1]].forEach(([k, sd]) => { const a = S('g', { id: id + k }, g); S('path', { d: `M${sd * (sh - 10)} -700 Q${sd * (sh + 18)} -580 ${sd * (sh + 14)} -470`, stroke: sd > 0 ? kDark(ac, .14) : ac, 'stroke-width': f ? 26 : 32, fill: 'none', 'stroke-linecap': 'round' }, a);
+    const hx = sd * (sh + 14), hy = -448; const hn = S('path', { d: `M${hx - 10} ${hy - 18} Q${hx - 13} ${hy + 6} ${hx - 6} ${hy + 18} Q${hx} ${hy + 24} ${hx + 6} ${hy + 18} Q${hx + 13} ${hy + 6} ${hx + 10} ${hy - 18} Z`, fill: sk }, a); kShade(a, hn, skD, skL); });
+  // neck + head (small, oval)
+  S('path', { d: `M-12 ${HY + 60} L-14 -712 Q0 -704 14 -712 L12 ${HY + 60} Z`, fill: sk }, g); S('path', { d: `M-12 ${HY + 70} Q0 ${HY + 86} 12 ${HY + 70} L13 ${HY + 86} Q0 ${HY + 94} -13 ${HY + 86} Z`, fill: skD, opacity: .6 }, g);
+  const HG = S('g', { id: id + 'H' }, g);
+  [-1, 1].forEach(sd => S('ellipse', { cx: sd * 42, cy: HY + 6, rx: 8, ry: 13, fill: sd > 0 ? skD : sk }, HG));
+  const hd = S('path', { d: `M-42 ${HY - 10} Q-44 ${HY + 46} -18 ${HY + 66} Q0 ${HY + 76} 18 ${HY + 66} Q44 ${HY + 46} 42 ${HY - 10} Q40 ${HY - 62} 0 ${HY - 64} Q-40 ${HY - 62} -42 ${HY - 10} Z`, fill: sk }, HG);
+  const hcl = S('g', { 'clip-path': kClip(d, hd) }, HG); S('ellipse', { cx: 34, cy: HY + 10, rx: 26, ry: 80, fill: skD, opacity: .35 }, hcl); S('ellipse', { cx: -14, cy: HY - 34, rx: 18, ry: 12, fill: skL, opacity: .45 }, hcl);
+  const E = S('g', { id: id + 'E' }, HG);
+  [-1, 1].forEach(sd => { const cx = sd * 17, cy = HY + 6; S('path', { d: `M${cx - 9} ${cy} Q${cx} ${cy - 8} ${cx + 9} ${cy} Q${cx} ${cy + 5} ${cx - 9} ${cy} Z`, fill: '#fbf7f2' }, E); S('circle', { cx, cy: cy - 1, r: 4.6, fill: '#2a1a16' }, E); S('circle', { cx: cx - 1.5, cy: cy - 3, r: 1.4, fill: '#fff' }, E);
+    S('path', { d: `M${cx - 10} ${cy} Q${cx} ${cy - 10} ${cx + 10} ${cy - 1}`, stroke: '#2a1a16', 'stroke-width': f ? 3 : 2.4, fill: 'none', 'stroke-linecap': 'round' }, E);
+    S('path', { d: `M${sd * 8} ${HY - 12} Q${sd * 17} ${HY - 18} ${sd * 28} ${HY - 13}`, stroke: kDark(hc, .1), 'stroke-width': f ? 2.6 : 4, fill: 'none', 'stroke-linecap': 'round' }, HG); });
+  S('path', { d: `M3 ${HY + 6} Q8 ${HY + 26} 2 ${HY + 32}`, stroke: skD, 'stroke-width': 2.4, fill: 'none', 'stroke-linecap': 'round' }, HG);
+  if (f) S('path', { id: id + 'mS', d: `M-11 ${HY + 46} Q0 ${HY + 42} 11 ${HY + 46} Q0 ${HY + 55} -11 ${HY + 46} Z`, fill: '#c95b6a' }, HG);
+  else S('path', { id: id + 'mS', d: `M-11 ${HY + 46} Q0 ${HY + 54} 11 ${HY + 46}`, stroke: '#8f3f36', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }, HG);
+  S('ellipse', { id: id + 'mO', cx: 0, cy: HY + 48, rx: 7, ry: 6, fill: '#6e2630', opacity: 0 }, HG);
+  [-1, 1].forEach(sd => S('ellipse', { cx: sd * 24, cy: HY + 30, rx: 8, ry: 5, fill: '#ff8f8f', opacity: f ? .3 : .15 }, HG));
+  const H3 = {
+    short: `M-44 ${HY - 4} Q-50 ${HY - 70} 0 ${HY - 78} Q46 ${HY - 80} 48 ${HY - 30} L44 ${HY - 4} Q40 ${HY - 34} 26 ${HY - 40} Q-6 ${HY - 36} -30 ${HY - 46} Q-40 ${HY - 30} -44 ${HY - 4} Z`,
+    wave: `M-46 ${HY + 10} Q-56 ${HY - 66} -8 ${HY - 76} Q48 ${HY - 84} 50 ${HY - 20} Q46 ${HY - 40} 30 ${HY - 46} Q4 ${HY - 34} -16 ${HY - 52} Q-34 ${HY - 34} -40 ${HY - 20} Q-44 ${HY - 4} -46 ${HY + 10} Z`,
+    long: `M-48 ${HY + 40} Q-58 ${HY - 70} 0 ${HY - 74} Q58 ${HY - 70} 48 ${HY + 40} Q42 ${HY - 10} 34 ${HY - 36} Q10 ${HY - 40} -6 ${HY - 56} Q-26 ${HY - 34} -38 ${HY - 30} Q-44 ${HY} -48 ${HY + 40} Z`,
+    bun2: `M-44 ${HY} Q-48 ${HY - 70} 0 ${HY - 74} Q48 ${HY - 70} 44 ${HY} Q38 ${HY - 40} 20 ${HY - 46} Q0 ${HY - 40} -20 ${HY - 46} Q-38 ${HY - 40} -44 ${HY} Z`,
+  };
+  if (o.hairStyle === 'bun2') kBall(HG, 0, HY - 92, 28, hc, hD, hL);
+  const hp = S('path', { d: H3[o.hairStyle || 'short'], fill: hc }, HG); const cl = S('g', { 'clip-path': kClip(d, hp) }, HG); S('ellipse', { cx: 30, cy: HY - 20, rx: 30, ry: 70, fill: hD, opacity: .5 }, cl); S('ellipse', { cx: -16, cy: HY - 66, rx: 22, ry: 8, fill: hL, opacity: .6, transform: `rotate(-12 -16 ${HY - 66})` }, cl);
+  return O;
+}
+
+// kTalk(id, t0, t1): mouth opens on every spoken word (kHuman / kSlim / kKid)
+function kTalk(id, t0, t1) { const base = document.getElementById(id + 'mS') ? id + 'mS' : id + 'm';
+  TW.filter(w => w[0] >= t0 - .01 && w[0] < t1).forEach((w, i, a) => { const op = Math.min(.17, Math.max(.07, ((a[i + 1] ? a[i + 1][0] : w[0] + .3) - w[0]) * .55));
+    tl.set('#' + id + 'mO', { opacity: 1 }, w[0]); tl.set('#' + base, { opacity: 0 }, w[0]); tl.set('#' + id + 'mO', { opacity: 0 }, w[0] + op); tl.set('#' + base, { opacity: 1 }, w[0] + op); }); B(t0); }
