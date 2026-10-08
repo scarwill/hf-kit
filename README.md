@@ -9,6 +9,7 @@ Kit for the HyperFrames explainer videos and YouTube thumbnails.
 LONG vs SHORT: same kit. Short = `python3 build.py all.js audio.m4a index.html --short` (VERT=true → 1080x1920 frame, each area a 1080x1920 room). check.js / sheets.py pick the size from the html.
 
 Build: `cat ~/hf-kit/{premium.js,illus.js,life.js,helpers.js,icons.js,scenes.js,extras.js} video.js > all.js && python3 ~/hf-kit/build.py all.js audio.m4a [index.html --short]`
+- `kurz/` — Kurzgesagt-style add-on (load after the video kit): `kurz.js` (KPAL worlds with auto parallax, shading kBall/kShade/kBlob, nature/space/micro props, kCallout/kArrow/kBigNum, kKid + kBlobby characters, kLife, kSCALE, kGROW), `organs.js` (eye, eye cross-section, brain, camera, phone). Example: `examples/kurz-blindspot-long.js`. Setup: `mkdir -p ~/hf-kit/kurz && cp /tmp/hfk/kurz/* ~/hf-kit/kurz/`
 - `thumb/` — premium (video-kit) thumbnails: thumbx.js, tshot.js (example: examples/thumb-premium-example.js); old style: thumb.js, shot.js, page.html
 
 Kit safety built in (no per-video code needed):
