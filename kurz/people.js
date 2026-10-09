@@ -39,7 +39,10 @@ function kBean(par, x, y, s, id, o = {}) {
   // curly: an afro of curls BEHIND the head (the face covers the middle), small curls along the hairline are added after the face
   if (st === 'curly') { const cb = S('g', {}, H); S('ellipse', { cx: hx, cy: hy - 16, rx: 86, ry: 82, fill: hD }, cb);
     for (let k = 0; k < 14; k++) { const a = Math.PI * (.82 + k * .1), rr = 30 + 6 * rnd(k * 3 + 1); kBall(cb, hx + Math.cos(a) * 82, hy - 16 + Math.sin(a) * 80, rr, k % 2 ? hc : kDark(hc, .1), hD, hL); } }
-  if (st === 'pony' && v === 'front') S('path', { d: `M${hx - 60 - X * 4} ${hy - 34} Q${hx - 74} ${hy + 60} ${hx - 54 - X * 20} ${hy + 94} Q${hx - X * 20} ${hy + 108} ${hx + 54 - X * 20} ${hy + 94} Q${hx + 74} ${hy + 60} ${hx + 60 - X * 4} ${hy - 34} Z`, fill: hD }, H);
+  // pony (front): tail peeks out behind the head on one side and hangs to the shoulder, with a hair tie (no mass under the chin)
+  if (st === 'pony' && v === 'front') { const pt = S('path', { d: `M${hx + 30} ${hy - 62} Q${hx + 104} ${hy - 60} ${hx + 100} ${hy + 20} Q${hx + 98} ${hy + 90} ${hx + 82} ${hy + 140} Q${hx + 74} ${hy + 90} ${hx + 66} ${hy + 40} Q${hx + 60} ${hy - 10} ${hx + 30} ${hy - 30} Z`, fill: hc }, H);
+    const pc = S('g', { 'clip-path': kClip(d, pt) }, H); S('ellipse', { cx: hx + 70, cy: hy + 40, rx: 14, ry: 90, fill: hD, opacity: .5 }, pc); S('path', { d: `M${hx + 92} ${hy - 20} Q${hx + 94} ${hy + 50} ${hx + 84} ${hy + 110}`, stroke: hL, 'stroke-width': 5, fill: 'none', opacity: .45, 'stroke-linecap': 'round' }, pc);
+    kBall(H, hx + 62, hy - 58, 10, top, kDark(top, .3), kLite(top, .4)); }
   if (st === 'pony' && v !== 'front') S('path', { d: `M${hx - dr * 52} ${hy - 30} Q${hx - dr * 110} ${hy} ${hx - dr * 92} ${hy + 76} Q${hx - dr * 70} ${hy + 30} ${hx - dr * 44} ${hy + 6} Z`, fill: hD }, H);
   if (st === 'bun') kBall(H, hx - X * 30, hy - 70, 28, hc, hD, hL);
   if (v !== 'side' || true) { const ex = v === 'front' ? 0 : -dr * (v === 'side' ? 6 : 40); if (v !== 'front' || true) [-1, 1].forEach(sg => { if ((v === 'front' && st !== 'long') || sg === -dr) S('ellipse', { cx: v === 'front' ? sg * 64 : hx + ex, cy: hy + 8, rx: 11, ry: 15, fill: skD }, H); }); }
