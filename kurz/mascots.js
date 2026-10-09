@@ -16,13 +16,13 @@ function _mFace(g, id, eyes, mx, my, o, eyeCol = '#1b1240', mw = 20) {   // shar
 }
 // view helper: o.view 'front' | '3q' | 'side'; facing right by default, o.flip = -1 faces left (the whole drawing is mirrored)
 function _mSet(id, m, root) { const q = k => (root || document).querySelector('#' + id + k); if (!q('E')) return;
-  const on = { happy: ['eH', 'mS'], shock: ['E', 'mO'], meh: ['E', 'mF'], neutral: ['E', 'mS'] }[m] || ['E', 'mS'];
+  const on = { happy: ['eH', 'mS'], smile: ['E', 'mS'], shock: ['E', 'mO'], meh: ['E', 'mF'], neutral: ['E', 'mS'] }[m] || ['E', 'mS'];
   ['E', 'eH', 'mS', 'mO', 'mF'].forEach(k => q(k).setAttribute('opacity', on.includes(k) ? 1 : 0));
   q('E').setAttribute('transform', m === 'meh' ? 'scale(1 .55)' : ''); q('E').style.transformBox = 'fill-box'; q('E').style.transformOrigin = '50% 50%';
   if (m === 'shock') q('E').setAttribute('transform', ''); }
 
-// soft shading for mascots: light top-left -> base -> darker rim (no hard diagonal split)
-const _mFill = (d, c, lx = '35%', ly = '28%') => kRG(d, [[0, kLite(c, .4)], [.55, c], [1, kDark(c, .28)]], lx, ly, '78%');
+// cel shading (Kurz look): flat base + a hard-edged curved shadow crescent on the lower right (no glossy gradient)
+const _mFill = (d, c, lx = '36%', ly = '30%') => kRG(d, [[0, c], [.8, c], [.8, kDark(c, .2)], [1, kDark(c, .2)]], lx, ly, '82%');
 // gill frond from (bx, by) at angle a (deg), length L, width w
 function _mGill(g, bx, by, a, L, w, col, frill = 0) { const [tx, ty] = kPt(bx, by, L, a), [p1x, p1y] = kPt(bx, by, w, a + 90), [p2x, p2y] = kPt(bx, by, w, a - 90);
   if (frill) for (let k = 1; k <= frill; k++) { const [fx, fy] = kPt(bx, by, L * (.3 + k * .55 / frill), a); [-1, 1].forEach(sd => { const [qx, qy] = kPt(fx, fy, w * 1.1, a + sd * 70); kBall(g, qx, qy, w * .55, kLite(col, .15)); }); }   // feathery bumps
@@ -117,7 +117,7 @@ function nPip(par, x, y, s, id, o = {}) { const c = o.col || '#ff8a3d', cr = '#f
   return M; }
 
 // ---------- timeline beats ----------
-function nMOOD(id, t, m) { const on = { happy: ['eH', 'mS'], shock: ['E', 'mO'], meh: ['E', 'mF'], neutral: ['E', 'mS'] }[m] || ['E', 'mS'];
+function nMOOD(id, t, m) { const on = { happy: ['eH', 'mS'], smile: ['E', 'mS'], shock: ['E', 'mO'], meh: ['E', 'mF'], neutral: ['E', 'mS'] }[m] || ['E', 'mS'];
   ['E', 'eH', 'mS', 'mO', 'mF'].forEach(k => tl.set('#' + id + k, { opacity: on.includes(k) ? 1 : 0 }, t));
   tl.to('#' + id + 'E', { scaleY: m === 'meh' ? .55 : 1, scale: m === 'shock' ? 1.2 : 1, transformOrigin: '50% 50%', duration: .2 }, t);
   if (m === 'shock') tl.fromTo('#' + id + 'B', { y: 0 }, { y: -30, duration: .15, yoyo: true, repeat: 1, ease: 'power2.out' }, t); B(t); }
