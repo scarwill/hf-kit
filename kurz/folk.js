@@ -1,7 +1,7 @@
 // ===================== KURZ FOLK (load AFTER kurz.js + neon.js + mascots.js): people in the newer Kurzgesagt look =====================
 // Big round head, compact rounded body, tall oval eyes, big simple hair shapes. Views: front / 3q / side (facing right; o.flip = -1 faces left).
 // nFolk(par, x, feetY, s, id, o) ~ 470 px tall at s=1.
-// o = { view, mood: 'happy'|'shock'|'meh'|'neutral', skin, hair, hairStyle: 'short'|'bob'|'pony'|'afro', top, pants, shoes, pose: 'stand'|'wave'|'point'|'cheer', flip }
+// o = { view, mood: 'happy'|'shock'|'meh'|'neutral', skin, hair, hairStyle: 'short'|'bob'|'pony'|'buzz', top, pants, shoes, pose: 'stand'|'wave'|'point'|'cheer', flip }
 // ids like the mascots: id+'B' whole, id+'H' head, id+'E' eyes, id+'eH' happy eyes, id+'mS'/'mO'/'mF' mouths, id+'aL'/'aR' arms (pivot = shoulder).
 // Beats: nMOOD, nHOP, nWAVE, nTALKM (mascots.js) all work on nFolk too.
 const FSKIN = ['#f6d2b8', '#e9b48f', '#c98b62', '#9a6243', '#6e4430'];
@@ -19,7 +19,6 @@ function nFolk(par, x, y, s, id, o = {}) {
   S('ellipse', { cx: 0, cy: 4, rx: 95, ry: 14, fill: '#000', opacity: .3 }, M);
   // ---- hair behind the head
   const back = S('g', {}, M);
-  if (st === 'afro') S('circle', { cx: P.hx - (v === 'side' ? 28 : v === '3q' ? 14 : 0), cy: HY - 25, r: 126, fill: F(d, hc, '35%', '25%') }, back);
   if (st === 'bob') S('rect', { x: P.hx - (v === 'side' ? 108 : v === '3q' ? 112 : 108), y: HY - 115, width: v === 'side' ? 160 : v === '3q' ? 200 : 216, height: 200, rx: 80, fill: hD }, back);
   if (st === 'pony') { const tx = v === 'front' ? 1 : -1, bx = v === 'front' ? 50 : -70;
     S('path', { d: `M${bx} ${HY - 85} Q${bx + tx * 95} ${HY - 80} ${bx + tx * 80} ${HY + 40} Q${bx + tx * 70} ${HY + 90} ${bx + tx * 40} ${HY + 120} Q${bx + tx * 40} ${HY + 50} ${bx + tx * 15} ${HY - 20} Z`, fill: F(d, hc, '30%', '20%') }, back);
@@ -66,8 +65,12 @@ function nFolk(par, x, y, s, id, o = {}) {
       : `M${hx - 94} ${HY - 4} Q${hx - 100} ${HY - 110} ${hx + 2} ${HY - 108} Q${hx + 100} ${HY - 108} ${hx + 95} ${HY - 4} Q${hx + 70} ${HY - 74} ${hx + 2 + (v === '3q' ? 24 : 0)} ${HY - 72} Q${hx - 66} ${HY - 74} ${hx - 94} ${HY - 4} Z`, fill: F(d, hc, '35%', '20%') }, f);
   if (st === 'bob') S('path', { d: v === 'side' ? `M92 ${HY - 40} Q60 ${HY - 66} 15 ${HY - 57} Q-6 ${HY - 30} -6 ${HY + 30} Q-6 ${HY + 72} -22 ${HY + 90} L-100 ${HY + 86} Q-112 ${HY + 30} -106 ${HY - 45} Q-90 ${HY - 116} 10 ${HY - 114} Q90 ${HY - 110} 92 ${HY - 40} Z`
       : `M${hx - 104} ${HY + 20} Q${hx - 110} ${HY - 116} ${hx + 2} ${HY - 116} Q${hx + 110} ${HY - 116} ${hx + 104} ${HY + 20} Q${hx + 96} ${HY - 44} ${hx + 50 + (v === '3q' ? 20 : 0)} ${HY - 56} Q${hx} ${HY - 40} ${hx - 50} ${HY - 58} Q${hx - 96} ${HY - 44} ${hx - 104} ${HY + 20} Z`, fill: F(d, hc, '35%', '20%') }, f);
-  if (st === 'afro') { const c0 = v === 'side' ? [-24, HY - 30] : v === '3q' ? [hx - 6, HY - 28] : [0, HY - 28], a0 = v === 'side' ? 200 : v === '3q' ? 185 : 180, a1 = v === 'side' ? 330 : v === '3q' ? 345 : 360;
-    for (let k = 0; k <= 9; k++) { const a = a0 + (a1 - a0) * k / 9, [bx, by] = kPt(c0[0], c0[1], 84, a); kBall(f, bx, by, 30 + (k % 2) * 6, hc, hD, kLite(hc, .25)); } }
+  if (st === 'buzz') {   // buzz cut: a thin cap hugging the skull, no volume
+    const bz = S('path', { d: v === 'side' ? `M88 ${HY - 46} Q55 ${HY - 70} 15 ${HY - 64} Q-10 ${HY - 38} -20 ${HY - 2} Q-44 ${HY + 26} -80 ${HY + 16} Q-90 ${HY - 100} 0 ${HY - 104} Q82 ${HY - 100} 88 ${HY - 46} Z`
+      : v === '3q' ? `M${hx - 89} ${HY - 8} Q${hx - 93} ${HY - 104} ${hx + 4} ${HY - 104} Q${hx + 96} ${HY - 102} ${hx + 95} ${HY - 18} Q${hx + 84} ${HY - 58} ${hx + 50} ${HY - 64} Q${hx + 10} ${HY - 58} ${hx - 40} ${HY - 62} Q${hx - 76} ${HY - 50} ${hx - 89} ${HY - 8} Z`
+      : `M-93 ${HY - 8} Q-96 ${HY - 104} 0 ${HY - 104} Q96 ${HY - 104} 93 ${HY - 8} Q88 ${HY - 56} 50 ${HY - 63} Q0 ${HY - 57} -50 ${HY - 63} Q-88 ${HY - 56} -93 ${HY - 8} Z`, fill: hc, opacity: .9 }, f);
+    const cl = S('g', { 'clip-path': kClip(d, bz) }, f); for (let k = 0; k < 70; k++) S('circle', { cx: hx - 95 + rnd(k * 7) * 190, cy: HY - 105 + rnd(k * 13) * 100, r: 1.6, fill: kLite(hc, .35), opacity: .5 }, cl);   // stubble texture
+  }
   // pose: raise the near arm at build time (beats can still rotate it)
   return M;
 }
