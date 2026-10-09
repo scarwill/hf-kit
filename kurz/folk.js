@@ -1,6 +1,5 @@
 // ===================== KURZ FOLK (load AFTER kurz.js + neon.js + mascots.js): people in the newer Kurzgesagt look =====================
-// Flat cel shading (hard curved shadow, _mFill), dot eyes, a big round nose that sticks out of the face in 3/4 and side,
-// open expressive mouths, chunky hair with a shadow chunk, mitten hands, short legs. Views: front / 3q / side (facing right; o.flip = -1 faces left).
+// Flat cel shading (hard curved shadow, _mFill), dot eyes, no nose (like Kurz), open expressive mouths, chunky hair with a shadow chunk, mitten hands, short legs. Views: front / 3q / side (facing right; o.flip = -1 faces left).
 // nFolk(par, x, y, s, id, o): full body ~430 px tall at s=1, feet at y. o.bust = true: head + shoulders only (y = bottom of the shoulders) for close-ups.
 // o = { view, bust, mood: 'smile'|'happy'|'shock'|'meh'|'neutral', skin, hair, hairStyle: 'short'|'bob'|'pony'|'buzz', top, collar, pants, shoes, pose: 'stand'|'wave'|'point'|'cheer', flip }
 // ids like the mascots: id+'B' whole, id+'H' head, id+'E' dot eyes, id+'eH' closed happy eyes, id+'mS' open smile, id+'mO' "oh", id+'mF' flat, id+'bL'/'bR' brows, id+'aL'/'aR' arms.
@@ -60,11 +59,9 @@ function nFolk(par, x, y, s, id, o = {}) {
     : `M-95 ${HY} Q-97 ${HY - 102} 0 ${HY - 104} Q97 ${HY - 102} 95 ${HY} Q95 ${HY + 62} 52 ${HY + 90} Q0 ${HY + 110} -52 ${HY + 90} Q-95 ${HY + 62} -95 ${HY} Z`;
   S('path', { d: hd, fill: F(d, sk, '34%', '30%') }, H);
   if (q3 && st !== 'bob') ear(-72); if (side && st !== 'bob') ear(-6);
-  // blush, nose (sticks out of the outline in 3q / side), brows, face
+  // blush, brows, face (no nose: Kurz faces have none)
   const blush = (bx, r = 18) => S('ellipse', { cx: bx, cy: HY + 48, rx: r, ry: r * .6, fill: '#ff6f8f', opacity: .4 }, H);
   if (v === 'front') { blush(-54); blush(54); } else if (q3) blush(-6); else blush(46);
-  const nose = (nx, ny, rx, ry) => { S('ellipse', { cx: nx + 2, cy: ny + 6, rx: rx * .9, ry: ry * .7, fill: kDark(sk, .2) }, H); S('ellipse', { cx: nx, cy: ny, rx, ry, fill: kDark(sk, .06) }, H); };
-  if (v === 'front') nose(0, HY + 32, 14, 11); else if (q3) nose(98, HY + 28, 20, 17); else nose(104, HY + 22, 22, 18);
   const eyes = v === 'front' ? [[-32, HY + 8, 10], [32, HY + 8, 10]] : q3 ? [[8, HY + 6, 10], [74, HY + 4, 9, .75]] : [[60, HY + 4, 10, .7]];
   const ink = '#1d1220', brow = (bx, w, k, tilt = 0) => S('path', { id: id + k, d: `M${bx - w} ${HY - 18 + tilt} L${bx + w} ${HY - 22 - tilt}`, stroke: kDark(hc, .1), 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' }, H);
   eyes.forEach(([bx, , , sx = 1], k) => brow(bx, 14 * sx, k ? 'bR' : 'bL'));
