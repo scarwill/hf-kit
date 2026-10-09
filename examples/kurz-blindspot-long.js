@@ -1,3 +1,4 @@
+// NOTE: older example — copy its STRUCTURE (worlds, kSCALE, camera, beats) only. Its pill() and kKid() are banned in new Kurz videos (kurzlint flags them).
 // Blind spot v2 — Kurzgesagt-style: shaded flat shapes, layered backgrounds, small character, idle motion. LONG 1920x1080.
 // Example for the kurzgesagt-explainer-video skill. Build: cat premium illus life helpers icons scenes extras kurz/kurz.js kurz/organs.js this > all.js
 // Source plan: no library. Worlds = kWorld palettes (auto parallax), organs = kurz/organs.js, nature props = kurz/kurz.js, camera/intro/outro = video kit.
