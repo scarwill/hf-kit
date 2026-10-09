@@ -33,10 +33,16 @@ function kBean(par, x, y, s, id, o = {}) {
   // neck + head
   S('rect', { x: nx - 14, y: -378, width: 28, height: 30, rx: 10, fill: skD }, M);
   const H = S('g', { id: id + 'H' }, M), hy = -436, hx = X * 4;
-  if (st === 'long' || (st === 'pony' && v === 'front')) S('path', { d: `M${hx - 60 - X * 4} ${hy - 34} Q${hx - 74} ${hy + 60} ${hx - 54 - X * 20} ${hy + 94} Q${hx - X * 20} ${hy + 108} ${hx + 54 - X * 20} ${hy + 94} Q${hx + 74} ${hy + 60} ${hx + 60 - X * 4} ${hy - 34} Z`, fill: hD }, H);
+  // long: two locks that fall in front of the shoulders, with a gap at the neck (one dark mass under the chin read as a beard)
+  if (st === 'long') { const lk = S('path', { d: `M${hx - 68} ${hy - 30} Q${hx - 82} ${hy + 60} ${hx - 92} ${hy + 160} Q${hx - 70} ${hy + 178} ${hx - 44} ${hy + 160} Q${hx - 40} ${hy + 110} ${hx - 32} ${hy + 64} L${hx} ${hy + 20} L${hx + 32} ${hy + 64} Q${hx + 40} ${hy + 110} ${hx + 44} ${hy + 160} Q${hx + 70} ${hy + 178} ${hx + 92} ${hy + 160} Q${hx + 82} ${hy + 60} ${hx + 68} ${hy - 30} Z`, fill: kDark(hc, .1) }, H);
+    const lc = S('g', { 'clip-path': kClip(d, lk) }, H); [-1, 1].forEach(sg => { S('ellipse', { cx: hx + sg * 50, cy: hy + 120, rx: 14, ry: 70, fill: hD, opacity: .45 }, lc); S('path', { d: `M${hx + sg * 76} ${hy + 40} Q${hx + sg * 80} ${hy + 100} ${hx + sg * 74} ${hy + 150}`, stroke: hL, 'stroke-width': 5, fill: 'none', opacity: .4, 'stroke-linecap': 'round' }, lc); }); }
+  // curly: an afro of curls BEHIND the head (the face covers the middle), small curls along the hairline are added after the face
+  if (st === 'curly') { const cb = S('g', {}, H); S('ellipse', { cx: hx, cy: hy - 16, rx: 86, ry: 82, fill: hD }, cb);
+    for (let k = 0; k < 14; k++) { const a = Math.PI * (.82 + k * .1), rr = 30 + 6 * rnd(k * 3 + 1); kBall(cb, hx + Math.cos(a) * 82, hy - 16 + Math.sin(a) * 80, rr, k % 2 ? hc : kDark(hc, .1), hD, hL); } }
+  if (st === 'pony' && v === 'front') S('path', { d: `M${hx - 60 - X * 4} ${hy - 34} Q${hx - 74} ${hy + 60} ${hx - 54 - X * 20} ${hy + 94} Q${hx - X * 20} ${hy + 108} ${hx + 54 - X * 20} ${hy + 94} Q${hx + 74} ${hy + 60} ${hx + 60 - X * 4} ${hy - 34} Z`, fill: hD }, H);
   if (st === 'pony' && v !== 'front') S('path', { d: `M${hx - dr * 52} ${hy - 30} Q${hx - dr * 110} ${hy} ${hx - dr * 92} ${hy + 76} Q${hx - dr * 70} ${hy + 30} ${hx - dr * 44} ${hy + 6} Z`, fill: hD }, H);
   if (st === 'bun') kBall(H, hx - X * 30, hy - 70, 28, hc, hD, hL);
-  if (v !== 'side' || true) { const ex = v === 'front' ? 0 : -dr * (v === 'side' ? 6 : 40); if (v !== 'front' || true) [-1, 1].forEach(sg => { if (v === 'front' || sg === -dr) S('ellipse', { cx: v === 'front' ? sg * 64 : hx + ex, cy: hy + 8, rx: 11, ry: 15, fill: skD }, H); }); }
+  if (v !== 'side' || true) { const ex = v === 'front' ? 0 : -dr * (v === 'side' ? 6 : 40); if (v !== 'front' || true) [-1, 1].forEach(sg => { if ((v === 'front' && st !== 'long') || sg === -dr) S('ellipse', { cx: v === 'front' ? sg * 64 : hx + ex, cy: hy + 8, rx: 11, ry: 15, fill: skD }, H); }); }
   // head shape: round; 3q/side get a gentle jaw + nose bump on the facing side
   const hd = v === 'side' ? `M${hx - dr * 62} ${hy} Q${hx - dr * 64} ${hy - 70} ${hx} ${hy - 72} Q${hx + dr * 60} ${hy - 72} ${hx + dr * 64} ${hy - 6} L${hx + dr * 76} ${hy + 12} Q${hx + dr * 78} ${hy + 20} ${hx + dr * 64} ${hy + 24} Q${hx + dr * 58} ${hy + 64} ${hx + dr * 10} ${hy + 68} Q${hx - dr * 60} ${hy + 66} ${hx - dr * 62} ${hy} Z`
     : v === '3q' ? `M${hx - dr * 64} ${hy} Q${hx - dr * 66} ${hy - 70} ${hx} ${hy - 72} Q${hx + dr * 64} ${hy - 72} ${hx + dr * 66} ${hy - 4} Q${hx + dr * 66} ${hy + 50} ${hx + dr * 30} ${hy + 68} Q${hx} ${hy + 76} ${hx - dr * 34} ${hy + 64} Q${hx - dr * 64} ${hy + 50} ${hx - dr * 64} ${hy} Z`
@@ -49,14 +55,19 @@ function kBean(par, x, y, s, id, o = {}) {
   const E = S('g', { id: id + 'E' }, H);
   const eye = (cx, k) => { S('ellipse', { cx, cy: hy + 4, rx: 9.5 * k, ry: 12, fill: '#fbf8f4' }, E); S('ellipse', { cx: cx + X * 2.5 * k, cy: hy + 5, rx: 6.5 * k, ry: 8.5, fill: '#2a1d1a' }, E); S('circle', { cx: cx + X * 2.5 * k - 2, cy: hy + 1, r: 2.4, fill: '#fff' }, E); };
   if (v === 'front') { eye(-gp, 1); eye(gp, 1); } else if (v === '3q') { eye(hx + fc - dr * gp, .78); eye(hx + fc + dr * gp * .9, 1); } else eye(hx + fc - dr * 8, .8);
+  if (f && v === 'front') [-1, 1].forEach(sg => S('path', { d: `M${sg * (gp + 7)} ${hy - 6} L${sg * (gp + 15)} ${hy - 11} M${sg * (gp + 9)} ${hy - 2} L${sg * (gp + 17)} ${hy - 4}`, stroke: '#2a1d1a', 'stroke-width': 3, 'stroke-linecap': 'round' }, E));
   const bc = kDark(hc, .15), bw = 4.5;
   const brow = (cx, w, sideId) => S('path', { id: id + sideId, d: `M${cx - w} ${hy - 16} Q${cx} ${hy - 24} ${cx + w} ${hy - 17}`, stroke: bc, 'stroke-width': bw, fill: 'none', 'stroke-linecap': 'round' }, H);
   if (v === 'front') { brow(-gp, 12, 'bL'); brow(gp, 12, 'bR'); } else if (v === '3q') { brow(hx + fc - dr * gp, 9, dr > 0 ? 'bL' : 'bR'); brow(hx + fc + dr * gp * .9, 12, dr > 0 ? 'bR' : 'bL'); } else brow(hx + fc - dr * 8, 10, 'bR');
   if (v !== 'side') S('path', { d: `M${hx + fc + X * 6} ${hy + 10} Q${hx + fc + X * 14 + (v === 'front' ? 4 : 0)} ${hy + 26} ${hx + fc + X * 4} ${hy + 30}`, stroke: skD, 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', opacity: .8 }, H);
   const mx = hx + fc + (v === 'side' ? dr * 4 : 0), mw = v === 'side' ? 9 : 13;
+  // beard: full jaw beard + mustache, drawn BEFORE the mouth so the mouth stays visible on a small skin patch
+  if (o.beard) { const bg = S('g', { 'clip-path': kClip(d, hp) }, H); const bd = S('path', { d: `M${mx - 66} ${hy + 4} Q${mx - 62} ${hy + 70} ${mx - 24} ${hy + 80} Q${mx} ${hy + 86} ${mx + 24} ${hy + 80} Q${mx + 62} ${hy + 70} ${mx + 66} ${hy + 4} L${mx + 54} ${hy + 6} Q${mx + 50} ${hy + 34} ${mx + 26} ${hy + 36} Q${mx} ${hy + 30} ${mx - 26} ${hy + 36} Q${mx - 50} ${hy + 34} ${mx - 54} ${hy + 6} Z`, fill: hc }, bg);
+    S('ellipse', { cx: mx + 40, cy: hy + 62, rx: 30, ry: 26, fill: hD, opacity: .45 }, bg); S('ellipse', { cx: mx - 24, cy: hy + 66, rx: 14, ry: 6, fill: hL, opacity: .35 }, bg);
+    S('ellipse', { cx: mx, cy: hy + 48, rx: 15, ry: 7, fill: sk }, H);
+    S('path', { d: `M${mx - 26} ${hy + 42} Q${mx - 16} ${hy + 30} ${mx} ${hy + 36} Q${mx + 16} ${hy + 30} ${mx + 26} ${hy + 42} Q${mx + 12} ${hy + 40} ${mx} ${hy + 42} Q${mx - 12} ${hy + 40} ${mx - 26} ${hy + 42} Z`, fill: kDark(hc, .1) }, H); }
   S('path', { id: id + 'mS', d: `M${mx - mw} ${hy + 44} Q${mx} ${hy + 53} ${mx + mw} ${hy + 44}`, stroke: '#8f3f36', 'stroke-width': 3.6, fill: 'none', 'stroke-linecap': 'round' }, H);
   S('ellipse', { id: id + 'mO', cx: mx, cy: hy + 47, rx: 8, ry: 7, fill: '#6e2630', opacity: 0 }, H);
-  const bk = v === 'side' ? .62 : v === '3q' ? .85 : 1; if (o.beard) { const bd = S('path', { d: `M${hx + fc - 52 * bk} ${hy + 22} Q${hx + fc - 44 * bk} ${hy + 72} ${hx + fc} ${hy + 76} Q${hx + fc + 44 * bk} ${hy + 72} ${hx + fc + 52 * bk} ${hy + 22} Q${hx + fc + 30 * bk} ${hy + 40} ${hx + fc} ${hy + 38} Q${hx + fc - 30 * bk} ${hy + 40} ${hx + fc - 52 * bk} ${hy + 22} Z`, fill: hc, 'clip-path': kClip(d, hp) }, H); }
   if (o.glasses) { const gs = v === 'front' ? [-gp, gp] : v === '3q' ? [hx + fc - dr * gp, hx + fc + dr * gp * .9] : [hx + fc - dr * 8]; gs.forEach((gx, k) => S('rect', { x: gx - 17, y: hy - 10, width: 34, height: 28, rx: 10, fill: '#fff', 'fill-opacity': .12, stroke: '#1d2333', 'stroke-width': 3.5 }, H)); }
   // hair (front shape; volume pushed to the back of the head when turned)
   const b = -X; const HR = {
@@ -65,7 +76,7 @@ function kBean(par, x, y, s, id, o = {}) {
     bun: `M${hx - 64} ${hy - 6} Q${hx - 68} ${hy - 80} ${hx} ${hy - 82} Q${hx + 68} ${hy - 80} ${hx + 64} ${hy - 6} Q${hx + 50} ${hy - 50} ${hx} ${hy - 52} Q${hx - 50} ${hy - 50} ${hx - 64} ${hy - 6} Z`,
     pony: `M${hx - 64} ${hy - 6} Q${hx - 68} ${hy - 80} ${hx} ${hy - 82} Q${hx + 68} ${hy - 80} ${hx + 64} ${hy - 6} Q${hx + 50} ${hy - 50} ${hx + X * 20} ${hy - 50} Q${hx - 50} ${hy - 48} ${hx - 64} ${hy - 6} Z`, bald: null }[st];
   const hairEl = HR ? S('path', { d: HR, fill: hc }, H) : null;
-  if (st === 'curly') { const cg = S('g', {}, H); for (let k = 0; k < 9; k++) { const a = Math.PI * (1.02 + k * .12); kBall(cg, hx + Math.cos(a) * 60 - X * 6, hy - 8 + Math.sin(a) * 66, 26, hc, hD, hL); } }
+  if (st === 'curly') { const cg = S('g', {}, H); for (let k = 0; k < 9; k++) { const a = Math.PI * (1.15 + k * .0875); kBall(cg, hx + Math.cos(a) * 58, hy - 12 + Math.sin(a) * 68, 19 + 4 * rnd(k * 5 + 2), k % 2 ? hc : kDark(hc, .08), hD, hL); } }
   if (hairEl) { const c2 = S('g', { 'clip-path': kClip(d, hairEl) }, H); S('ellipse', { cx: hx + 50, cy: hy - 20, rx: 40, ry: 70, fill: hD, opacity: .5 }, c2); S('ellipse', { cx: hx - 20, cy: hy - 70, rx: 30, ry: 10, fill: hL, opacity: .55, transform: `rotate(-12 ${hx - 20} ${hy - 70})` }, c2); }
   return M;
 }
