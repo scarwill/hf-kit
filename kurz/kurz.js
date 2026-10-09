@@ -365,14 +365,9 @@ function kSlim(par, x, y, s, id, o = {}) {
 }
 
 // kTalk(id, t0, t1): mouth opens on every spoken word (kHuman / kSlim / kKid)
-// 3/4 view: turn a kHuman / kSlim face toward dir (-1 = viewer's left, 1 = right). Build time. amt 0..1
-function kTurn(id, dir = 1, amt = 1) { const F = document.getElementById(id + 'F'), H = document.getElementById(id + 'H'); if (!F || !H) return;
-  const w = H.getBBox().width; tl.set('#' + id + 'F', { x: dir * w * .075 * amt, y: 0 }, 0); tl.set('#' + id + 'H', { rotation: dir * 3 * amt, transformOrigin: '50% 100%' }, 0);
-  [...H.children].forEach(c => { const cx = +c.getAttribute('cx'); if (c.tagName === 'ellipse' && Math.abs(cx) > 35 && Math.sign(cx) === Math.sign(dir) && amt > .5) c.setAttribute('opacity', 0); });
-  [...H.children].forEach(c => { if (c.tagName === 'path' && !c.id && c.getAttribute('stroke') && /^M-?6[0-9] -80/.test(c.getAttribute('d') || '') && Math.sign(parseFloat(c.getAttribute('d').slice(1))) === Math.sign(dir)) c.setAttribute('opacity', 0); }); }
 // look at something during the video: face slides toward dir (-1/0/1), small head tilt; dy for up/down (px, e.g. -8 = up)
 function kLook(id, t, dir, dy = 0, d = .45) { const F = document.getElementById(id + 'F'), H = document.getElementById(id + 'H'), w = H.getBBox().width;
-  tl.to('#' + id + 'F', { x: dir * w * .075, y: dy, duration: d, ease: 'power2.inOut' }, t); tl.to('#' + id + 'H', { rotation: dir * 3 + dy * .3, transformOrigin: '50% 100%', duration: d, ease: 'power2.inOut' }, t); B(t); }
+  tl.to('#' + id + 'F', { x: dir * w * .03, y: dy, duration: d, ease: 'power2.inOut' }, t); tl.to('#' + id + 'H', { rotation: dir * 3 + dy * .3, transformOrigin: '50% 100%', duration: d, ease: 'power2.inOut' }, t); B(t); }
 function kTalk(id, t0, t1) { const base = document.getElementById(id + 'mS') ? id + 'mS' : id + 'm';
   TW.filter(w => w[0] >= t0 - .01 && w[0] < t1).forEach((w, i, a) => { const op = Math.min(.17, Math.max(.07, ((a[i + 1] ? a[i + 1][0] : w[0] + .3) - w[0]) * .55));
     tl.set('#' + id + 'mO', { opacity: 1 }, w[0]); tl.set('#' + base, { opacity: 0 }, w[0]); tl.set('#' + id + 'mO', { opacity: 0 }, w[0] + op); tl.set('#' + base, { opacity: 1 }, w[0] + op); }); B(t0); }

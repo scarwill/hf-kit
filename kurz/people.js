@@ -1,12 +1,12 @@
 // ===================== KURZ PEOPLE: simple, clean, shaded "bean" people (load AFTER kurz.js) =====================
 // Original design in the Kurzgesagt spirit: round head, pill body, clear open eyes (no heavy lids), soft shading, no outlines.
-// Real turns: view 'front' | '3q' (three-quarter) | 'side' (profile), dir 1 = facing viewer's right, -1 = left.
-// kBean(par, x, feetY, s, id, o) ~ 520 px tall at s=1. o = {view, dir, sex:'m'|'f', skin, hair, hairStyle:'short'|'curly'|'long'|'bun'|'pony'|'bald',
+// FRONT VIEW ONLY (user dropped 3/4 and side: "side angle bohot bhayanak", "nahi chahiye 3/4 look"). To look at something use kLook (small eye/head shift).
+// kBean(par, x, feetY, s, id, o) ~ 520 px tall at s=1. o = {sex:'m'|'f', skin, hair, hairStyle:'short'|'curly'|'long'|'bun'|'pony'|'bald',
 //   top, pants, shoes, glasses, beard, coat}
 // ids: id+'B' whole (move / bob), id+'H' head, id+'E' eyes (blink: eyes('#idE',[t])), id+'mS' mouth, id+'mO' open mouth, id+'bL'/'bR' brows,
-//      id+'aN'/'aF' near / far arm (rotate, transformOrigin '50% 0%'), id+'lN'/'lF' legs. Speaking: kTalk(id, t0, t1). Walking: kWALK(id, t, dx, d).
+//      id+'aN' right arm / id+'aF' left arm (rotate, transformOrigin '50% 0%'), id+'lN'/'lF' legs. Speaking: kTalk(id, t0, t1). Walking: kWALK(id, t, dx, d).
 function kBean(par, x, y, s, id, o = {}) {
-  const v = o.view || 'front', dr = o.dir || 1, sk = o.skin || '#f3cfb3', skD = kDark(sk, .22), skL = kLite(sk, .35);
+  const v = 'front',   /* user: only front view (3/4 and side dropped) */ dr = o.dir || 1, sk = o.skin || '#f3cfb3', skD = kDark(sk, .22), skL = kLite(sk, .35);
   const hc = o.hair || '#5a3a26', hD = kDark(hc, .3), hL = kLite(hc, .3), top = o.top || '#3a7bd5', pants = o.pants || '#2b2f4a', shoe = o.shoes || '#1b1d2e';
   const f = o.sex === 'f', st = o.hairStyle || (f ? 'long' : 'short'), d = kDefs(par);
   const O = S('g', { transform: `translate(${x},${y}) scale(${s})` }, par), M = S('g', { id: id + 'B' }, O);
@@ -75,3 +75,6 @@ function kWALK(id, t, dx, d = 1.6) { const n = Math.max(2, Math.round(d / .4));
   tl.to('#' + id + 'lN', { rotation: 16, transformOrigin: '50% 0%', duration: d / n, yoyo: true, repeat: n - 1, ease: 'sine.inOut' }, t);
   tl.to('#' + id + 'lF', { rotation: -16, transformOrigin: '50% 0%', duration: d / n, yoyo: true, repeat: n - 1, ease: 'sine.inOut' }, t);
   tl.to('#' + id + 'B', { y: -8, duration: d / n / 2, yoyo: true, repeat: 2 * n - 1, ease: 'sine.inOut' }, t); B(t); }
+
+// look toward something: eyes + head shift a little (dir -1 left / 1 right, dy px up/down). Works for kBean.
+function kGaze(id, t, dir, dy = 0, d = .4) { tl.to('#' + id + 'E', { x: dir * 5, y: dy * .4, duration: d, ease: 'power2.inOut' }, t); tl.to('#' + id + 'H', { rotation: dir * 4, y: dy * .3, transformOrigin: '50% 100%', duration: d, ease: 'power2.inOut' }, t); B(t); }
