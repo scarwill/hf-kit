@@ -107,3 +107,39 @@ function kBot(par, x, feetY, s, id, col = '#7b6cf6') {
   S('path', { id: id + 'mS', d: 'M-22 -440 Q0 -428 22 -440', stroke: '#7cf6ff', 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' }, H);
   return M;
 }
+
+// ---------- AI model options (pick ONE per video, keep it all video) ----------
+// A: faceted crystal core — a cut gem with a glowing network inside, small shards floating around (no planet ring)
+function kGem(par, cx, cy, r, col, id) {
+  const g = S('g', { id }, par); kGlow(g, cx, cy, r * 2.4, col, .55, id + 'g');
+  const pts = Array.from({ length: 6 }, (_, k) => [cx + Math.cos(Math.PI / 3 * k - Math.PI / 2) * r, cy + Math.sin(Math.PI / 3 * k - Math.PI / 2) * r * 1.08]);
+  const shade = [.2, .05, -.25, -.4, -.15, .3];
+  pts.forEach((p, k) => { const q = pts[(k + 1) % 6], f = shade[k]; S('path', { d: `M${cx} ${cy} L${p[0]} ${p[1]} L${q[0]} ${q[1]} Z`, fill: f > 0 ? kLite(col, f) : kDark(col, -f) }, g); });
+  const net = S('g', { id: id + 'n', opacity: .85 }, g); const inner = pts.map(p => [cx + (p[0] - cx) * .55, cy + (p[1] - cy) * .55]);
+  inner.forEach((p, k) => { S('path', { d: `M${cx} ${cy} L${p[0]} ${p[1]} L${inner[(k + 2) % 6][0]} ${inner[(k + 2) % 6][1]}`, stroke: kLite(col, .75), 'stroke-width': Math.max(2, r * .02), fill: 'none', opacity: .7 }, net); S('circle', { cx: p[0], cy: p[1], r: r * .05, fill: '#fff' }, net); });
+  kGlow(g, cx, cy, r * .5, '#ffffff', .6); S('circle', { cx, cy, r: r * .09, fill: '#fff' }, g);
+  S('path', { d: `M${pts[5][0] + r * .08} ${pts[5][1] + r * .1} L${pts[0][0] - r * .02} ${pts[0][1] + r * .2}`, stroke: '#fff', 'stroke-width': r * .04, 'stroke-linecap': 'round', opacity: .6 }, g);
+  const sh = S('g', { id: id + 'o', class: 'kBob' }, g); [[-1.45, -.5, .2], [1.5, .2, .16], [-1.2, .85, .12], [1.1, -.95, .1]].forEach(([a, b, s2]) => kCrystal(sh, cx + a * r, cy + b * r, r * s2 * 2, kLite(col, .2), null, false));
+  return g;
+}
+// B: neuron cluster — a cloud of glowing nodes and threads, brighter at the centre (a "mind" made of connections)
+function kMind(par, cx, cy, r, col, id, n = 46) {
+  const g = S('g', { id }, par); kGlow(g, cx, cy, r * 2.2, col, .5, id + 'g');
+  const P = []; for (let k = 0; k < n; k++) { const a = rnd(k * 13 + 1) * Math.PI * 2, d = Math.sqrt(rnd(k * 29 + 7)) * r; P.push([cx + Math.cos(a) * d, cy + Math.sin(a) * d * .82, d / r]); }
+  const L = S('g', {}, g); P.forEach((p, i) => P.forEach((q, j) => { if (j <= i) return; const dd = Math.hypot(p[0] - q[0], p[1] - q[1]); if (dd < r * .38) S('path', { d: `M${p[0]} ${p[1]} L${q[0]} ${q[1]}`, stroke: kLite(col, .5), 'stroke-width': Math.max(1.5, r * .012), opacity: .5 * (1 - dd / (r * .38)) + .1 }, L); }));
+  kGlow(g, cx, cy, r * .8, kLite(col, .6), .55);
+  const N = S('g', { id: id + 'n' }, g); P.forEach((p, k) => { const rr = r * (.035 + .045 * (1 - p[2])); kBall(N, p[0], p[1], rr, p[2] < .35 ? kLite(col, .6) : kLite(col, .25)); });
+  kBall(g, cx, cy, r * .14, kLite(col, .75), kLite(col, .3), '#fff');
+  return g;
+}
+// C: glowing machine-cell orb — soft translucent membrane, inner layers, glowing nucleus with circuitry (zoom INTO it)
+function kOrb(par, cx, cy, r, col, id) {
+  const g = S('g', { id }, par); kGlow(g, cx, cy, r * 2.2, col, .5, id + 'g'); const d = kDefs(par);
+  const m = S('path', { d: kBlobD(cx, cy, r, .12, 4, 10), fill: kMix(col, '#0b0820', .35), 'fill-opacity': .85 }, g); kShade(g, m);
+  S('path', { d: kBlobD(cx, cy, r, .12, 4, 10), fill: 'none', stroke: kLite(col, .55), 'stroke-width': r * .05, opacity: .7 }, g);
+  S('path', { d: kBlobD(cx - r * .04, cy - r * .02, r * .78, .14, 8, 9), fill: kMix(col, '#0b0820', .15), opacity: .8 }, g);
+  for (let k = 0; k < 9; k++) { const a = k * .7 + .4, dd = r * (.5 + .2 * rnd(k * 5)); kBall(g, cx + Math.cos(a) * dd, cy + Math.sin(a) * dd * .9, r * (.04 + .03 * rnd(k * 11)), kLite(col, .35)); }
+  kGlow(g, cx, cy, r * .7, kLite(col, .5), .6); kBall(g, cx, cy, r * .34, kLite(col, .3), null, null, id + 'k', '#fff');
+  const c = S('g', { opacity: .9 }, g); for (let k = 0; k < 6; k++) { const a = k * Math.PI / 3 + .3, x2 = cx + Math.cos(a) * r * .24, y2 = cy + Math.sin(a) * r * .24; S('path', { d: `M${cx} ${cy} L${(cx + x2) / 2} ${cy} L${x2} ${y2}`, stroke: '#fff', 'stroke-width': r * .018, fill: 'none', opacity: .75 }, c); S('circle', { cx: x2, cy: y2, r: r * .03, fill: '#fff' }, c); }
+  return g;
+}
