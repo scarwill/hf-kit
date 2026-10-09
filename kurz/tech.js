@@ -123,9 +123,9 @@ function kGem(par, cx, cy, r, col, id) {
   return g;
 }
 // B: neuron cluster — a cloud of glowing nodes and threads, brighter at the centre (a "mind" made of connections)
-function kMind(par, cx, cy, r, col, id, n = 46) {
+function kMind(par, cx, cy, r, col, id, n = 70) {
   const g = S('g', { id }, par); kGlow(g, cx, cy, r * 2.2, col, .5, id + 'g');
-  const P = []; for (let k = 0; k < n; k++) { const a = rnd(k * 13 + 1) * Math.PI * 2, d = Math.sqrt(rnd(k * 29 + 7)) * r; P.push([cx + Math.cos(a) * d, cy + Math.sin(a) * d * .82, d / r]); }
+  const P = []; for (let k = 0; k < n; k++) { const a = k * 2.39996, d = Math.sqrt((k + .5) / n) * r * (.92 + .16 * rnd(k * 7)); P.push([cx + Math.cos(a) * d, cy + Math.sin(a) * d * .82, d / r]); }
   const L = S('g', {}, g); P.forEach((p, i) => P.forEach((q, j) => { if (j <= i) return; const dd = Math.hypot(p[0] - q[0], p[1] - q[1]); if (dd < r * .38) S('path', { d: `M${p[0]} ${p[1]} L${q[0]} ${q[1]}`, stroke: kLite(col, .5), 'stroke-width': Math.max(1.5, r * .012), opacity: .5 * (1 - dd / (r * .38)) + .1 }, L); }));
   kGlow(g, cx, cy, r * .8, kLite(col, .6), .55);
   const N = S('g', { id: id + 'n' }, g); P.forEach((p, k) => { const rr = r * (.035 + .045 * (1 - p[2])); kBall(N, p[0], p[1], rr, p[2] < .35 ? kLite(col, .6) : kLite(col, .25)); });
