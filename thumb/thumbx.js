@@ -27,3 +27,19 @@ function tArrow(par, x1, y1, x2, y2, col = '#ef4444', w = 40) { const a = Math.a
   const g = S('g', { transform: `translate(${x1} ${y1}) rotate(${a * 180 / Math.PI})`, filter: 'url(#fSh)' }, par);
   S('path', { d: `M0 ${-w / 2} L${L - hl} ${-w / 2} L${L - hl} ${-hw} L${L} 0 L${L - hl} ${hw} L${L - hl} ${w / 2} L0 ${w / 2} Z`, fill: col, stroke: '#000', 'stroke-width': 7, 'stroke-linejoin': 'round' }, g); return g; }
 // keep x>1665, y>945 empty (YouTube time badge). Call tSafe() while testing to see the box.
+
+// ----- POP kit: bold backgrounds + sticker outline (thumbnails must read at phone size; no busy rooms) -----
+// full-frame radial background: bright core c1 around (cx, cy) fading to c2 at the edges
+function tBg(par, c1, c2, cx = 1300, cy = 520, r = 1300) { const id = 'tb' + (++_gi); const g = S('radialGradient', { id, cx, cy, r, gradientUnits: 'userSpaceOnUse' }, document.querySelector('#world defs'));
+  S('stop', { offset: 0, 'stop-color': c1 }, g); S('stop', { offset: 1, 'stop-color': c2 }, g); return S('rect', { x: -10, y: -10, width: 1940, height: 1100, fill: `url(#${id})` }, par); }
+// sun-burst rays from (cx, cy): energy behind the hero
+function tBurst(par, cx, cy, col = '#ffffff', n = 18, op = .1, R = 2200) { const g = S('g', { opacity: op }, par);
+  for (let k = 0; k < n; k++) { const a = k / n * Math.PI * 2, b = a + Math.PI / n * .9; S('path', { d: `M${cx} ${cy} L${cx + Math.cos(a) * R} ${cy + Math.sin(a) * R} L${cx + Math.cos(b) * R} ${cy + Math.sin(b) * R} Z`, fill: col }, g); } return g; }
+// sticker look: thick outline (col, w px in frame units) + drop shadow around any group; el = the hero's outer <g>
+function tSticker(el, col = '#ffffff', w = 10) { const id = 'ts' + (++_gi); const f = S('filter', { id, x: '-20%', y: '-20%', width: '140%', height: '140%' }, document.querySelector('#world defs'));
+  S('feMorphology', { in: 'SourceAlpha', operator: 'dilate', radius: w, result: 'd' }, f); S('feFlood', { 'flood-color': col, result: 'c' }, f); S('feComposite', { in: 'c', in2: 'd', operator: 'in', result: 'o' }, f);
+  S('feDropShadow', { in: 'o', dx: 0, dy: 18, stdDeviation: 16, 'flood-color': '#000', 'flood-opacity': .55, result: 'os' }, f);
+  const m = S('feMerge', {}, f); S('feMergeNode', { in: 'os' }, m); S('feMergeNode', { in: 'SourceGraphic' }, m); el.setAttribute('filter', `url(#${id})`); return el; }
+// small spark burst (broken / missing part)
+function tSpark(par, cx, cy, s = 1, col = '#fde047') { const g = S('g', {}, par); [0, 45, 90, 135, 180, 225, 270, 315].forEach((a, k) => { const r = (k % 2 ? 46 : 70) * s, rad = a * Math.PI / 180;
+  S('path', { d: `M${cx + Math.cos(rad) * 18 * s} ${cy + Math.sin(rad) * 18 * s} L${cx + Math.cos(rad) * r} ${cy + Math.sin(rad) * r}`, stroke: col, 'stroke-width': 10 * s, 'stroke-linecap': 'round' }, g); }); return g; }
