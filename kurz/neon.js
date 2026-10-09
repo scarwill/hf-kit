@@ -1,5 +1,5 @@
 // ===================== KURZ NEON (load AFTER kurz.js): the newer Kurzgesagt space look + Kurz-style infographic parts =====================
-// Look: deep navy/violet space, soft nebula clouds, tiny + 4-point stars, strong bloom on light sources, saturated neon accents.
+// Look: deep navy/violet space, soft nebula clouds, tiny + 4-point stars (static), strong bloom on light sources, saturated neon accents.
 // Parts: glowing titles, label pills, map pins, timelines, counters, icon cards, gauges, speech bubbles, planets, galaxy, rocket.
 // Every part: (par, ..., id) -> <g id>. Hide with hidId(id) at build, show with the matching CAPS beat (nPOP, nDRAW, nCOUNT ...).
 const NPAL = { bg: '#0a0626', bg2: '#170a45', deep: '#05031a', mag: '#ff2e88', cyan: '#22e3ff', yel: '#ffd23f', vio: '#8b5cf6',
@@ -161,9 +161,9 @@ function nFLY(id, t, dx, d = 2, dy = 0) { tl.to('#' + id, { x: dx, y: dy, durati
 // slow camera drift for a whole area (the newer Kurz camera never stands still)
 function nDRIFT(t0, t1, cx, cy, z0 = 1, z1 = 1.06, dx = 30) { CAM(t0, cx - dx, cy, z0, .01, 'none');
   CAM(t0 + .02, cx + dx, cy, z1, Math.max(.5, t1 - t0 - .02), 'none'); }
-// ambient life for the whole video: twinkling stars, drifting nebula, spinning galaxies, speed lines streaming. Call once in beats.
+// ambient life for the whole video: slow nebula drift, spinning galaxies, speed lines streaming. Call once in beats.
+// Stars do NOT twinkle (user rule: no twinkling / floating particles; stars only move with the camera parallax).
 function nLife() { const rep = d => Math.max(1, Math.floor((END + 4) / d));
-  document.querySelectorAll('.nTw').forEach((e, k) => tl.fromTo(e, { opacity: .25 }, { opacity: 1, duration: .9 + (k % 5) * .35, yoyo: true, repeat: rep(1.2), ease: 'sine.inOut' }, (k % 7) * .23));
   document.querySelectorAll('.nNeb').forEach((e, k) => tl.to(e, { x: 60, y: -25, duration: 9, yoyo: true, repeat: rep(9), ease: 'sine.inOut' }, 0));
   document.querySelectorAll('.nSpinI').forEach(e => tl.to(e, { rotation: 360, transformOrigin: '50% 50%', duration: 60, repeat: rep(60), ease: 'none' }, 0));
   document.querySelectorAll('.nSpd').forEach(e => tl.fromTo(e, { x: 300 }, { x: -500, duration: .6, repeat: rep(.6), ease: 'none' }, 0));
