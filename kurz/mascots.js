@@ -32,19 +32,18 @@ function _mGill(g, bx, by, a, L, w, col, frill = 0) { const [tx, ty] = kPt(bx, b
 function nAxo(par, x, y, s, id, o = {}) { const c = o.col || '#ff9ec7', gc = o.gill || '#ff3d9a', d = kDefs(par), v = o.view || 'front', cD = kDark(c, .22);
   const O = S('g', { transform: `translate(${x},${y}) scale(${s * (o.flip || 1)},${s})` }, par), M = S('g', { id: id + 'B' }, O);
   const belly = kLite(c, .5), arm = (k, ax, ay, rot, col) => { const a = S('g', { id: id + k }, M); S('ellipse', { cx: ax, cy: ay, rx: 20, ry: 38, fill: col, transform: `rotate(${rot} ${ax} ${ay})` }, a); return a; };
-  if (v === 'side') {   // profile: head and body in one line (head a bit taller), gills fanning back, legs fore and aft
-    S('ellipse', { cx: -20, cy: 4, rx: 175, ry: 15, fill: '#000', opacity: .3 }, M);
-    S('path', { d: 'M-130 -118 Q-250 -140 -320 -88 Q-240 -60 -130 -70 Z', fill: c }, M); S('path', { d: 'M-140 -116 Q-250 -148 -315 -91 Q-235 -120 -150 -100 Z', fill: kLite(gc, .4), opacity: .8 }, M);   // tail + top fin
-    [-100, 20].forEach(lx => S('ellipse', { cx: lx, cy: -16, rx: 26, ry: 15, fill: kDark(c, .32) }, M));   // far legs
-    [[-112, 56], [-88, 50]].forEach(([a, L]) => _mGill(M, 34, -196, a, L, 11, kDark(gc, .25)));   // far-side gills peek over the back of the head   // far-side gills peek over the head
-    S('ellipse', { cx: -25, cy: -98, rx: 142, ry: 66, fill: _mFill(d, c, '40%', '20%') }, M); S('ellipse', { cx: -25, cy: -50, rx: 95, ry: 20, fill: belly, opacity: .85 }, M);
-    S('ellipse', { cx: -88, cy: -30, rx: 20, ry: 22, fill: cD }, M); S('ellipse', { cx: -80, cy: -10, rx: 30, ry: 14, fill: cD }, M);   // near back leg
-    { const a = S('g', { id: id + 'aR' }, M); S('ellipse', { cx: 40, cy: -30, rx: 20, ry: 22, fill: cD }, a); S('ellipse', { cx: 50, cy: -10, rx: 30, ry: 14, fill: cD }, a); }   // near front leg
+  if (v === 'side') {   // side (user's pick): upright round body like the front view, head turned to profile, gills at the back of the head
+    S('ellipse', { cx: -30, cy: 4, rx: 150, ry: 16, fill: '#000', opacity: .3 }, M);
+    S('path', { d: 'M-50 -60 Q-240 -40 -270 -150 Q-200 -90 -60 -120 Z', fill: kDark(c, .12) }, M);
+    S('ellipse', { cx: -65, cy: -14, rx: 30, ry: 18, fill: kDark(c, .2) }, M); S('ellipse', { cx: 15, cy: -14, rx: 30, ry: 18, fill: kDark(c, .32) }, M);
+    arm('aL', 60, -120, 20, kDark(c, .3));   // far arm, mostly behind the body
+    S('ellipse', { cx: -15, cy: -110, rx: 90, ry: 100, fill: _mFill(d, c) }, M); S('ellipse', { cx: 36, cy: -90, rx: 40, ry: 62, fill: belly, opacity: .85 }, M);
+    arm('aR', 70, -115, -35, cD);
     const H = S('g', { id: id + 'H' }, M);
-    [[8, -172, -132, 84], [-6, -142, -168, 92], [2, -112, 152, 80]].forEach(([bx, by, a, L]) => _mGill(H, bx, by, a, L, 15, gc));   // three gill fronds fanned back (same style as front view)
-    S('path', { d: 'M-22 -132 Q-18 -208 88 -210 Q196 -204 206 -136 Q210 -70 116 -62 Q14 -58 -22 -132 Z', fill: _mFill(d, c, '40%', '22%') }, H);
-    S('ellipse', { cx: 150, cy: -106, rx: 17, ry: 10, fill: '#ff5d8f', opacity: .45 }, H);
-    _mFace(H, id, [[142, -150, 20, .8]], 168, -92, o, '#1b1240', 14);
+    [-38, 0, 38].forEach(a => _mGill(H, -66, -300, 180 - a, 92 - Math.abs(a) * .5, 17, gc));
+    S('ellipse', { cx: 40, cy: -290, rx: 128, ry: 112, fill: _mFill(d, c, '40%', '25%') }, H);
+    S('ellipse', { cx: 148, cy: -266, rx: 15, ry: 10, fill: '#ff5d8f', opacity: .45 }, H);
+    _mFace(H, id, [[128, -300, 22, .75]], 132, -246, o, '#1b1240', 14);
   } else if (v === '3q') {
     S('ellipse', { cx: -20, cy: 4, rx: 135, ry: 16, fill: '#000', opacity: .3 }, M);
     S('path', { d: 'M-50 -70 Q-200 -50 -250 -150 Q-170 -95 -60 -125 Z', fill: kDark(c, .1) }, M);
