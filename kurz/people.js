@@ -3,7 +3,7 @@
 // Views: o.view 'front' (default) | '3q' | 'side', facing right; o.flip = -1 faces left. Each view is its own drawing in the same style.
 // To look at something without turning use kGaze (small eye/head shift).
 // kBean(par, x, feetY, s, id, o) ~ 520 px tall at s=1. o = {view, flip, sex:'m'|'f', skin, hair, hairStyle:'short'|'long'|'bun'|'pony'|'bald',
-//   top, pants, shoes, glasses, beard, coat}
+//   top, pants, shoes, glasses, coat}   (beard was dropped)
 // ids: id+'B' whole (move / bob), id+'H' head, id+'E' eyes (blink: eyes('#idE',[t])), id+'mS' mouth, id+'mO' open mouth, id+'bL'/'bR' brows,
 //      id+'aN' right arm / id+'aF' left arm (rotate, transformOrigin '50% 0%'), id+'lN'/'lF' legs. Speaking: kTalk(id, t0, t1). Walking: kWALK(id, t, dx, d).
 function kBean(par, x, y, s, id, o = {}) {
@@ -63,11 +63,6 @@ function kBean(par, x, y, s, id, o = {}) {
   if (v === 'front') { brow(-gp, 12, 'bL'); brow(gp, 12, 'bR'); } else if (v === '3q') { brow(hx + fc - dr * gp, 9, dr > 0 ? 'bL' : 'bR'); brow(hx + fc + dr * gp * .9, 12, dr > 0 ? 'bR' : 'bL'); } else brow(hx + fc - dr * 8, 10, 'bR');
   if (v !== 'side') S('path', { d: `M${hx + fc + X * 6} ${hy + 10} Q${hx + fc + X * 14 + (v === 'front' ? 4 : 0)} ${hy + 26} ${hx + fc + X * 4} ${hy + 30}`, stroke: skD, 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', opacity: .8 }, H);
   const mx = hx + fc + (v === 'side' ? dr * 4 : 0), mw = v === 'side' ? 9 : 13;
-  // beard: full jaw beard + mustache, drawn BEFORE the mouth so the mouth stays visible on a small skin patch
-  if (o.beard) { const bg = S('g', { 'clip-path': kClip(d, hp) }, H); const bd = S('path', { d: `M${mx - 66} ${hy + 4} Q${mx - 62} ${hy + 70} ${mx - 24} ${hy + 80} Q${mx} ${hy + 86} ${mx + 24} ${hy + 80} Q${mx + 62} ${hy + 70} ${mx + 66} ${hy + 4} L${mx + 54} ${hy + 6} Q${mx + 50} ${hy + 34} ${mx + 26} ${hy + 36} Q${mx} ${hy + 30} ${mx - 26} ${hy + 36} Q${mx - 50} ${hy + 34} ${mx - 54} ${hy + 6} Z`, fill: hc }, bg);
-    S('ellipse', { cx: mx + 40, cy: hy + 62, rx: 30, ry: 26, fill: hD, opacity: .45 }, bg); S('ellipse', { cx: mx - 24, cy: hy + 66, rx: 14, ry: 6, fill: hL, opacity: .35 }, bg);
-    S('ellipse', { cx: mx, cy: hy + 48, rx: 15, ry: 7, fill: sk }, H);
-    S('path', { d: `M${mx - 26} ${hy + 42} Q${mx - 16} ${hy + 30} ${mx} ${hy + 36} Q${mx + 16} ${hy + 30} ${mx + 26} ${hy + 42} Q${mx + 12} ${hy + 40} ${mx} ${hy + 42} Q${mx - 12} ${hy + 40} ${mx - 26} ${hy + 42} Z`, fill: kDark(hc, .1) }, H); }
   S('path', { id: id + 'mS', d: `M${mx - mw} ${hy + 44} Q${mx} ${hy + 53} ${mx + mw} ${hy + 44}`, stroke: '#8f3f36', 'stroke-width': 3.6, fill: 'none', 'stroke-linecap': 'round' }, H);
   S('ellipse', { id: id + 'mO', cx: mx, cy: hy + 47, rx: 8, ry: 7, fill: '#6e2630', opacity: 0 }, H);
   if (o.glasses) { const gs = v === 'front' ? [-gp, gp] : v === '3q' ? [hx + fc - dr * gp, hx + fc + dr * gp * .9] : [hx + fc - dr * 8]; gs.forEach((gx, k) => S('rect', { x: gx - 17, y: hy - 10, width: 34, height: 28, rx: 10, fill: '#fff', 'fill-opacity': .12, stroke: '#1d2333', 'stroke-width': 3.5 }, H)); }
@@ -131,13 +126,6 @@ function _kBeanTurn(par, x, y, s, id, o) {
   const bc = kDark(hc, .15); eyes.forEach(([cx, k], i) => S('path', { id: id + (i ? 'bR' : side ? 'bR' : 'bL'), d: `M${cx - 12 * k} ${hy - 16} Q${cx} ${hy - 24} ${cx + 12 * k} ${hy - 17}`, stroke: bc, 'stroke-width': 4.5, fill: 'none', 'stroke-linecap': 'round' }, H));
   if (!side) S('path', { d: `M${fc + 8} ${hy + 10} Q${fc + 18} ${hy + 26} ${fc + 6} ${hy + 30}`, stroke: skD, 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', opacity: .8 }, H);
   const mx = side ? fc + 8 : fc + 6, mw = side ? 8 : 12;
-  if (o.beard) { const bg = S('g', { 'clip-path': kClip(d, hp) }, H);
-    // beard: back edge runs down in front of the ear from the sideburn, along the jaw to the chin; top edge follows the cheek to the mustache
-    S('path', { d: side ? `M${hx + 2} ${hy - 8} L${hx + 12} ${hy - 8} Q${hx + 12} ${hy + 16} ${hx + 22} ${hy + 26} Q${hx + 34} ${hy + 34} ${mx - 6} ${hy + 34} Q${mx} ${hy + 31} ${mx + 8} ${hy + 34} Q${hx + 62} ${hy + 34} ${hx + 68} ${hy + 24} L${hx + 72} ${hy + 30} Q${hx + 62} ${hy + 74} ${hx + 24} ${hy + 80} Q${hx - 4} ${hy + 76} ${hx - 6} ${hy + 40} Q${hx - 4} ${hy + 10} ${hx + 2} ${hy - 8} Z`
-      : `M${hx - 30} ${hy - 6} L${hx - 36} ${hy + 2} Q${hx - 46} ${hy + 50} ${hx - 20} ${hy + 72} Q${hx + 10} ${hy + 86} ${hx + 36} ${hy + 76} Q${hx + 62} ${hy + 60} ${hx + 68} ${hy + 12} L${hx + 56} ${hy + 12} Q${hx + 52} ${hy + 36} ${mx + 10} ${hy + 36} Q${mx} ${hy + 31} ${mx - 12} ${hy + 36} Q${hx + 4} ${hy + 36} ${hx - 16} ${hy + 22} Q${hx - 24} ${hy + 8} ${hx - 24} ${hy - 6} Z`, fill: hc }, bg);
-    S('ellipse', { cx: mx + 30, cy: hy + 64, rx: 28, ry: 24, fill: hD, opacity: .4 }, bg);
-    S('ellipse', { cx: mx, cy: hy + 48, rx: side ? 10 : 14, ry: 7, fill: sk }, H);
-    S('path', { d: `M${mx - mw * 1.8} ${hy + 42} Q${mx - mw} ${hy + 30} ${mx} ${hy + 36} Q${mx + mw} ${hy + 30} ${mx + mw * 1.8} ${hy + 42} Q${mx + mw} ${hy + 40} ${mx} ${hy + 42} Q${mx - mw} ${hy + 40} ${mx - mw * 1.8} ${hy + 42} Z`, fill: kDark(hc, .1) }, H); }
   S('path', { id: id + 'mS', d: `M${mx - mw} ${hy + 44} Q${mx} ${hy + 53} ${mx + mw} ${hy + 44}`, stroke: '#8f3f36', 'stroke-width': 3.6, fill: 'none', 'stroke-linecap': 'round' }, H);
   S('ellipse', { id: id + 'mO', cx: mx, cy: hy + 47, rx: 7, ry: 7, fill: '#6e2630', opacity: 0 }, H);
   if (o.glasses) { eyes.forEach(([gx, k]) => S('rect', { x: gx - 17 * k, y: hy - 10, width: 34 * k, height: 28, rx: 10 * k, fill: '#fff', 'fill-opacity': .12, stroke: '#1d2333', 'stroke-width': 3.5 }, H));
