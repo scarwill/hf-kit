@@ -2,7 +2,7 @@
 // Original design in the Kurzgesagt spirit: round head, pill body, clear open eyes (no heavy lids), soft shading, no outlines.
 // Views: o.view 'front' (default) | '3q' | 'side', facing right; o.flip = -1 faces left. Each view is its own drawing in the same style.
 // To look at something without turning use kGaze (small eye/head shift).
-// kBean(par, x, feetY, s, id, o) ~ 520 px tall at s=1. o = {view, flip, sex:'m'|'f', skin, hair, hairStyle:'short'|'curly'|'long'|'bun'|'pony'|'bald',
+// kBean(par, x, feetY, s, id, o) ~ 520 px tall at s=1. o = {view, flip, sex:'m'|'f', skin, hair, hairStyle:'short'|'long'|'bun'|'pony'|'bald',
 //   top, pants, shoes, glasses, beard, coat}
 // ids: id+'B' whole (move / bob), id+'H' head, id+'E' eyes (blink: eyes('#idE',[t])), id+'mS' mouth, id+'mO' open mouth, id+'bL'/'bR' brows,
 //      id+'aN' right arm / id+'aF' left arm (rotate, transformOrigin '50% 0%'), id+'lN'/'lF' legs. Speaking: kTalk(id, t0, t1). Walking: kWALK(id, t, dx, d).
@@ -10,7 +10,7 @@ function kBean(par, x, y, s, id, o = {}) {
   if (o.view === '3q' || o.view === 'side') return _kBeanTurn(par, x, y, s, id, o);
   const v = 'front', dr = 1, sk = o.skin || '#f3cfb3', skD = kDark(sk, .22), skL = kLite(sk, .35);
   const hc = o.hair || '#5a3a26', hD = kDark(hc, .3), hL = kLite(hc, .3), top = o.top || '#3a7bd5', pants = o.pants || '#2b2f4a', shoe = o.shoes || '#1b1d2e';
-  const f = o.sex === 'f', st = o.hairStyle || (f ? 'long' : 'short'), d = kDefs(par);
+  const f = o.sex === 'f', st = o.hairStyle === 'curly' ? 'short' : o.hairStyle || (f ? 'long' : 'short'), d = kDefs(par);   // curly was dropped
   const O = S('g', { transform: `translate(${x},${y}) scale(${s})` }, par), M = S('g', { id: id + 'B' }, O);
   const X = v === 'front' ? 0 : dr;                       // facing sign (0 = front)
   S('ellipse', { cx: 0, cy: 2, rx: 78, ry: 12, fill: 'rgba(0,0,0,.28)' }, M);
@@ -38,9 +38,6 @@ function kBean(par, x, y, s, id, o = {}) {
   // long: two locks that fall in front of the shoulders, with a gap at the neck (one dark mass under the chin read as a beard)
   if (st === 'long') { const lk = S('path', { d: `M${hx - 68} ${hy - 30} Q${hx - 82} ${hy + 60} ${hx - 92} ${hy + 160} Q${hx - 70} ${hy + 178} ${hx - 44} ${hy + 160} Q${hx - 40} ${hy + 110} ${hx - 32} ${hy + 64} L${hx} ${hy + 20} L${hx + 32} ${hy + 64} Q${hx + 40} ${hy + 110} ${hx + 44} ${hy + 160} Q${hx + 70} ${hy + 178} ${hx + 92} ${hy + 160} Q${hx + 82} ${hy + 60} ${hx + 68} ${hy - 30} Z`, fill: kDark(hc, .1) }, H);
     const lc = S('g', { 'clip-path': kClip(d, lk) }, H); [-1, 1].forEach(sg => { S('ellipse', { cx: hx + sg * 50, cy: hy + 120, rx: 14, ry: 70, fill: hD, opacity: .45 }, lc); S('path', { d: `M${hx + sg * 76} ${hy + 40} Q${hx + sg * 80} ${hy + 100} ${hx + sg * 74} ${hy + 150}`, stroke: hL, 'stroke-width': 5, fill: 'none', opacity: .4, 'stroke-linecap': 'round' }, lc); }); }
-  // curly: an afro of curls BEHIND the head (the face covers the middle), small curls along the hairline are added after the face
-  if (st === 'curly') { const cb = S('g', {}, H); S('ellipse', { cx: hx, cy: hy - 16, rx: 86, ry: 82, fill: hD }, cb);
-    for (let k = 0; k < 14; k++) { const a = Math.PI * (.82 + k * .1), rr = 30 + 6 * rnd(k * 3 + 1); kBall(cb, hx + Math.cos(a) * 82, hy - 16 + Math.sin(a) * 80, rr, k % 2 ? hc : kDark(hc, .1), hD, hL); } }
   // pony (front): tail peeks out behind the head on one side and hangs to the shoulder, with a hair tie (no mass under the chin)
   if (st === 'pony' && v === 'front') { const pt = S('path', { d: `M${hx + 30} ${hy - 62} Q${hx + 104} ${hy - 60} ${hx + 100} ${hy + 20} Q${hx + 98} ${hy + 90} ${hx + 82} ${hy + 140} Q${hx + 74} ${hy + 90} ${hx + 66} ${hy + 40} Q${hx + 60} ${hy - 10} ${hx + 30} ${hy - 30} Z`, fill: hc }, H);
     const pc = S('g', { 'clip-path': kClip(d, pt) }, H); S('ellipse', { cx: hx + 70, cy: hy + 40, rx: 14, ry: 90, fill: hD, opacity: .5 }, pc); S('path', { d: `M${hx + 92} ${hy - 20} Q${hx + 94} ${hy + 50} ${hx + 84} ${hy + 110}`, stroke: hL, 'stroke-width': 5, fill: 'none', opacity: .45, 'stroke-linecap': 'round' }, pc);
@@ -77,11 +74,10 @@ function kBean(par, x, y, s, id, o = {}) {
   // hair (front shape; volume pushed to the back of the head when turned)
   const b = -X; const HR = {
     short: `M${hx - 66} ${hy - 4} Q${hx - 72} ${hy - 80} ${hx + b * 6} ${hy - 84} Q${hx + 72} ${hy - 82} ${hx + 66} ${hy - 6} Q${hx + 58 + b * 10} ${hy - 44} ${hx + X * 30} ${hy - 48} Q${hx} ${hy - 40} ${hx - X * 20} ${hy - 52} Q${hx - 58} ${hy - 44} ${hx - 66} ${hy - 4} Z`,
-    curly: null, long: `M${hx - 68} ${hy + 30} Q${hx - 76} ${hy - 82} ${hx} ${hy - 84} Q${hx + 76} ${hy - 82} ${hx + 68} ${hy + 30} Q${hx + 60} ${hy - 20} ${hx + X * 40 + 20} ${hy - 44} Q${hx + X * 10} ${hy - 36} ${hx - 20 + X * 20} ${hy - 54} Q${hx - 56} ${hy - 30} ${hx - 68} ${hy + 30} Z`,
+    long: `M${hx - 68} ${hy + 30} Q${hx - 76} ${hy - 82} ${hx} ${hy - 84} Q${hx + 76} ${hy - 82} ${hx + 68} ${hy + 30} Q${hx + 60} ${hy - 20} ${hx + X * 40 + 20} ${hy - 44} Q${hx + X * 10} ${hy - 36} ${hx - 20 + X * 20} ${hy - 54} Q${hx - 56} ${hy - 30} ${hx - 68} ${hy + 30} Z`,
     bun: `M${hx - 64} ${hy - 6} Q${hx - 68} ${hy - 80} ${hx} ${hy - 82} Q${hx + 68} ${hy - 80} ${hx + 64} ${hy - 6} Q${hx + 50} ${hy - 50} ${hx} ${hy - 52} Q${hx - 50} ${hy - 50} ${hx - 64} ${hy - 6} Z`,
     pony: `M${hx - 64} ${hy - 6} Q${hx - 68} ${hy - 80} ${hx} ${hy - 82} Q${hx + 68} ${hy - 80} ${hx + 64} ${hy - 6} Q${hx + 50} ${hy - 50} ${hx + X * 20} ${hy - 50} Q${hx - 50} ${hy - 48} ${hx - 64} ${hy - 6} Z`, bald: null }[st];
   const hairEl = HR ? S('path', { d: HR, fill: hc }, H) : null;
-  if (st === 'curly') { const cg = S('g', {}, H); for (let k = 0; k < 9; k++) { const a = Math.PI * (1.15 + k * .0875); kBall(cg, hx + Math.cos(a) * 58, hy - 12 + Math.sin(a) * 68, 19 + 4 * rnd(k * 5 + 2), k % 2 ? hc : kDark(hc, .08), hD, hL); } }
   if (hairEl) { const c2 = S('g', { 'clip-path': kClip(d, hairEl) }, H); S('ellipse', { cx: hx + 50, cy: hy - 20, rx: 40, ry: 70, fill: hD, opacity: .5 }, c2); S('ellipse', { cx: hx - 20, cy: hy - 70, rx: 30, ry: 10, fill: hL, opacity: .55, transform: `rotate(-12 ${hx - 20} ${hy - 70})` }, c2); }
   return M;
 }
@@ -89,7 +85,7 @@ function kBean(par, x, y, s, id, o = {}) {
 function _kBeanTurn(par, x, y, s, id, o) {
   const side = o.view === 'side', sk = o.skin || '#f3cfb3', skD = kDark(sk, .22), skL = kLite(sk, .35);
   const hc = o.hair || '#5a3a26', hD = kDark(hc, .3), hL = kLite(hc, .3), top = o.top || '#3a7bd5', pants = o.pants || '#2b2f4a', shoe = o.shoes || '#1b1d2e';
-  const f = o.sex === 'f', st = o.hairStyle || (f ? 'long' : 'short'), d = kDefs(par);
+  const f = o.sex === 'f', st = o.hairStyle === 'curly' ? 'short' : o.hairStyle || (f ? 'long' : 'short'), d = kDefs(par);   // curly was dropped
   const O = S('g', { transform: `translate(${x},${y}) scale(${s * (o.flip || 1)},${s})` }, par), M = S('g', { id: id + 'B' }, O);
   S('ellipse', { cx: 6, cy: 2, rx: 82, ry: 12, fill: 'rgba(0,0,0,.28)' }, M);
   const leg = (lx, idl, far) => { const g = S('g', { id: id + idl }, M); S('rect', { x: lx - 17, y: -158, width: 34, height: 150, rx: 16, fill: far ? kDark(pants, .25) : pants }, g);
@@ -115,8 +111,6 @@ function _kBeanTurn(par, x, y, s, id, o) {
   if (st === 'long') { const lk = side ? S('path', { d: `M${hx - 10} ${hy - 60} Q${hx - 88} ${hy - 50} ${hx - 84} ${hy + 60} Q${hx - 82} ${hy + 140} ${hx - 54} ${hy + 168} Q${hx - 26} ${hy + 150} ${hx - 30} ${hy + 70} Q${hx - 26} ${hy + 20} ${hx - 6} ${hy - 6} Z`, fill: kDark(hc, .1) }, H)
       : S('path', { d: `M${hx - 64} ${hy - 30} Q${hx - 80} ${hy + 60} ${hx - 90} ${hy + 160} Q${hx - 68} ${hy + 178} ${hx - 44} ${hy + 160} Q${hx - 40} ${hy + 110} ${hx - 34} ${hy + 64} L${hx + 4} ${hy + 30} L${hx + 40} ${hy + 70} Q${hx + 44} ${hy + 110} ${hx + 50} ${hy + 156} Q${hx + 70} ${hy + 170} ${hx + 84} ${hy + 152} Q${hx + 76} ${hy + 60} ${hx + 64} ${hy - 30} Z`, fill: kDark(hc, .1) }, H);
     const lc = S('g', { 'clip-path': kClip(d, lk) }, H); S('ellipse', { cx: hx - 56, cy: hy + 110, rx: 14, ry: 70, fill: hD, opacity: .45 }, lc); }
-  if (st === 'curly') { const cb = S('g', {}, H), cx0 = hx - (side ? 22 : 12); S('ellipse', { cx: cx0, cy: hy - 16, rx: 84, ry: 80, fill: hD }, cb);
-    for (let k = 0; k < 13; k++) { const a = Math.PI * ((side ? .62 : .8) + k * .1), rr = 30 + 6 * rnd(k * 3 + 1); kBall(cb, cx0 + Math.cos(a) * 80, hy - 16 + Math.sin(a) * 78, rr, k % 2 ? hc : kDark(hc, .1), hD, hL); } }
   if (st === 'pony') { const bx = hx - (side ? 56 : 50), pt = S('path', { d: `M${bx} ${hy - 50} Q${bx - 70} ${hy - 40} ${bx - 58} ${hy + 40} Q${bx - 50} ${hy + 100} ${bx - 26} ${hy + 140} Q${bx - 24} ${hy + 70} ${bx - 10} ${hy + 20} Q${bx - 2} ${hy - 10} ${bx + 10} ${hy - 30} Z`, fill: hc }, H);
     const pc = S('g', { 'clip-path': kClip(d, pt) }, H); S('ellipse', { cx: bx - 20, cy: hy + 40, rx: 14, ry: 90, fill: hD, opacity: .5 }, pc); kBall(H, bx - 4, hy - 46, 10, top, kDark(top, .3), kLite(top, .4)); }
   if (st === 'bun') kBall(H, hx - (side ? 46 : 26), hy - (side ? 62 : 72), 28, hc, hD, hL);
@@ -125,7 +119,7 @@ function _kBeanTurn(par, x, y, s, id, o) {
     : `M${hx - 64} ${hy} Q${hx - 66} ${hy - 72} ${hx} ${hy - 74} Q${hx + 66} ${hy - 72} ${hx + 66} ${hy} Q${hx + 66} ${hy + 50} ${hx + 34} ${hy + 68} Q${hx + 4} ${hy + 78} ${hx - 30} ${hy + 68} Q${hx - 62} ${hy + 52} ${hx - 64} ${hy} Z`;
   const hp = S('path', { d: hd, fill: sk }, H), hcl = S('g', { 'clip-path': kClip(d, hp) }, H);
   S('ellipse', { cx: hx + 70, cy: hy + 26, rx: 30, ry: 84, fill: skD, opacity: .24 }, hcl); S('ellipse', { cx: hx - 22, cy: hy - 40, rx: 26, ry: 16, fill: skL, opacity: .5 }, hcl);
-  if (st !== 'long' || side) { const ex = side ? hx - 8 : hx - 46; S('ellipse', { cx: ex, cy: hy + 8, rx: side ? 12 : 10, ry: 15, fill: kMix(sk, skD, .35) }, H); S('ellipse', { cx: ex + 2, cy: hy + 9, rx: 5, ry: 8, fill: skD, opacity: .7 }, H); }   // ear on the back side
+  if (st !== 'long' || side) { const ex = side ? hx - 16 : hx - 46; S('ellipse', { cx: ex, cy: hy + 8, rx: side ? 12 : 10, ry: 15, fill: kMix(sk, skD, .35) }, H); S('ellipse', { cx: ex + 2, cy: hy + 9, rx: 5, ry: 8, fill: skD, opacity: .7 }, H); }   // ear on the back side
   // ---- face
   const fc = hx + (side ? 40 : 22), gp = 23;
   const eyes = side ? [[fc, .72]] : [[fc - gp, 1], [fc + gp, .78]];
@@ -138,8 +132,9 @@ function _kBeanTurn(par, x, y, s, id, o) {
   if (!side) S('path', { d: `M${fc + 8} ${hy + 10} Q${fc + 18} ${hy + 26} ${fc + 6} ${hy + 30}`, stroke: skD, 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', opacity: .8 }, H);
   const mx = side ? fc + 8 : fc + 6, mw = side ? 8 : 12;
   if (o.beard) { const bg = S('g', { 'clip-path': kClip(d, hp) }, H);
-    S('path', { d: side ? `M${hx - 14} ${hy + 4} Q${hx - 12} ${hy + 70} ${hx + 26} ${hy + 80} Q${hx + 60} ${hy + 72} ${hx + 70} ${hy + 26} L${hx + 62} ${hy + 26} Q${hx + 58} ${hy + 36} ${hx + 46} ${hy + 36} Q${hx + 20} ${hy + 34} ${hx + 6} ${hy + 20} Q${hx - 4} ${hy + 10} ${hx - 14} ${hy + 4} Z`
-      : `M${mx - 72} ${hy + 4} Q${mx - 66} ${hy + 70} ${mx - 26} ${hy + 80} Q${mx} ${hy + 86} ${mx + 22} ${hy + 78} Q${mx + 50} ${hy + 68} ${mx + 56} ${hy + 6} L${mx + 46} ${hy + 8} Q${mx + 42} ${hy + 34} ${mx + 22} ${hy + 36} Q${mx} ${hy + 30} ${mx - 26} ${hy + 36} Q${mx - 52} ${hy + 34} ${mx - 60} ${hy + 6} Z`, fill: hc }, bg);
+    // beard: back edge runs down in front of the ear from the sideburn, along the jaw to the chin; top edge follows the cheek to the mustache
+    S('path', { d: side ? `M${hx + 2} ${hy - 8} L${hx + 12} ${hy - 8} Q${hx + 12} ${hy + 16} ${hx + 22} ${hy + 26} Q${hx + 34} ${hy + 34} ${mx - 6} ${hy + 34} Q${mx} ${hy + 31} ${mx + 8} ${hy + 34} Q${hx + 62} ${hy + 34} ${hx + 68} ${hy + 24} L${hx + 72} ${hy + 30} Q${hx + 62} ${hy + 74} ${hx + 24} ${hy + 80} Q${hx - 4} ${hy + 76} ${hx - 6} ${hy + 40} Q${hx - 4} ${hy + 10} ${hx + 2} ${hy - 8} Z`
+      : `M${hx - 30} ${hy - 6} L${hx - 36} ${hy + 2} Q${hx - 46} ${hy + 50} ${hx - 20} ${hy + 72} Q${hx + 10} ${hy + 86} ${hx + 36} ${hy + 76} Q${hx + 62} ${hy + 60} ${hx + 68} ${hy + 12} L${hx + 56} ${hy + 12} Q${hx + 52} ${hy + 36} ${mx + 10} ${hy + 36} Q${mx} ${hy + 31} ${mx - 12} ${hy + 36} Q${hx + 4} ${hy + 36} ${hx - 16} ${hy + 22} Q${hx - 24} ${hy + 8} ${hx - 24} ${hy - 6} Z`, fill: hc }, bg);
     S('ellipse', { cx: mx + 30, cy: hy + 64, rx: 28, ry: 24, fill: hD, opacity: .4 }, bg);
     S('ellipse', { cx: mx, cy: hy + 48, rx: side ? 10 : 14, ry: 7, fill: sk }, H);
     S('path', { d: `M${mx - mw * 1.8} ${hy + 42} Q${mx - mw} ${hy + 30} ${mx} ${hy + 36} Q${mx + mw} ${hy + 30} ${mx + mw * 1.8} ${hy + 42} Q${mx + mw} ${hy + 40} ${mx} ${hy + 42} Q${mx - mw} ${hy + 40} ${mx - mw * 1.8} ${hy + 42} Z`, fill: kDark(hc, .1) }, H); }
@@ -149,17 +144,16 @@ function _kBeanTurn(par, x, y, s, id, o) {
     S('path', { d: side ? `M${fc - 12} ${hy + 2} L${hx - 6} ${hy + 4}` : `M${fc - gp - 17} ${hy + 2} L${hx - 44} ${hy + 4}`, stroke: '#1d2333', 'stroke-width': 3.5, 'stroke-linecap': 'round' }, H); }
   // ---- hair in front (volume toward the back of the head)
   const HR = side ? {
-      short: `M${hx + 60} ${hy - 30} Q${hx + 40} ${hy - 52} ${hx + 10} ${hy - 48} Q${hx - 10} ${hy - 30} ${hx - 20} ${hy - 4} Q${hx - 30} ${hy + 20} ${hx - 62} ${hy + 12} Q${hx - 74} ${hy - 80} ${hx + 4} ${hy - 84} Q${hx + 64} ${hy - 80} ${hx + 60} ${hy - 30} Z`,
+      short: `M${hx + 60} ${hy - 30} Q${hx + 40} ${hy - 52} ${hx + 10} ${hy - 48} Q${hx + 2} ${hy - 40} ${hx + 2} ${hy - 26} L${hx + 12} ${hy - 4} L${hx + 2} ${hy - 2} Q${hx - 8} ${hy - 22} ${hx - 22} ${hy - 22} Q${hx - 36} ${hy - 20} ${hx - 34} ${hy + 30} Q${hx - 48} ${hy + 50} ${hx - 62} ${hy + 28} Q${hx - 74} ${hy - 80} ${hx + 4} ${hy - 84} Q${hx + 64} ${hy - 80} ${hx + 60} ${hy - 30} Z`,
       long: `M${hx + 62} ${hy - 28} Q${hx + 40} ${hy - 54} ${hx + 6} ${hy - 48} Q${hx - 14} ${hy - 20} ${hx - 16} ${hy + 20} Q${hx - 40} ${hy + 40} ${hx - 66} ${hy + 30} Q${hx - 76} ${hy - 82} ${hx + 4} ${hy - 84} Q${hx + 66} ${hy - 80} ${hx + 62} ${hy - 28} Z`,
       pony: `M${hx + 60} ${hy - 30} Q${hx + 40} ${hy - 54} ${hx + 8} ${hy - 50} Q${hx - 30} ${hy - 44} ${hx - 52} ${hy - 6} Q${hx - 70} ${hy - 30} ${hx - 64} ${hy - 50} Q${hx - 50} ${hy - 84} ${hx + 4} ${hy - 84} Q${hx + 62} ${hy - 80} ${hx + 60} ${hy - 30} Z`,
       bun: `M${hx + 60} ${hy - 30} Q${hx + 40} ${hy - 54} ${hx + 8} ${hy - 50} Q${hx - 30} ${hy - 44} ${hx - 52} ${hy - 6} Q${hx - 70} ${hy - 30} ${hx - 64} ${hy - 50} Q${hx - 50} ${hy - 84} ${hx + 4} ${hy - 84} Q${hx + 62} ${hy - 80} ${hx + 60} ${hy - 30} Z` }
     : {
-      short: `M${hx - 66} ${hy + 2} Q${hx - 74} ${hy - 80} ${hx + 4} ${hy - 84} Q${hx + 72} ${hy - 82} ${hx + 66} ${hy - 8} Q${hx + 54} ${hy - 46} ${hx + 30} ${hy - 48} Q${hx + 6} ${hy - 40} ${hx - 14} ${hy - 52} Q${hx - 44} ${hy - 40} ${hx - 56} ${hy - 14} Q${hx - 62} ${hy - 6} ${hx - 66} ${hy + 2} Z`,
+      short: `M${hx - 66} ${hy + 2} Q${hx - 74} ${hy - 80} ${hx + 4} ${hy - 84} Q${hx + 72} ${hy - 82} ${hx + 66} ${hy - 8} Q${hx + 54} ${hy - 46} ${hx + 30} ${hy - 48} Q${hx + 6} ${hy - 40} ${hx - 14} ${hy - 52} Q${hx - 26} ${hy - 44} ${hx - 28} ${hy - 30} L${hx - 26} ${hy + 0} Q${hx - 32} ${hy + 6} ${hx - 38} ${hy} L${hx - 40} ${hy - 22} Q${hx - 52} ${hy - 22} ${hx - 58} ${hy - 10} Q${hx - 56} ${hy + 20} ${hx - 60} ${hy + 34} Q${hx - 66} ${hy + 20} ${hx - 66} ${hy + 2} Z`,
       long: `M${hx - 70} ${hy + 30} Q${hx - 78} ${hy - 82} ${hx + 4} ${hy - 84} Q${hx + 76} ${hy - 80} ${hx + 68} ${hy + 20} Q${hx + 60} ${hy - 24} ${hx + 40} ${hy - 44} Q${hx + 16} ${hy - 36} ${hx - 4} ${hy - 54} Q${hx - 50} ${hy - 30} ${hx - 70} ${hy + 30} Z`,
       pony: `M${hx - 64} ${hy - 2} Q${hx - 68} ${hy - 80} ${hx + 4} ${hy - 82} Q${hx + 70} ${hy - 80} ${hx + 66} ${hy - 6} Q${hx + 50} ${hy - 50} ${hx + 24} ${hy - 50} Q${hx - 40} ${hy - 48} ${hx - 64} ${hy - 2} Z`,
       bun: `M${hx - 64} ${hy - 2} Q${hx - 68} ${hy - 80} ${hx + 4} ${hy - 82} Q${hx + 70} ${hy - 80} ${hx + 66} ${hy - 6} Q${hx + 50} ${hy - 50} ${hx + 24} ${hy - 50} Q${hx - 40} ${hy - 48} ${hx - 64} ${hy - 2} Z` };
   const hairEl = HR[st] ? S('path', { d: HR[st], fill: hc }, H) : null;
-  if (st === 'curly') { const cg = S('g', {}, H); for (let k = 0; k < 7; k++) { const a = Math.PI * ((side ? 1.3 : 1.18) + k * .09); kBall(cg, hx + 6 + Math.cos(a) * 58, hy - 12 + Math.sin(a) * 66, 19 + 4 * rnd(k * 5 + 2), k % 2 ? hc : kDark(hc, .08), hD, hL); } }
   if (hairEl) { const c2 = S('g', { 'clip-path': kClip(d, hairEl) }, H); S('ellipse', { cx: hx - 40, cy: hy - 10, rx: 36, ry: 70, fill: hD, opacity: .45 }, c2); S('ellipse', { cx: hx, cy: hy - 70, rx: 30, ry: 10, fill: hL, opacity: .55, transform: `rotate(-12 ${hx} ${hy - 70})` }, c2); }
   return M;
 }
