@@ -29,7 +29,7 @@ function _mGill(g, bx, by, a, L, w, col, frill = 0) { const [tx, ty] = kPt(bx, b
   S('path', { d: `M${p1x} ${p1y} L${tx} ${ty} L${p2x} ${p2y} Z`, fill: col, stroke: col, 'stroke-width': w * 1.4, 'stroke-linejoin': 'round' }, g); kBall(g, tx, ty, w * .8, kLite(col, .3)); }
 
 // ---------- Axo: pink axolotl. Each view is its own drawing (front / 3q / side), facing right; o.flip = -1 faces left ----------
-function nAxo(par, x, y, s, id, o = {}) { const c = o.col || '#ff9ec7', gc = o.gill || '#ff3d9a', d = kDefs(par), v = o.view || 'front', cD = kDark(c, .22);
+function nAxo(par, x, y, s, id, o = {}) { const c = o.col || '#ff9ec7', gc = o.gill || '#ff3d9a', d = kDefs(par), v = 'front' /* front only: user rejected 3/4 and side */, cD = kDark(c, .22);
   const O = S('g', { transform: `translate(${x},${y}) scale(${s * (o.flip || 1)},${s})` }, par), M = S('g', { id: id + 'B' }, O);
   const belly = kLite(c, .5), arm = (k, ax, ay, rot, col) => { const a = S('g', { id: id + k }, M); S('ellipse', { cx: ax, cy: ay, rx: 20, ry: 38, fill: col, transform: `rotate(${rot} ${ax} ${ay})` }, a); return a; };
   if (v === 'side') {   // side (user's pick): upright round body like the front view, head turned to profile, gills at the back of the head
@@ -71,7 +71,7 @@ function nAxo(par, x, y, s, id, o = {}) { const c = o.col || '#ff9ec7', gc = o.g
   return M; }
 
 // ---------- Glim: one-eyed teal jelly blob, glowing antenna bulb, little tentacle feet (front / 3q / side) ----------
-function nGlim(par, x, y, s, id, o = {}) { const c = o.col || '#2de0c2', d = kDefs(par), v = o.view || 'front', cD = kDark(c, .15);
+function nGlim(par, x, y, s, id, o = {}) { const c = o.col || '#2de0c2', d = kDefs(par), v = 'front' /* front only: user rejected 3/4 and side */, cD = kDark(c, .15);
   const O = S('g', { transform: `translate(${x},${y}) scale(${s * (o.flip || 1)},${s})` }, par), M = S('g', { id: id + 'B' }, O);
   S('ellipse', { cx: 0, cy: 4, rx: 120, ry: 16, fill: '#000', opacity: .3 }, M);
   const antenna = (bx0, tipx) => { S('path', { d: `M${bx0} -325 Q${bx0 - 15} -395 ${tipx} -420`, stroke: kDark(c, .25), 'stroke-width': 10, fill: 'none', 'stroke-linecap': 'round' }, M); kGlow(M, tipx, -424, 60, NPAL.yel, .8); kBall(M, tipx, -424, 20, NPAL.yel, '#e0a630', '#fff6cf'); };

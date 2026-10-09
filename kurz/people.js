@@ -1,13 +1,13 @@
 // ===================== KURZ PEOPLE: simple, clean, shaded "bean" people (load AFTER kurz.js) =====================
 // Original design in the Kurzgesagt spirit: round head, pill body, clear open eyes (no heavy lids), soft shading, no outlines.
-// Views: o.view 'front' (default) | '3q' | 'side', facing right; o.flip = -1 faces left. Each view is its own drawing in the same style.
+// FRONT VIEW ONLY (user rejected every 3/4 and side view). o.view is ignored.
 // To look at something without turning use kGaze (small eye/head shift).
 // kBean(par, x, feetY, s, id, o) ~ 520 px tall at s=1. o = {view, flip, sex:'m'|'f', skin, hair, hairStyle:'short'|'long'|'bun'|'pony'|'bald',
 //   top, pants, shoes, glasses, coat}   (beard was dropped)
 // ids: id+'B' whole (move / bob), id+'H' head, id+'E' eyes (blink: eyes('#idE',[t])), id+'mS' mouth, id+'mO' open mouth, id+'bL'/'bR' brows,
 //      id+'aN' right arm / id+'aF' left arm (rotate, transformOrigin '50% 0%'), id+'lN'/'lF' legs. Speaking: kTalk(id, t0, t1). Walking: kWALK(id, t, dx, d).
 function kBean(par, x, y, s, id, o = {}) {
-  if (o.view === '3q' || o.view === 'side') return _kBeanTurn(par, x, y, s, id, o);
+  // front view only (user: no 3/4 or side for any character); _kBeanTurn below is kept but not used
   const v = 'front', dr = 1, sk = o.skin || '#f3cfb3', skD = kDark(sk, .22), skL = kLite(sk, .35);
   const hc = o.hair || '#5a3a26', hD = kDark(hc, .3), hL = kLite(hc, .3), top = o.top || '#3a7bd5', pants = o.pants || '#2b2f4a', shoe = o.shoes || '#1b1d2e';
   const f = o.sex === 'f', st = o.hairStyle === 'curly' ? 'short' : o.hairStyle || (f ? 'long' : 'short'), d = kDefs(par);   // curly was dropped
