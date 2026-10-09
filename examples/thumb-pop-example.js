@@ -1,4 +1,4 @@
-// Demo v2 (POP style, needs thumbx.js POP kit + kurz files for V=3): AI Agents video. Text (exact): "IT HAS NO HANDS"
+// Demo v2 (POP style, needs the thumbx.js POP kit): AI Agents video. Text (exact): "IT HAS NO HANDS"
 const LINES = [['IT', 'HAS'], ['NO', 'HANDS']], HL = ['NO', 'HANDS'];
 const V = +new URLSearchParams(location.search).get('v') || 1;
 const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
@@ -19,13 +19,12 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
     const c = charB(G, 430, 2350, 3.6, 'c2', { hair: 'short', skin: SKIN[0], hairC: '#7c4a1e', top: '#2563eb', topType: 'hoodie' }); tSticker(c.parentNode, '#ffffff', 6); after.push(() => mood('c2', 0, 'surprised'));
     tTitle(G, LINES, { x: 1000, y: 30, maxW: 860, size: 200, hl: HL, panel: false });
   }
-  if (V === 3) {   // T3 KURZ LOOK: glowing Kurz world, huge armless kBot, tiny kBean looking up (scale), fat red arrow
-    const W = kWorld(BG, defs, 0, 0, 'space', { stars: 80 });
-    kGlow(G, 1300, 470, 620, '#7cf6ff', .45);
-    const kb = kBot(G, 1300, 1010, 1.55, 'kb3'); after.push(() => tl.set('#kb3aL,#kb3aR', { autoAlpha: 0 }, 0));
-    [-1, 1].forEach(sd => tSpark(G, 1300 + sd * 120 * 1.55, 1010 - 300 * 1.55, 1));
-    kBean(G, 1730, 1075, .85, 'p3', { sex: 'f', hairStyle: 'pony', hair: '#a2512c', top: '#ffb703' }); after.push(() => { tl.set('#p3mO', { opacity: 1 }, 0); tl.set('#p3mS', { opacity: 0 }, 0); tl.set('#p3E', { x: -6, y: -4 }, 0); });
-    tArrow(G, 1020, 160, 1080, 450, '#ef4444', 46);
+  if (V === 3) {   // T3 MYSTERY: armless robot on a red-purple burst, red ring + fat arrow on the empty shoulder, small shocked person for scale
+    tBg(BG, '#9333ea', '#1e0b3a', 1300, 520, 1250); tBurst(BG, 1300, 520, '#f472b6', 18, .1);
+    tGlow(G, 1300, 560, 560, '#ef4444', .4);
+    const b = botB(G, 1300, 1000, 1.45, 'b3'); tSticker(b.parentNode, '#ffffff', 6); after.push(() => { tl.set('#b3aL,#b3aR', { autoAlpha: 0 }, 0); mood('b3', 0, 'worried'); });
+    const sx = 1300 + 112 * 1.45, sy = 1000 - 255 * 1.45; tSpark(G, sx, sy, 1.1); tRing(G, sx, sy, 105, 125, '#ef4444', 16); tArrow(G, sx + 330, sy - 330, sx + 95, sy - 95, '#ef4444', 44);
+    const c = charB(G, 870, 1050, .66, 'c3', { hair: 'long', skin: SKIN[0], hairC: '#a2512c', top: '#f59e0b', topType: 'tshirt' }); tSticker(c.parentNode, '#ffffff', 6); after.push(() => mood('c3', 0, 'surprised'));
     tTitle(G, LINES, { x: 60, y: 260, maxW: 820, size: 300, hl: HL, panel: false });
   }
   return () => { after.forEach(f => f()); };
