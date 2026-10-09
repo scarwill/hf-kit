@@ -9,7 +9,7 @@ BANNED = {
  'card': 'kTablet / kScreen', 'docSheet': 'kTablet', 'stamp': 'kBigNum or a red kCallout', 'token': 'kCube(glyph) / kAttn', 'txt': 'kCallout',
  'tln': 'kTablet lines', 'codeCard': 'kCode', 'win': 'kScreen', 'wordC': 'kCube(glyph)',
  # flat icons -> draw the real object shaded (kBall/kBlob/kShade) or use kurz props
- 'ic': 'a shaded real object (kBall/kBlob/kShade) or kCrystal/kCube/kCore', 'ico': 'a shaded real object',
+ 'ic': 'a shaded real object (kBall/kBlob/kShade) or kCrystal/kCube/kMind', 'ico': 'a shaded real object',
  # Infographics rooms / themes / room props
  'scene': 'kWorld', 'useTheme': 'kWorld palette', 'room': 'kWorld', 'street': 'kWorld', 'skyline': 'kMountain/kWorld hills',
  'windowPane': 'kWorld', 'tower': 'kServer / kMountain', 'shelf': 'remove', 'plant': 'kTree/kGrass', 'clock': 'remove',
@@ -20,10 +20,10 @@ BANNED = {
  'person': 'kBean', 'kKid': 'kBean', 'kKidTalk': 'kTalk', 'kBlobby': 'kBean', 'kHuman': 'kBean (user: faces looked drunk)', 'kSlim': 'kBean (user: faces looked drunk)', 'kTurn': 'kGaze (front view only)',
  'kCore': 'kMind (planet-orb model was rejected)',
  # flat tech props -> kurz/tech.js
- 'laptop': 'kScreen', 'server': 'kServer', 'gpu': 'kCube / kServer', 'phone': 'kPhone2', 'desktop': 'kScreen', 'chipM': 'kCore',
- 'brainBox': 'kBrain2 / kCore', 'block': 'kCube', 'funnelG': 'shaded custom drawing', 'okM': 'kCallout', 'noWifi': 'shaded custom drawing',
+ 'laptop': 'kScreen', 'server': 'kServer', 'gpu': 'kCube / kServer', 'phone': 'kPhone2', 'desktop': 'kScreen', 'chipM': 'kMind / kBox3D',
+ 'brainBox': 'kMind', 'block': 'kCube', 'funnelG': 'shaded custom drawing', 'okM': 'kCallout', 'noWifi': 'shaded custom drawing',
  'nnet': 'kNet / kStack', 'fire': 'kFIRE', 'encT': 'kVector', 'vecG': 'kVector', 'pixImg': 'shaded custom drawing', 'bulb': 'kGlow + kBall',
- 'gearG': 'shaded custom drawing', 'ballG': 'kBall', 'liar': 'dim(t) + kCore glow',
+ 'gearG': 'shaded custom drawing', 'ballG': 'kBall', 'liar': 'dim(t) + pink kCrystal',
  'eyeBig': 'kEye2 / kEyeFull', 'brainG': 'kBrain2', 'ghostG': 'shaded custom drawing', 'fakePaper': 'kTablet', 'treeG': 'kTree', 'sunG': 'kSun', 'flowerG': 'kGrass/kTree',
 }
 BANNED.pop('moodLayer')
