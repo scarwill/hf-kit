@@ -24,26 +24,27 @@ function _mSet(id, m, root) { const q = k => (root || document).querySelector('#
 // soft shading for mascots: light top-left -> base -> darker rim (no hard diagonal split)
 const _mFill = (d, c, lx = '35%', ly = '28%') => kRG(d, [[0, kLite(c, .4)], [.55, c], [1, kDark(c, .28)]], lx, ly, '78%');
 // gill frond from (bx, by) at angle a (deg), length L, width w
-function _mGill(g, bx, by, a, L, w, col) { const [tx, ty] = kPt(bx, by, L, a), [p1x, p1y] = kPt(bx, by, w, a + 90), [p2x, p2y] = kPt(bx, by, w, a - 90);
+function _mGill(g, bx, by, a, L, w, col, frill = 0) { const [tx, ty] = kPt(bx, by, L, a), [p1x, p1y] = kPt(bx, by, w, a + 90), [p2x, p2y] = kPt(bx, by, w, a - 90);
+  if (frill) for (let k = 1; k <= frill; k++) { const [fx, fy] = kPt(bx, by, L * (.3 + k * .55 / frill), a); [-1, 1].forEach(sd => { const [qx, qy] = kPt(fx, fy, w * 1.1, a + sd * 70); kBall(g, qx, qy, w * .55, kLite(col, .15)); }); }   // feathery bumps
   S('path', { d: `M${p1x} ${p1y} L${tx} ${ty} L${p2x} ${p2y} Z`, fill: col, stroke: col, 'stroke-width': w * 1.4, 'stroke-linejoin': 'round' }, g); kBall(g, tx, ty, w * .8, kLite(col, .3)); }
 
 // ---------- Axo: pink axolotl. Each view is its own drawing (front / 3q / side), facing right; o.flip = -1 faces left ----------
 function nAxo(par, x, y, s, id, o = {}) { const c = o.col || '#ff9ec7', gc = o.gill || '#ff3d9a', d = kDefs(par), v = o.view || 'front', cD = kDark(c, .22);
   const O = S('g', { transform: `translate(${x},${y}) scale(${s * (o.flip || 1)},${s})` }, par), M = S('g', { id: id + 'B' }, O);
   const belly = kLite(c, .5), arm = (k, ax, ay, rot, col) => { const a = S('g', { id: id + k }, M); S('ellipse', { cx: ax, cy: ay, rx: 20, ry: 38, fill: col, transform: `rotate(${rot} ${ax} ${ay})` }, a); return a; };
-  if (v === 'side') {
-    S('ellipse', { cx: -30, cy: 4, rx: 170, ry: 16, fill: '#000', opacity: .3 }, M);
-    S('path', { d: 'M-80 -150 Q-200 -170 -290 -120 Q-200 -70 -80 -70 Z', fill: c }, M); S('path', { d: 'M-90 -150 Q-200 -175 -285 -122 Q-200 -150 -110 -128 Z', fill: kLite(gc, .35), opacity: .8 }, M);   // tail + fin
-    [[-70, cD], [40, cD]].forEach(([lx, col]) => S('ellipse', { cx: lx - 18, cy: -14, rx: 30, ry: 18, fill: kDark(c, .3) }, M));   // far legs
-    S('ellipse', { cx: -10, cy: -105, rx: 120, ry: 82, fill: _mFill(d, c) }, M); S('ellipse', { cx: 20, cy: -62, rx: 82, ry: 34, fill: belly, opacity: .85 }, M);
-    [-60, 52].forEach(lx => S('ellipse', { cx: lx, cy: -14, rx: 32, ry: 19, fill: cD }, M));   // near legs
-    arm('aR', 70, -88, -35, cD);
+  if (v === 'side') {   // profile: head and body in one line (head a bit taller), gills fanning back, legs fore and aft
+    S('ellipse', { cx: -20, cy: 4, rx: 175, ry: 15, fill: '#000', opacity: .3 }, M);
+    S('path', { d: 'M-130 -118 Q-250 -140 -320 -88 Q-240 -60 -130 -70 Z', fill: c }, M); S('path', { d: 'M-140 -116 Q-250 -148 -315 -91 Q-235 -120 -150 -100 Z', fill: kLite(gc, .4), opacity: .8 }, M);   // tail + top fin
+    [-100, 20].forEach(lx => S('ellipse', { cx: lx, cy: -16, rx: 26, ry: 15, fill: kDark(c, .32) }, M));   // far legs
+    [[-112, 56], [-88, 50]].forEach(([a, L]) => _mGill(M, 34, -196, a, L, 11, kDark(gc, .25)));   // far-side gills peek over the back of the head   // far-side gills peek over the head
+    S('ellipse', { cx: -25, cy: -98, rx: 142, ry: 66, fill: _mFill(d, c, '40%', '20%') }, M); S('ellipse', { cx: -25, cy: -50, rx: 95, ry: 20, fill: belly, opacity: .85 }, M);
+    S('ellipse', { cx: -88, cy: -30, rx: 20, ry: 22, fill: cD }, M); S('ellipse', { cx: -80, cy: -10, rx: 30, ry: 14, fill: cD }, M);   // near back leg
+    { const a = S('g', { id: id + 'aR' }, M); S('ellipse', { cx: 40, cy: -30, rx: 20, ry: 22, fill: cD }, a); S('ellipse', { cx: 50, cy: -10, rx: 30, ry: 14, fill: cD }, a); }   // near front leg
     const H = S('g', { id: id + 'H' }, M);
-    [[205, .7], [175, .9], [145, .75]].forEach(([a, k], n) => _mGill(H, -10, -330 + n * 4, a + 20, 70 * k, 13 * k, kDark(gc, .25)));   // far side, behind the head
-    [[150, .95], [180, 1.1], [210, .95]].forEach(([a, k]) => _mGill(H, -30, -262, a, 92 * k, 17, gc));
-    S('path', { d: 'M-70 -255 Q-72 -360 45 -362 Q178 -356 190 -262 Q196 -172 92 -160 Q-60 -150 -70 -255 Z', fill: _mFill(d, c, '45%', '25%') }, H);
-    S('ellipse', { cx: 112, cy: -222, rx: 18, ry: 10, fill: '#ff5d8f', opacity: .45 }, H);
-    _mFace(H, id, [[118, -280, 22, .8]], 160, -210, o, '#1b1240', 13);
+    [[8, -172, -132, 84], [-6, -142, -168, 92], [2, -112, 152, 80]].forEach(([bx, by, a, L]) => _mGill(H, bx, by, a, L, 15, gc));   // three gill fronds fanned back (same style as front view)
+    S('path', { d: 'M-22 -132 Q-18 -208 88 -210 Q196 -204 206 -136 Q210 -70 116 -62 Q14 -58 -22 -132 Z', fill: _mFill(d, c, '40%', '22%') }, H);
+    S('ellipse', { cx: 150, cy: -106, rx: 17, ry: 10, fill: '#ff5d8f', opacity: .45 }, H);
+    _mFace(H, id, [[142, -150, 20, .8]], 168, -92, o, '#1b1240', 14);
   } else if (v === '3q') {
     S('ellipse', { cx: -20, cy: 4, rx: 135, ry: 16, fill: '#000', opacity: .3 }, M);
     S('path', { d: 'M-50 -70 Q-200 -50 -250 -150 Q-170 -95 -60 -125 Z', fill: kDark(c, .1) }, M);
