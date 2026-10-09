@@ -6,8 +6,8 @@ import re, sys
 BANNED = {
  # Infographics text widgets -> use kCallout / kSay / kBigNum
  'chat': 'kSay (<=4 words) or kCallout', 'pill': 'kCallout', 'bubble': 'kSay', 'say': 'kSay', 'thought': 'kSay',
- 'card': 'kTablet / kScreen', 'docSheet': 'kTablet', 'stamp': 'kBigNum or a red kCallout', 'token': 'kCube(glyph)', 'txt': 'kCallout',
- 'tln': 'kTablet lines', 'codeCard': 'kScreen', 'win': 'kScreen', 'wordC': 'kCube(glyph)',
+ 'card': 'kTablet / kScreen', 'docSheet': 'kTablet', 'stamp': 'kBigNum or a red kCallout', 'token': 'kCube(glyph) / kAttn', 'txt': 'kCallout',
+ 'tln': 'kTablet lines', 'codeCard': 'kCode', 'win': 'kScreen', 'wordC': 'kCube(glyph)',
  # flat icons -> draw the real object shaded (kBall/kBlob/kShade) or use kurz props
  'ic': 'a shaded real object (kBall/kBlob/kShade) or kCrystal/kCube/kCore', 'ico': 'a shaded real object',
  # Infographics rooms / themes / room props
@@ -16,12 +16,13 @@ BANNED = {
  'lamp': 'kGlow', 'crate': 'kCube', 'book': 'kTablet', 'bookPile': 'kTablet', 'heads': 'kFgRocks/kFgPlants', 'cone': 'kWorld rays',
  'fgHeads': 'kFgRocks/kFgPlants', 'fgLeaves': 'kFgPlants', 'fgBox': 'kFgRocks', 'moodLayer': 'OK only with dim/glow - allowed',
  # Infographics characters / robots
- 'charB': 'kHuman / kSlim', 'botB': 'kBot or kCore(face)', 'charP': 'kHuman / kSlim', 'botP': 'kBot or kCore(face)',
- 'person': 'kHuman / kSlim', 'kKid': 'kHuman / kSlim', 'kKidTalk': 'kTalk', 'kBlobby': 'kHuman / kSlim',
+ 'charB': 'kBean', 'botB': 'kMind (or kBot)', 'charP': 'kBean', 'botP': 'kMind (or kBot)',
+ 'person': 'kBean', 'kKid': 'kBean', 'kKidTalk': 'kTalk', 'kBlobby': 'kBean', 'kHuman': 'kBean (user: faces looked drunk)', 'kSlim': 'kBean (user: faces looked drunk)', 'kTurn': 'kGaze (front view only)',
+ 'kCore': 'kMind (planet-orb model was rejected)',
  # flat tech props -> kurz/tech.js
  'laptop': 'kScreen', 'server': 'kServer', 'gpu': 'kCube / kServer', 'phone': 'kPhone2', 'desktop': 'kScreen', 'chipM': 'kCore',
  'brainBox': 'kBrain2 / kCore', 'block': 'kCube', 'funnelG': 'shaded custom drawing', 'okM': 'kCallout', 'noWifi': 'shaded custom drawing',
- 'nnet': 'kNet', 'fire': 'kFIRE', 'encT': 'kCube', 'vecG': 'kCube row', 'pixImg': 'shaded custom drawing', 'bulb': 'kGlow + kBall',
+ 'nnet': 'kNet / kStack', 'fire': 'kFIRE', 'encT': 'kVector', 'vecG': 'kVector', 'pixImg': 'shaded custom drawing', 'bulb': 'kGlow + kBall',
  'gearG': 'shaded custom drawing', 'ballG': 'kBall', 'liar': 'dim(t) + kCore glow',
  'eyeBig': 'kEye2 / kEyeFull', 'brainG': 'kBrain2', 'ghostG': 'shaded custom drawing', 'fakePaper': 'kTablet', 'treeG': 'kTree', 'sunG': 'kSun', 'flowerG': 'kGrass/kTree',
 }
