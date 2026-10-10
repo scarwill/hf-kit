@@ -7,14 +7,18 @@ import statistics
 import yt_dlp
 
 KEYWORDS = [
-    "how hackers steal passwords",
-    "is a VPN worth it",
-    "how to know if your phone is hacked",
     "small claims court explained",
+    "what happens if you get sued",
+    "how to dispute a parking ticket",
+    "landlord keeping security deposit",
+    "what is probate explained",
+    "how to write a will",
+    "what happens if you die without a will",
+    "employment tribunal explained",
 ]
 TOP_N = 15
 
-opts = {"quiet": True, "skip_download": True, "ignoreerrors": True}
+opts = {"quiet": True, "skip_download": True, "ignoreerrors": True, "no_warnings": True}
 
 
 def analyse(keyword):
