@@ -10,16 +10,16 @@ import statistics
 import yt_dlp
 
 KEYWORDS = [
-    "how does a neural network work",
-    "gradient descent explained",
-    "transformer explained",
-    "attention mechanism explained",
-    "random forest explained",
-    "how does chatgpt work",
-    "backpropagation explained",
-    "what is rag in ai",
-    "pca explained",
-    "how diffusion models work",
+    "mixture of experts explained",
+    "kv cache explained",
+    "lora fine tuning explained",
+    "speculative decoding explained",
+    "how reasoning models work",
+    "flash attention explained",
+    "quantization llm explained",
+    "vision transformer explained",
+    "reinforcement learning from human feedback explained",
+    "how ai agents work",
 ]
 TOP_N = 15
 SMALL_CHANNEL = 50_000  # isse kam subs = chhota channel
