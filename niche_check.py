@@ -10,25 +10,25 @@ import statistics
 import yt_dlp
 
 KEYWORDS = [
-    # AI generation - how it works
-    "how does ai generate music",
-    "how does ai image generation work",
-    "how do ai video generators work",
-    # Tools / models comparison
-    "flux vs stable diffusion",
-    "what is comfyui",
-    "comfyui explained for beginners",
-    # Local LLM / quantization
-    "q4 vs q5 vs q8 quantization",
-    "gguf quantization explained",
-    # Fine-tuning
-    "how to train a lora",
-    "train lora on large model",
-    # Safety / censorship
-    "why ai models are censored",
-    "how ai refuses harmful requests",
-    "uncensored llm explained",
-    "ai lobotomized explained",
+    # Agentic AI - concepts
+    "what is mcp model context protocol",
+    "agentic ai explained",
+    "how ai agents use tools",
+    # Coding agents / vibe coding
+    "claude code tutorial",
+    "claude code vs cursor",
+    "vibe coding explained",
+    "claude skills explained",
+    # No-code agents / automation
+    "n8n ai agent tutorial",
+    "crewai vs langgraph",
+    # Gen AI tools
+    "nano banana explained",
+    "how notebooklm works",
+    "ai browser agent explained",
+    # Under the hood (our angle)
+    "how does claude code work",
+    "how chatgpt memory works",
 ]
 TOP_N = 15
 SMALL_CHANNEL = 50_000  # isse kam subs = chhota channel
