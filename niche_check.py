@@ -10,14 +10,16 @@ import statistics
 import yt_dlp
 
 KEYWORDS = [
-    "small claims court explained",
-    "what happens if you get sued",
-    "how to dispute a parking ticket",
-    "landlord keeping security deposit",
-    "what is probate explained",
-    "how to write a will",
-    "what happens if you die without a will",
-    "employment tribunal explained",
+    "how does a neural network work",
+    "gradient descent explained",
+    "transformer explained",
+    "attention mechanism explained",
+    "random forest explained",
+    "how does chatgpt work",
+    "backpropagation explained",
+    "what is rag in ai",
+    "pca explained",
+    "how diffusion models work",
 ]
 TOP_N = 15
 SMALL_CHANNEL = 50_000  # isse kam subs = chhota channel
