@@ -10,16 +10,25 @@ import statistics
 import yt_dlp
 
 KEYWORDS = [
-    "mixture of experts explained",
-    "kv cache explained",
-    "lora fine tuning explained",
-    "speculative decoding explained",
-    "how reasoning models work",
-    "flash attention explained",
-    "quantization llm explained",
-    "vision transformer explained",
-    "reinforcement learning from human feedback explained",
-    "how ai agents work",
+    # AI generation - how it works
+    "how does ai generate music",
+    "how does ai image generation work",
+    "how do ai video generators work",
+    # Tools / models comparison
+    "flux vs stable diffusion",
+    "what is comfyui",
+    "comfyui explained for beginners",
+    # Local LLM / quantization
+    "q4 vs q5 vs q8 quantization",
+    "gguf quantization explained",
+    # Fine-tuning
+    "how to train a lora",
+    "train lora on large model",
+    # Safety / censorship
+    "why ai models are censored",
+    "how ai refuses harmful requests",
+    "uncensored llm explained",
+    "ai lobotomized explained",
 ]
 TOP_N = 15
 SMALL_CHANNEL = 50_000  # isse kam subs = chhota channel
@@ -77,7 +86,11 @@ def score(rows):
     }
 
 
-def verdict(s):
+def verdict(s, st=None):
+    if st and st["median_views"] < 20_000 and st["small"] >= st["n"] / 2:
+        return "💤 LOW DEMAND (no rivals)"
+    if st and st["small"] <= 2:
+        return "❌ BIG CHANNELS"
     if s >= 60:
         return "✅ STRONG GAP"
     if s >= 40:
@@ -101,7 +114,7 @@ def main():
     print("-" * 96)
     for i, (kw, s, _) in enumerate(results, 1):
         print(f"{i:<3}{kw[:40]:<42}{s['score']:>6}  {fmt(s['median_views']):>7}"
-              f"{fmt(s['median_subs']):>8}{s['median_age']:>6.1f}y{s['small']:>4}/{s['n']:<2}  {verdict(s['score'])}")
+              f"{fmt(s['median_subs']):>8}{s['median_age']:>6.1f}y{s['small']:>4}/{s['n']:<2}  {verdict(s['score'], s)}")
     print("-" * 96)
     print("Views/Subs/Age = top results ka median | Small = <50k subs wale channels jo top mein hain")
 
