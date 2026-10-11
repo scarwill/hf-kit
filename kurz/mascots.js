@@ -7,6 +7,7 @@
 
 function _mFace(g, id, eyes, mx, my, o, eyeCol = '#1b1240', mw = 20) {   // shared eyes + mouths; eyes = [[x, y, r, sx]]
   const E = S('g', { id: id + 'E' }, g), H = S('g', { id: id + 'eH', opacity: 0 }, g);
+  const ex = eyes.flatMap(([x, , er, sx = 1]) => [x - er * sx, x + er * sx]); E.dataset.px = ((Math.min(...ex) + Math.max(...ex)) / 2).toFixed(2); E.dataset.py = (eyes.reduce((a, e) => a + e[1], 0) / eyes.length).toFixed(2);
   eyes.forEach(([x, y, er, sx = 1]) => { S('ellipse', { cx: x, cy: y, rx: er * sx, ry: er * 1.15, fill: eyeCol }, E); S('circle', { cx: x - er * .32 * sx, cy: y - er * .4, r: er * .36 * Math.max(.7, sx), fill: '#ffffff' }, E); S('circle', { cx: x + er * .35 * sx, cy: y + er * .3, r: er * .15, fill: '#ffffff', opacity: .8 }, E);
     S('path', { d: `M${x - er * .9 * sx} ${y + er * .2} Q${x} ${y - er * 1.1} ${x + er * .9 * sx} ${y + er * .2}`, stroke: eyeCol, 'stroke-width': er * .38, fill: 'none', 'stroke-linecap': 'round' }, H); });
   S('path', { id: id + 'mS', d: `M${mx - mw} ${my} Q${mx} ${my + 18} ${mx + mw} ${my}`, stroke: eyeCol, 'stroke-width': 6, fill: 'none', 'stroke-linecap': 'round' }, g);
@@ -18,8 +19,12 @@ function _mFace(g, id, eyes, mx, my, o, eyeCol = '#1b1240', mw = 20) {   // shar
 function _mSet(id, m, root) { const q = k => (root || document).querySelector('#' + id + k); if (!q('E')) return;
   const on = { happy: ['eH', 'mS'], smile: ['E', 'mS'], shock: ['E', 'mO'], meh: ['E', 'mF'], neutral: ['E', 'mS'] }[m] || ['E', 'mS'];
   ['E', 'eH', 'mS', 'mO', 'mF'].forEach(k => q(k).setAttribute('opacity', on.includes(k) ? 1 : 0));
-  q('E').setAttribute('transform', m === 'meh' ? 'scale(1 .55)' : ''); q('E').style.transformBox = 'fill-box'; q('E').style.transformOrigin = '50% 50%';
-  if (m === 'shock') q('E').setAttribute('transform', ''); }
+  q('E').setAttribute('transform', _mTf(q('E'), m === 'shock' ? 'smile' : m)); }
+// eye squash/scale as ONE explicit transform attribute pivoting on the eyes' own centre (E.dataset.px/py, set in _mFace).
+// Never give #idE a CSS transform-box/transform-origin and never tween it with GSAP scale/scaleY (eyes(), BOING, PULSE):
+// real GSAP then applies the origin twice and the eyes jump up off the face (the shim hides this). Use nMOOD only.
+function _mTf(E, m) { const x = +E.dataset.px, y = +E.dataset.py, sx = m === 'shock' ? 1.2 : 1, sy = m === 'meh' ? .55 : sx;
+  return `translate(${x} ${y}) scale(${sx} ${sy}) translate(${-x} ${-y})`; }
 
 // cel shading (Kurz look): flat base + a hard-edged curved shadow crescent on the lower right (no glossy gradient)
 const _mFill = (d, c, lx = '36%', ly = '30%') => kRG(d, [[0, c], [.8, c], [.8, kDark(c, .2)], [1, kDark(c, .2)]], lx, ly, '82%');
@@ -119,8 +124,12 @@ function nPip(par, x, y, s, id, o = {}) { const c = o.col || '#ff8a3d', cr = '#f
 // ---------- timeline beats ----------
 function nMOOD(id, t, m) { const on = { happy: ['eH', 'mS'], smile: ['E', 'mS'], shock: ['E', 'mO'], meh: ['E', 'mF'], neutral: ['E', 'mS'] }[m] || ['E', 'mS'];
   ['E', 'eH', 'mS', 'mO', 'mF'].forEach(k => tl.set('#' + id + k, { opacity: on.includes(k) ? 1 : 0 }, t));
-  tl.to('#' + id + 'E', { scaleY: m === 'meh' ? .55 : 1, scale: m === 'shock' ? 1.2 : 1, transformOrigin: '50% 50%', duration: .2 }, t);
+  const E = document.getElementById(id + 'E'); if (E) tl.to(E, { attr: { transform: _mTf(E, m) }, duration: .2, ease: 'power2.out' }, t);
   if (m === 'shock') tl.fromTo('#' + id + 'B', { y: 0 }, { y: -30, duration: .15, yoyo: true, repeat: 1, ease: 'power2.out' }, t); B(t); }
 const nHOP = (id, t, h = 50) => { tl.fromTo('#' + id + 'B', { y: 0 }, { y: -h, duration: .22, yoyo: true, repeat: 1, ease: 'power2.out' }, t); B(t); };
-const nWAVE = (id, t, n = 3) => { tl.to('#' + id + 'aR', { rotation: -40, transformOrigin: '50% 100%', duration: .18, yoyo: true, repeat: n * 2 - 1, ease: 'sine.inOut' }, t); B(t); };
+// wave: pivot at the SHOULDER (top-inner end of the arm, '20% 10%' of its box) -> raise, wiggle n times, lower. (Pivoting at '50% 100%' = the hand end made the arm swing off the body.)
+const nWAVE = (id, t, n = 2) => { const s = '#' + id + 'aR', o = { transformOrigin: '20% 10%' };
+  tl.to(s, Object.assign({ rotation: -120, duration: .25, ease: 'power2.out' }, o), t);
+  tl.to(s, Object.assign({ rotation: -95, duration: .16, yoyo: true, repeat: n * 2 - 1, ease: 'sine.inOut' }, o), t + .25);
+  tl.to(s, Object.assign({ rotation: 0, duration: .3, ease: 'power2.inOut' }, o), t + .25 + .16 * n * 2); B(t); };
 function nTALKM(id, t0, t1) { const n = Math.max(1, Math.round((t1 - t0) / .24)); for (let k = 0; k < n; k++) { const t = t0 + k * .24; tl.set('#' + id + 'mO', { opacity: 1, scaleY: .6 + (k % 3) * .2, transformOrigin: '50% 0%' }, t); tl.set('#' + id + 'mS', { opacity: 0 }, t); tl.set('#' + id + 'mO', { opacity: 0 }, t + .14); tl.set('#' + id + 'mS', { opacity: 1 }, t + .14); } B(t0); }

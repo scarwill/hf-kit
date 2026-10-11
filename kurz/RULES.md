@@ -152,5 +152,6 @@ const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
 - Characters are front view only: never mirror or rotate them sideways; don't put labels or callouts on a face.
 - `kSCALE` uses `#flash` from `addLife(s)` and moves the camera: keep close-up CAMs ending ≥ 0.6 s before it.
 - `POP()` hides its target from frame 0: never POP the intro hero; PULSE it instead.
-- Whole-eye blinks: `eyes('#id', [t])` squashes the whole group — use it on eye groups only (`id+'E'`).
+- Whole-eye blinks: `eyes('#id', [t])` squashes the whole group — use it on eye groups only (`id+'E'`) of kBean people — never on mascot eyes.
+- Mascot (Axo/Glim) eyes and arms: change the eyes ONLY with `nMOOD` and wave ONLY with `nWAVE` (shoulder pivot). Never `eyes()`, `PULSE`, `BOING`, `scale`/`scaleY` tweens or a CSS transform-origin on `#idE` / `#idaR`: real GSAP then applies the origin twice and the eyes jump off the face / the arm swings off the body. The gsap shim used by check.js does not show this, so it is not caught in the rev sheets.
 - Same video-kit pitfalls apply: `hid()` + `DRAW()` stays invisible (use `DR()`), fromTo needs autoAlpha in both from and to, comments on their own line, no emoji, no colour tweens, no onUpdate, finite repeats only.
