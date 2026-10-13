@@ -1,5 +1,8 @@
 # usage: python3 align.py <audio> <script.txt>   -> words.json, meta.json (END, title or None, sentences)
-import numpy as np, re, json, sys, subprocess
+import numpy as np, re, json, sys, subprocess, os
+# sentence breaks: silences >= BIGT s. 0.2 (was 0.3): some narrators pause only ~0.2 s between sentences; with 0.3 two sentences merged
+# and every later sentence drifted 3-9 s late (visuals came after the words). Override: BIGT=0.3 python3 align.py ...
+BIGT=float(os.environ.get('BIGT','0.2'))
 aud, scr = sys.argv[1], sys.argv[2]
 END = float(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration','-of','csv=p=0',aud]).decode())
 subprocess.run(['ffmpeg','-loglevel','error','-y','-i',aud,'-ac','1','-ar','16000','-f','s16le','a.raw'],check=True)
@@ -26,7 +29,7 @@ for k,p in enumerate(paras):
     sents+=ss
 w=lambda t:1+len(t)/10
 L=np.array([sum(w(t) for t in s.split()) for s in sents])
-big=[(a,b) for a,b in runs if b-a>=0.3 and a>fs and b<ls]
+big=[(a,b) for a,b in runs if b-a>=BIGT and a>fs and b<ls]
 B=[(fs,fs)]+big+[(ls,ls)];K=len(B);M=len(sents)
 rate=sp(fs,ls)/L.sum();INF=1e18
 dp=np.full((M+1,K),INF);bk=np.zeros((M+1,K),int);dp[0][0]=0
