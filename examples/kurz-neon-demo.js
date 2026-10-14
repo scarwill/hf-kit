@@ -1,6 +1,7 @@
 // Kurz NEON demo (no audio, fixed times): the newer Kurzgesagt space look + Kurz infographic parts (kurz/neon.js).
 // Build: cat premium illus life helpers icons scenes extras kurz/{kurz,organs,tech,people,techviz,neon,mascots}.js this > all.js ; meta.json {"END": 21}, words.json []
-// Hosts Axo + Glim react in every area; kBean people watch. Everyone front view, light skin.
+// Host Axo reacts in every area; kBean people watch. Everyone front view, light skin.
+// Parts showcase only: no intro() (kurzlint flags that) — a real video must start with intro().
 // Areas: 0 glowing title over nebula + galaxy, 1 Earth -> Mars timeline with pills, counter and rocket, 2 icon cards on a grid floor
 // (gauge x calendar = Mars), 3 Milky Way with a "You Are Here" pin and a speech bubble.
 const VIDEO = { theme: 'purple', scenes: [{ type: 'custom', build: (s) => {
@@ -12,7 +13,7 @@ const VIDEO = { theme: 'purple', scenes: [{ type: 'custom', build: (s) => {
   nGalaxy(G, a0x + 1560, a0y + 840, 330, 'gal0', .45);
   nPlanet(G, a0x + 260, a0y + 860, 90, '#ff9b5e', 'pl0', { bands: true, ring: '#ffd9a8', seed: 4 });
   nTitle(G, a0x + 960, a0y + 300, [{ t: 'SPACE IS', s: 110, c: NPAL.cyan }, { t: 'REALLY BIG', s: 190, c: NPAL.blue }], 'ttl0');
-  nAxo(G, a0x + 560, a0y + 1045, .5, 'ax0', { mood: 'smile' }); nGlim(G, a0x + 800, a0y + 1045, .45, 'gl0', { mood: 'smile' });
+  nAxo(G, a0x + 560, a0y + 1045, .5, 'ax0', { mood: 'smile' }); nAxo(G, a0x + 800, a0y + 1045, .45, 'gl0', { mood: 'smile' });
   const sub = S('text', { id: 'sub0', x: a0x + 960, y: a0y + 650, 'text-anchor': 'middle', 'font-family': 'Poppins', 'font-weight': 600, 'font-size': 38, fill: '#c9c2ff' }, G); sub.textContent = '(like, really)'; hidId('sub0');
 
   // ========== AREA 1: Earth -> Mars ==========
@@ -27,7 +28,7 @@ const VIDEO = { theme: 'purple', scenes: [{ type: 'custom', build: (s) => {
   nCounter(G, a1x + 1020, a1y + 690, nNum(0, 225000000, 14).map(v => v + ' km'), 58, '#ffffff', 'cnt1'); hidId('cnt1');
   nRocket(G, a1x + 540, a1y + 560, .42, 'rk1'); hidId('rk1');
   kBean(G, a1x + 330, a1y + 1040, .55, 'pp1', { sex: 'f', hairStyle: 'pony', hair: '#a2512c', top: '#ff8a3d' });
-  nGlim(G, a1x + 1440, a1y + 1050, .45, 'gl1', { mood: 'meh' });
+  nAxo(G, a1x + 1440, a1y + 1050, .45, 'gl1', { mood: 'meh' });
   nBubble(G, a1x + 1250, a1y + 740, 360, 100, 'Are we there yet?', a1x + 1430, a1y + 880, 'bb1', 32); hidId('bb1');
 
   // ========== AREA 2: icon cards on a synthwave grid ==========
@@ -49,7 +50,7 @@ const VIDEO = { theme: 'purple', scenes: [{ type: 'custom', build: (s) => {
   nPill(G, a3x + 1000, a3y + 120, 'The Milky Way', NPAL.mag, 'pG3', 40); hidId('pG3');
   nPin(G, a3x + 640, a3y + 690, 1.3, '#2f7bff', 'pin3', (g, cx, cy, r) => nPlanet(g, cx, cy, r * .8, '#2f7bff', null, { land: '#2fbf71', seed: 3 })); hidId('pin3');
   nPill(G, a3x + 640, a3y + 790, 'You Are Here', NPAL.cyan, 'pY3', 30, { ink: '#04263a' }); hidId('pY3');
-  nAxo(G, a3x + 300, a3y + 1000, .55, 'ax3', { mood: 'smile' }); nGlim(G, a3x + 1600, a3y + 1000, .5, 'gl3', { mood: 'neutral' });
+  nAxo(G, a3x + 300, a3y + 1000, .55, 'ax3', { mood: 'smile' }); nAxo(G, a3x + 1600, a3y + 1000, .5, 'gl3', { mood: 'neutral' });
   nBubble(G, a3x + 160, a3y + 560, 440, 120, "...and Mars is\nbasically next door.", a3x + 340, a3y + 790, 'bb3', 30); hidId('bb3');
 
   return () => {

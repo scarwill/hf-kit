@@ -18,7 +18,7 @@ BANNED = {
  # Infographics characters / robots
  'charB': 'kBean', 'botB': 'kMind (or kBot)', 'charP': 'kBean', 'botP': 'kMind (or kBot)',
  'person': 'kBean', 'kKid': 'kBean', 'kKidTalk': 'kTalk', 'kBlobby': 'kBean', 'kHuman': 'kBean (user: faces looked drunk)', 'kSlim': 'kBean (user: faces looked drunk)', 'kTurn': 'kGaze (front view only)',
- 'kCore': 'kMind (planet-orb model was rejected)',
+ 'kCore': 'kMind (planet-orb model was rejected)', 'nGlim': 'nAxo (host = Axo only)', 'nPip': 'nAxo (host = Axo only)',
  # flat tech props -> kurz/tech.js
  'laptop': 'kScreen', 'server': 'kServer', 'gpu': 'kCube / kServer', 'phone': 'kPhone2', 'desktop': 'kScreen', 'chipM': 'kMind / kBox3D',
  'brainBox': 'kMind', 'block': 'kCube', 'funnelG': 'shaded custom drawing', 'okM': 'kCallout', 'noWifi': 'shaded custom drawing',
@@ -44,4 +44,10 @@ for i, raw in enumerate(lines, 1):
         if len(t.split()) > 4: print(f'WARN    line {i}: text "{t}" > 4 words (Kurz labels are 1-4 words)'); warn += 1
 n_txt = len(re.findall(r'\bwtext\(', src)); n_area = len(re.findall(r'\bkWorld\(', src)) or 1
 if n_txt > n_area * 2: print(f'WARN    {n_txt} wtext() for {n_area} areas (> 2 per area): too much text, show it instead'); warn += 1
+code = '\n'.join(re.sub(r"//.*$", '', l) for l in lines)
+for fn in ('intro', 'outro'):
+    if not re.search(r'\b' + fn + r'\(', code): print(f'BANNED  no {fn}() call: every Kurz video starts with intro() and ends with outro()'); bad += 1
+if not re.search(r'\b(kSCALE|ZOOMIN)\(', code): print('WARN    no kSCALE()/ZOOMIN(): add at least one macro<->micro scale jump if the topic allows'); warn += 1
+if not re.search(r'\bnAxo\(', code): print('WARN    no nAxo(): the host Axo should react in most areas'); warn += 1
+if not re.search(r'\b(kLife|nLife)\(', code): print('WARN    no kLife()/nLife(): the world will not breathe'); warn += 1
 print(f'kurzlint: {bad} banned, {warn} warnings'); sys.exit(1 if bad else 0)

@@ -21,5 +21,5 @@ Kit safety built in (no per-video code needed):
 New chat setup:
 
 ```bash
-git clone --depth 1 https://github.com/scarwill/hf-kit /tmp/hfk && mkdir -p ~/hf-kit ~/thumb-kit && cp /tmp/hfk/video/* ~/hf-kit/ && cp /tmp/hfk/thumb/* ~/thumb-kit/
+git clone --depth 1 https://github.com/scarwill/hf-kit /tmp/hfk && mkdir -p ~/hf-kit ~/thumb-kit && cp /tmp/hfk/video/* ~/hf-kit/ && cp -r /tmp/hfk/kurz /tmp/hfk/netlight ~/hf-kit/ && cp /tmp/hfk/thumb/* ~/thumb-kit/
 ```
