@@ -263,3 +263,73 @@ function nlOutro(s) { const e = D(stage, '', `position:absolute;inset:0;z-index:
   nlOrb(e, 'nlOo', 960, 400, 170); const txt = '> subscribe --next'; nlType(e, 'nlOt', Math.round(960 - txt.length * 60 * .6 / 2), 700, txt, 60); return e; }
 function nlOutroBeats() { const t = END + .2; tl.set('#nlO', { autoAlpha: 0 }, 0); tl.set('#nlOt', { autoAlpha: 0 }, 0); tl.set('#nlOoC', { autoAlpha: 0 }, 0); FADE('#nlO', t, { d: .4 }); ORB_BOUNCE('nlOo', t + .3, 2); const te = TYPE('nlOt', t + .5, .045); CARET('nlOt', te + .1, 2);
   ORB_SLEEP('nlOo', t + 2.4); tl.to('#nlO', { opacity: 0, duration: .5 }, END + TAIL - .6); tl.set({}, {}, END + TAIL); }
+
+// =====================================================================================================
+// HOUSE HELPERS + MOTION + REAL-PAGE HELPERS (moved from the per-video house.js into the kit).
+// Every name is defined with nlDef: if video.js already declares the same name (an older video.js that still pastes
+// the house helpers), the video's own version is kept and nothing breaks.
+// =====================================================================================================
+const nlDef = (name, v) => { if (!(name in globalThis)) globalThis[name] = v; };
+// ---- orb in the bottom-right corner with fixed eyes (looking up-left at the content) ----
+nlDef('OX', 1790); nlDef('OY', 962); nlDef('OR', 56); nlDef('ORBS', []);
+nlDef('cOrb', (sc, id) => { ORBS.push(id); return nlOrb(sc, id, OX, OY, OR); });
+// ---- no grid ----
+nlDef('houseStart', () => { const st = document.createElement('style'); st.textContent = '.grid-bg{display:none!important}'; document.head.appendChild(st); });
+// ---- arrowheads. arw(g, x, y, c, dir): fixed head at (x,y), dir 'r' right, 'd' down, 'u' up, 'l' left.
+//      arwA(g, c): head at the END of the wire, pointing along the wire's last tangent (works for L and C paths) — prefer this.
+nlDef('arw', (g, x, y, c, dir = 'r') => S('path', { class: 'draw', d: dir === 'd' ? `M${x - 11} ${y - 16} L${x} ${y} L${x + 11} ${y - 16}` : dir === 'u' ? `M${x - 11} ${y + 16} L${x} ${y} L${x + 11} ${y + 16}` : dir === 'l' ? `M${x + 16} ${y - 11} L${x} ${y} L${x + 16} ${y + 11}` : `M${x - 16} ${y - 11} L${x} ${y} L${x - 16} ${y + 11}`, stroke: c, 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g));
+nlDef('arwA', (g, c, L = 20) => {
+  const d = g.querySelector('path').getAttribute('d'), n = d.match(/-?\d+(\.\d+)?/g).map(Number);
+  const x = n[n.length - 2], y = n[n.length - 1]; let px = n[n.length - 4], py = n[n.length - 3];
+  if (px === x && py === y) { px = n[n.length - 6]; py = n[n.length - 5]; }
+  const a = Math.atan2(y - py, x - px), w = .55;
+  return S('path', { class: 'draw', d: `M${(x - L * Math.cos(a - w)).toFixed(1)} ${(y - L * Math.sin(a - w)).toFixed(1)} L${x} ${y} L${(x - L * Math.cos(a + w)).toFixed(1)} ${(y - L * Math.sin(a + w)).toFixed(1)}`, stroke: c, 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+});
+// ---- sound cues -> window.__CUES -> score.py. kinds: whoosh hit chime blip tick err pop down type(n chars, dt) ----
+nlDef('CUES', []); window.__CUES = window.__CUES || CUES;
+nlDef('CUE', (t, k, n = 1, dt = 0) => { if (t != null) CUES.push([+(+t).toFixed(3), k, n, dt]); return t; });
+nlDef('NEXT', (sel, ph) => CUE(nlNext(sel, ph), 'whoosh'));
+nlDef('houseBeats', () => { ORBS.forEach(id => tl.set('#' + id + 'E', { x: -12, y: -7 }, 0)); CUE(.4, 'type', 13, .05); CUE(1.0, 'blip'); CUE(1.9, 'chime'); });
+nlDef('houseEnd', () => { CUE(END + .2, 'whoosh'); CUE(END + .5, 'type', 18, .045); CUE(END + 2.4, 'down'); });
+// ---- custom drawing: art(par, id, x, y, w, h, '<svg inner>') -> positioned svg box ----
+nlDef('art', (par, id, x, y, w, h, inner) => D(par, `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="overflow:visible">${inner}</svg>`, `position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px`, id));
+// ---- row of word chips with known positions: chips(par, id, x, y, [[text, colour], ...], fs) ; el.cx(k) = centre x of chip k ; chips are id+'k'+k ----
+nlDef('chips', (par, id, x, y, items, fs = 32) => {
+  const e = D(par, '', `position:absolute;left:${x}px;top:${y}px;height:${fs * 1.2 + 24}px`, id); let cx = 0; e.xs = [];
+  items.forEach(([t, c], k) => { const w = Math.round(t.length * fs * .6 + 40); e.xs.push([cx, w]); D(e, t, `position:absolute;left:${cx}px;top:0;width:${w}px;padding:10px 0;text-align:center;border-radius:12px;border:2px solid ${c};background:color-mix(in srgb,${c} 16%,#0a0f1a);font:600 ${fs}px ${NLMONO};color:#fff;white-space:pre;box-shadow:0 0 20px -8px ${c}`, id + 'k' + k, id + 'k'); cx += w + 12; });
+  e.style.width = (cx - 12) + 'px'; e.cx = k => x + e.xs[k][0] + e.xs[k][1] / 2; return e;
+});
+// ---- motion along a path: bez(p0,p1,p2,p3,n) -> points on a cubic (p0 excluded) ; FOLLOW(sel, t, pts, d, {org, rot}) moves at constant speed.
+//      org = the element's centre at rest (default pts[0]); rot = rotate along the path (+offset deg, e.g. 90 for a nose-up drawing)
+nlDef('bez', (p0, p1, p2, p3, n = 16) => { const o = []; for (let i = 1; i <= n; i++) { const t = i / n, u = 1 - t; o.push([u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0], u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1]]); } return o; });
+nlDef('FOLLOW', (sel, t, pts, d, o = {}) => {
+  B(t); const [x0, y0] = o.org || pts[0], L = []; let tot = 0;
+  for (let i = 1; i < pts.length; i++) { const l = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); L.push(l); tot += l; }
+  let tt = t; for (let i = 1; i < pts.length; i++) { const dd = d * L[i - 1] / tot, v = { x: pts[i][0] - x0, y: pts[i][1] - y0, duration: dd, ease: 'none' };
+    if (o.rot != null) v.rotation = Math.atan2(pts[i][1] - pts[i - 1][1], pts[i][0] - pts[i - 1][0]) * 180 / Math.PI + o.rot; tl.to(sel, v, tt); tt += dd; }
+  return tt;
+});
+// ---- real pages: screenshot inside a browser window + scroll/zoom focus, highlight box, cursor + click ----
+// nlShot(par,id,x,y,w,h,src,url,nw,nh): src = 'assets/<file>.png', nw/nh = the image's real pixel size. Keep images under 8000 px tall (crop).
+nlDef('nlShot', (par, id, x, y, w, h, src, url, nw, nh) => {
+  const e = nlWin(par, id, x, y, w, h, NL.model, url), vh = h - 50, ih = Math.round(w * nh / nw);
+  const vp = D(e, '', `position:absolute;left:0;top:50px;width:${w}px;height:${vh}px;overflow:hidden;background:#0d1117`, id + 'vp');
+  D(vp, `<img src="${src}" style="width:${w}px;height:${ih}px;display:block">`, `position:absolute;left:0;top:0;width:${w}px;height:${ih}px;transform-origin:0 0`, null, id + 'im');
+  e.dataset.vw = w; e.dataset.vh = vh; e.dataset.ih = ih; return e;
+});
+// SHOT_FOCUS(id,t,px,py,s,d): bring image point (px,py) (image px at scale 1) to the window centre at zoom s (s=1 = plain scroll)
+nlDef('SHOT_FOCUS', (id, t, px, py, s = 1, d = 1.1) => {
+  const e = document.getElementById(id), vw = +e.dataset.vw, vh = +e.dataset.vh, ih = +e.dataset.ih;
+  const x = Math.min(0, Math.max(vw - vw * s, vw / 2 - px * s)), y = Math.min(0, Math.max(vh - ih * s, vh / 2 - py * s));
+  return TO('.' + id + 'im', t, { x, y, scale: s, duration: d, ease: 'power2.inOut' });
+});
+// highlight box on the image layer (moves with scroll/zoom). Measure px/py/w/h from the image pixels, never guess. POP('#hid', t) to show.
+nlDef('nlShotHL', (id, hid, px, py, w, h, c = NL.out) => D(document.querySelector('.' + id + 'im'), '', `position:absolute;left:${px}px;top:${py}px;width:${w}px;height:${h}px;border:4px solid ${c};border-radius:10px;box-shadow:0 0 22px ${c},inset 0 0 18px ${c}55`, hid));
+// mouse cursor: nlCursor(par,id,x,y) ; CURSOR(id,t,x,y,d) moves its tip to (x,y) ; CLICK(id,t) ring + press
+nlDef('nlCursor', (par, id, x, y) => {
+  const e = D(par, `<svg width="44" height="54" viewBox="0 0 22 27"><path d="M2 2 L2 22 L7.5 17 L11 25 L14.5 23.5 L11 15.5 L18 15.5 Z" fill="#fff" stroke="#05070d" stroke-width="1.6" stroke-linejoin="round"/></svg>`, `position:absolute;left:${x - 4}px;top:${y - 4}px;width:44px;height:54px;z-index:6;filter:drop-shadow(0 4px 6px #000)`, id);
+  D(par, '', `position:absolute;left:${x - 22}px;top:${y - 22}px;width:44px;height:44px;border-radius:50%;border:3px solid ${NL.out};z-index:5`, id + 'r');
+  e.dataset.x = x; e.dataset.y = y; return e;
+});
+nlDef('CURSOR', (id, t, x, y, d = .8) => { const e = document.getElementById(id), dx = x - +e.dataset.x, dy = y - +e.dataset.y; TO(['#' + id, '#' + id + 'r'], t, { x: dx, y: dy, duration: d, ease: 'power2.inOut' }); return t + d; });
+nlDef('CLICK', (id, t) => { B(t); tl.fromTo('#' + id + 'r', { autoAlpha: 1, scale: .3 }, { autoAlpha: 0, scale: 1.6, duration: .45, ease: 'power2.out' }, t); tl.to('#' + id, { scale: .85, duration: .08, yoyo: true, repeat: 1, transformOrigin: '10% 10%' }, t); return t + .45; });
