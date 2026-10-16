@@ -2,7 +2,7 @@
 // Follows every rule of the light skill: nlSetup / nlBegin / nlFinish, cOrb in the corner of every scene but the last, NEXT per scene,
 // 2-3 word unique phrases, typed text inside windows, custom drawings (laptop, scissors), a cursor click, a moving packet, sound cues.
 // Build (in the video folder with words.json + meta.json): python3 ~/hf-kit/light/lbuild.py video.js talk.m4a
-// Token IDs are illustrative (cl100k-style), not verified.
+// Token IDs are the real cl100k_base IDs (verified with tiktoken, Oct 2026): How=4438, " do"=656, " token"=4037, "izers"=12509, " work"=990, "?"=30.
 // Script (9 lines): You type a question into a chat box, but the model never sees your words. / It sees something else entirely. /
 //   First, a tokenizer cuts your text into small pieces called tokens. / One word can become several tokens. /
 //   Every token is then swapped for a number from a fixed vocabulary of about one hundred thousand entries. /
