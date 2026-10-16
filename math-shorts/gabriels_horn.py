@@ -185,7 +185,7 @@ def cam(**kw):
     return c
 
 
-CAM_GRAPH = cam(cx=3.9, cy=1.75, s=118.0, yaw=0.0, pitch=0.0, dist=400.0)
+CAM_GRAPH = cam(cx=4.1, cy=1.75, s=110.0, yaw=0.0, pitch=0.0, dist=400.0)
 LOG_KEYS = ("s", "dist")
 
 
@@ -787,7 +787,7 @@ def draw_ui(ctx, t, c):
             text(ctx, str(k), x, y, 30, WHITE, 0.6 * ga, bold=False)
         x, y = to_screen(c, (-0.28, 1.0, 0))
         text(ctx, "1", x, y, 30, WHITE, 0.6 * ga, bold=False)
-        x, y = to_screen(c, (8.45, 0.38, 0))
+        x, y = to_screen(c, (8.6, -0.34, 0))
         text(ctx, "x", x, y, 40, WHITE, 0.8 * ga)
         x, y = to_screen(c, (0, 5.75, 0))
         text(ctx, "y", x, y, 40, WHITE, 0.8 * ga)
