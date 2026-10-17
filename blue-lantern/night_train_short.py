@@ -188,6 +188,8 @@ if len(sys.argv) > 1 and sys.argv[1] == 'still':
 p = subprocess.Popen(['ffmpeg', '-loglevel', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{W}x{H}', '-r', str(FPS), '-i', '-',
                       '-f', 'f32le', '-ar', str(SR), '-ac', '2', '-i', '/tmp/nts.raw', '-c:v', 'libx264', '-preset', 'medium', '-crf', '19',
                       '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart',
-                      os.path.join(OUT, 'night_train_short.mp4')], stdin=subprocess.PIPE)
-for i in range(int(DUR * FPS)): p.stdin.write(frame(i).tobytes())
+                      os.path.join(os.environ.get('BL_OUT', OUT), 'night_train_short.mp4')], stdin=subprocess.PIPE)
+import multiprocessing as mp
+with mp.get_context('fork').Pool(3) as pool:   # 3 workers render frames in parallel, ffmpeg gets them in order
+    for fr in pool.imap(frame, range(int(DUR * FPS)), chunksize=8): p.stdin.write(fr.tobytes())
 p.stdin.close(); p.wait(); print('done')
