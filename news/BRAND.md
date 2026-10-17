@@ -1,4 +1,4 @@
-# News channel look (locked 17 Oct 2026)
+# News channel look (locked 17 Oct 2026, updated: blue + black only)
 
 Decided with the user. The `news` kit and skill must follow this; the old neon look in `news.js` is retired for this channel.
 
@@ -6,16 +6,16 @@ Decided with the user. The `news` kit and skill must follow this; the old neon l
 - **Shorts only for now:** 1080 x 1920, one story per Short, about 30-45 s of voice.
 - Long videos (5-6 min, 1920 x 1080) come later, once the channel has subscribers and is monetized. Same look.
 
-## Colours (light theme "Clean Blue + Fresh Teal")
+## Colours (light theme "Clean Blue", blue + black only, no teal)
 | token | hex | use |
 |---|---|---|
-| bg | `#F5F8FA` | page background, with a soft glow: `#E3ECFF` top-right, `#DDF2EE` bottom-left |
+| bg | `#F5F8FA` | page background, with a soft blue glow `#E3ECFF` top-right and `#EEF2F7` bottom-left |
 | ink | `#0F172A` | headlines, main text |
 | soft | `#5B6678` | labels, secondary text |
 | card | `#FFFFFF` | cards, chips (2 px border `#E2E8F0`, soft shadow) |
 | line | `#E2E8F0` | borders, row dividers |
-| blue | `#2563EB` | primary accent: the key word in a headline, source/date pill (tint `#E3ECFF`), the main number |
-| teal | `#0E9384` | secondary accent: numbers in chips, section tags ("THE CATCH"), quote highlight (`#BFE9E2`), quote card tint `#F3FBF9` |
+| blue | `#2563EB` | the only accent: key word in a headline, source/date pill (tint `#E3ECFF`), numbers in chips, section tags ("THE CATCH"), quote highlight (`#C7D7FE`), quote card tint `#F1F5FF` |
+| black | `#0F172A` (= ink) | everything else: headlines, values, strong labels. Blue + black are the whole brand. |
 | red | `#E11D48` | problems / risks only (not legal, failed, delayed) |
 
 No neon, no glow lines, no dark backgrounds (dark photos are fine inside their rounded frames).
