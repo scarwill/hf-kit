@@ -1,0 +1,245 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+ html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#2d3a4f}
+ canvas{display:block}
+ #ov{position:absolute;left:0;top:0;width:1080px;height:1920px;pointer-events:none;
+     font-family:"Poppins","Montserrat","DejaVu Sans",sans-serif;color:#fff;text-align:center}
+ .t{position:absolute;left:0;width:100%;font-weight:800;letter-spacing:.5px;
+    text-shadow:0 4px 0 rgba(0,0,0,.35),0 0 24px rgba(0,0,0,.45)}
+ #title{top:380px;font-size:74px;line-height:92px}
+ #num{top:580px;font-size:72px}
+ #end{top:560px;font-size:80px;line-height:100px;opacity:0}
+</style></head>
+<body>
+<div id="ov">
+ <div class="t" id="title">Do You Recognize<br>These 4 Tracks?</div>
+ <div class="t" id="num"></div>
+ <div class="t" id="end">Name every track.<br>GO!!</div>
+</div>
+<script src="node_modules/three/build/three.min.js"></script>
+<script src="notes.js"></script>
+<script>
+const W = 1080, H = 1920, G = 30, R = 0.34, PAD_TOP = 0.5;
+const COLORS = [0xff4fd8, 0x2f8cff, 0xff8a1f, 0x3dff8a];
+
+// deterministic random
+let seed = 7;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const rr = (a, b) => a + (b - a) * rnd();
+
+// ---- path: one waypoint per note, plus a start point and a few rest bounces ----
+const wps = [];
+let x = 0, z = 0, head = -Math.PI / 2, turn = 0;
+wps.push({ t: 0, x: 0, z: 6, y: R, pad: null });
+NOTES.forEach((n, i) => {
+  if (i > 0) {
+    const dt = n.t - NOTES[i - 1].t;
+    const d = Math.min(6, Math.max(1.45, 8.5 * dt));
+    // try turns from small to large; keep the first that stays clear of older pads
+    const base = turn * 0.6 + rr(-0.45, 0.45) + (dt > 0.6 ? rr(-0.9, 0.9) : 0);
+    let best = null;
+    for (const extra of [0, 0.35, -0.35, 0.7, -0.7, 1.1, -1.1, 1.5, -1.5]) {
+      const h = head + base + extra, nx = x + Math.cos(h) * d, nz = z + Math.sin(h) * d;
+      let clear = 1e9;
+      for (let j = 0; j < wps.length - 3; j++) clear = Math.min(clear, Math.hypot(wps[j].x - nx, wps[j].z - nz));
+      if (!best || clear > best.clear) best = { h, nx, nz, clear, t: base + extra };
+      if (clear > 4) break;
+    }
+    turn = best.t; head = best.h; x = best.nx; z = best.nz;
+  }
+  wps.push({ t: n.t, x, z, y: PAD_TOP + R, pad: i, k: n.k, head });
+});
+// after the last note the ball drops to the floor and bounces to rest
+{
+  const last = wps[wps.length - 1];
+  let t = last.t, px = last.x, pz = last.z;
+  [[0.7, 3.2], [0.42, 1.8], [0.26, 1.0], [0.16, 0.5]].forEach(([dt, d]) => {
+    t += dt; px += Math.cos(head) * d; pz += Math.sin(head) * d;
+    wps.push({ t, x: px, z: pz, y: R, pad: null });
+  });
+}
+// start point sits behind the first pad
+wps[0].x = wps[1].x - Math.cos(wps[1].head || 0) * 0;
+wps[0].z = wps[1].z + 6;
+
+function ballAt(t) {
+  if (t <= wps[0].t) return { x: wps[0].x, y: wps[0].y, z: wps[0].z, land: -1 };
+  for (let i = 0; i < wps.length - 1; i++) {
+    const a = wps[i], b = wps[i + 1];
+    if (t <= b.t) {
+      const T = b.t - a.t, u = t - a.t, f = u / T;
+      // parabola through both landing heights under gravity G
+      // long hops get lower gravity so the arc never rises above ~2.6 units
+      const g = Math.min(G, 8 * 2.6 / (T * T));
+      const vy = (b.y - a.y + 0.5 * g * T * T) / T;
+      return { x: a.x + (b.x - a.x) * f, z: a.z + (b.z - a.z) * f,
+               y: a.y + vy * u - 0.5 * g * u * u, land: a.t, i };
+    }
+  }
+  const e = wps[wps.length - 1];
+  return { x: e.x, y: e.y, z: e.z, land: e.t };
+}
+
+// ---- three.js scene ----
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H); renderer.setPixelRatio(1);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+document.body.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x34445c);
+scene.fog = new THREE.Fog(0x34445c, 26, 48);
+const cam = new THREE.PerspectiveCamera(42, W / H, 0.1, 200);
+
+scene.add(new THREE.HemisphereLight(0xbfd4ff, 0x1c2433, 1.1));
+const sun = new THREE.DirectionalLight(0xfff1dc, 2.6);
+sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 80 });
+sun.shadow.bias = -0.0006; sun.shadow.radius = 3;
+scene.add(sun, sun.target);
+
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000),
+  new THREE.MeshStandardMaterial({ color: 0x3e4f6a, roughness: 0.95 }));
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+
+const dark = new THREE.MeshStandardMaterial({ color: 0x1c1f26, roughness: 0.45, metalness: 0.3 });
+const metal = new THREE.MeshStandardMaterial({ color: 0xc9d2de, roughness: 0.3, metalness: 0.8 });
+
+// pads: one shape per track
+const padGeo = [
+  new THREE.BoxGeometry(0.95, PAD_TOP, 0.95),
+  new THREE.BoxGeometry(1.3, PAD_TOP, 0.8),
+  new THREE.CylinderGeometry(0.62, 0.62, PAD_TOP, 32),
+  new THREE.CylinderGeometry(0.62, 0.62, PAD_TOP, 6),
+];
+const capGeo = [
+  new THREE.BoxGeometry(0.8, 0.06, 0.8),
+  new THREE.BoxGeometry(1.15, 0.06, 0.65),
+  new THREE.CylinderGeometry(0.5, 0.5, 0.06, 32),
+  new THREE.CylinderGeometry(0.5, 0.5, 0.06, 6),
+];
+const ringGeo = new THREE.RingGeometry(0.55, 0.68, 48);
+const pads = [];
+wps.forEach(w => {
+  if (w.pad === null) return;
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(padGeo[w.k], dark);
+  body.position.y = PAD_TOP / 2; body.castShadow = body.receiveShadow = true;
+  const capMat = new THREE.MeshStandardMaterial({ color: 0x2a2e38, emissive: COLORS[w.k],
+    emissiveIntensity: 0, roughness: 0.4 });
+  const cap = new THREE.Mesh(capGeo[w.k], capMat); cap.position.y = PAD_TOP + 0.01;
+  const ringMat = new THREE.MeshBasicMaterial({ color: COLORS[w.k], transparent: true,
+    opacity: 0, side: THREE.DoubleSide, depthWrite: false });
+  const ring = new THREE.Mesh(ringGeo, ringMat); ring.rotation.x = -Math.PI / 2;
+  ring.position.y = PAD_TOP + 0.03;
+  g.add(body, cap, ring);
+  g.position.set(w.x, 0, w.z); g.rotation.y = -w.head;
+  scene.add(g);
+  pads.push({ t: w.t, g, cap, capMat, ring, ringMat });
+});
+
+// ball
+const ballMat = new THREE.MeshStandardMaterial({ color: 0xffb3bf, emissive: 0xff3d63,
+  emissiveIntensity: 0.35, roughness: 0.25, metalness: 0.1 });
+const ball = new THREE.Mesh(new THREE.SphereGeometry(R, 48, 32), ballMat);
+ball.castShadow = true; scene.add(ball);
+const glow = new THREE.PointLight(0xff6f8e, 0, 4, 2); scene.add(glow);
+
+// decor: dark posts, pucks and metal rails scattered beside the path, never on it
+const pts = wps.map(w => [w.x, w.z]);
+function distToPath(px, pz) {
+  let m = 1e9;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [ax, az] = pts[i], [bx, bz] = pts[i + 1];
+    const dx = bx - ax, dz = bz - az, L = dx * dx + dz * dz || 1;
+    const u = Math.max(0, Math.min(1, ((px - ax) * dx + (pz - az) * dz) / L));
+    m = Math.min(m, Math.hypot(px - ax - u * dx, pz - az - u * dz));
+  }
+  return m;
+}
+const postGeo = new THREE.BoxGeometry(0.45, 1.6, 0.45);
+const puckGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.35, 28);
+const pinGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.9, 8);
+for (let n = 0; n < 480; n++) {
+  const w = pts[Math.floor(rnd() * pts.length)];
+  const a = rnd() * Math.PI * 2, d = rr(2.2, 11);
+  const px = w[0] + Math.cos(a) * d, pz = w[1] + Math.sin(a) * d;
+  if (distToPath(px, pz) < 2.0) continue;
+  const kind = rnd();
+  if (kind < 0.45) {
+    const m = new THREE.Mesh(postGeo, dark);
+    m.position.set(px, 0.8, pz); m.rotation.y = rnd() * 3;
+    m.castShadow = true; scene.add(m);
+  } else if (kind < 0.8) {
+    const m = new THREE.Mesh(puckGeo, dark);
+    m.position.set(px, 0.175, pz); m.castShadow = true; scene.add(m);
+    const pin = new THREE.Mesh(pinGeo, metal);
+    pin.position.set(px, 0.6, pz); pin.castShadow = true; scene.add(pin);
+  } else {
+    // curved metal rail on little stands
+    const len = rr(2.5, 4.5), r0 = rnd() * 6, bend = rr(-1.2, 1.2);
+    const cps = [];
+    for (let s = 0; s <= 4; s++) {
+      const f = s / 4;
+      cps.push(new THREE.Vector3(px + Math.cos(r0) * len * f - Math.sin(r0) * bend * Math.sin(f * Math.PI),
+        0.55 + 0.25 * Math.sin(f * Math.PI * 2),
+        pz + Math.sin(r0) * len * f + Math.cos(r0) * bend * Math.sin(f * Math.PI)));
+    }
+    const ok = cps.every(p => distToPath(p.x, p.z) > 1.6);
+    if (!ok) continue;
+    const curve = new THREE.CatmullRomCurve3(cps);
+    const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 40, 0.05, 8), metal);
+    tube.castShadow = true; scene.add(tube);
+    cps.forEach(p => {
+      const st = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, p.y, 6), metal);
+      st.position.set(p.x, p.y / 2, p.z); st.castShadow = true; scene.add(st);
+    });
+  }
+}
+
+// ---- per-frame state, a pure function of time ----
+const num = document.getElementById('num'), title = document.getElementById('title'),
+      endT = document.getElementById('end');
+function camTarget(t) {
+  let sx = 0, sz = 0, n = 0;
+  for (let k = -6; k <= 6; k++) {
+    const b = ballAt(Math.max(0, t + k * 0.06)); sx += b.x; sz += b.z; n++;
+  }
+  return [sx / n, sz / n];
+}
+window.renderAt = function (t) {
+  const b = ballAt(t);
+  const since = b.land >= 0 ? t - b.land : 9;
+  const sq = Math.exp(-since * 25);
+  ball.position.set(b.x, b.y - sq * 0.06, b.z);
+  ball.scale.set(1 + sq * 0.25, 1 - sq * 0.3, 1 + sq * 0.25);
+  glow.position.set(b.x, b.y + 0.6, b.z); glow.intensity = 3 * sq;
+
+  pads.forEach(p => {
+    const d = t - p.t;
+    if (d < 0) { p.capMat.emissiveIntensity = 0; p.ringMat.opacity = 0; p.g.scale.y = 1; return; }
+    p.capMat.emissiveIntensity = 0.7 + 3.0 * Math.exp(-d * 5);
+    p.g.scale.y = 1 - 0.25 * Math.exp(-d * 18);
+    const rf = Math.min(1, d / 0.45);
+    p.ring.scale.setScalar(1 + rf * 2.2); p.ringMat.opacity = d < 0.45 ? 0.9 * (1 - rf) : 0;
+  });
+
+  const [cx, cz] = camTarget(t);
+  cam.position.set(cx + 1.2, 19, cz + 7.5); cam.lookAt(cx, 0, cz - 2.2);
+  sun.position.set(cx + 9, 16, cz - 6); sun.target.position.set(cx, 0, cz);
+
+  // overlay text
+  let cur = -1;
+  SECTIONS.forEach(s => { if (t >= s.start - 0.2) cur = s.k; });
+  const ending = t >= 28.2;
+  num.textContent = cur >= 0 && !ending ? (cur + 1) + ' -' : '';
+  title.style.opacity = ending ? 0 : 1;
+  const e = Math.max(0, Math.min(1, (t - 28.2) / 0.25));
+  endT.style.opacity = e; endT.style.transform = 'scale(' + (0.8 + 0.2 * e) + ')';
+  renderer.render(scene, cam);
+};
+window.READY = true;
+</script></body></html>
