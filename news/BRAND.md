@@ -1,8 +1,9 @@
-# AI + Dev news channel: locked decisions (updated 19 Oct 2026)
+# Merge Report: locked decisions for the AI + Dev news channel (updated 19 Oct 2026)
 
 Decided with the user. The `news` skill and kit follow this file.
 
 ## Channel
+- **Name:** Merge Report (handle @mergereport, or the closest free one). Profile picture: `brand/dp.png` (white MR on blue). Banner: `brand/banner.png` (2560x1440, text inside the phone-safe centre 1546x423). Sources of both: `brand/*.html`.
 - **Niche:** AI news + developer news. About 60 % AI (new models from OpenAI / Google / Anthropic / Meta / xAI / DeepSeek..., Hugging Face trending and open models, AI agents, AI tools, AI failures and hacks), 30 % coding and dev tools (GitHub viral repos, languages, editors, open source), 10 % cloud and security (only big ones: AWS / Azure / GCP outages, price changes, big hacks that hit developers).
 - **Not covered:** gadgets and phones unless the story is about AI or developers, crypto prices, politics / celebrity drama, unconfirmed leaks (or say "reportedly"), tiny updates.
 - **Audience:** US / UK. Voice: English (the user's TTS). The user talks to Claude in Hinglish.
@@ -44,3 +45,10 @@ Decided with the user. The `news` skill and kit follow this file.
 - Official press photos, official logo files, real page screenshots, credited. No ripped video clips, no movie / meme images, no redrawn logos or fake UI.
 - Humour yes, swearing and jokes about groups of people no.
 - Say what is illustrative, say "reportedly" for anything not confirmed, and give the honest caveat (for example "this happened in internal training, not in ChatGPT").
+
+## Monetization safety (YouTube "inauthentic content" = mass-produced / templated, judged across the channel)
+- Faceless + TTS is allowed, but every video must clearly be made with care: own research, own script, own analysis ("what it means for developers"), visuals built for that story.
+- Never the same layout twice in a row: change the opening visual, scene order and parts from video to video. No fixed "template" Short.
+- One consistent, natural voice for the channel (the user's own voice is best). Never a voice that imitates a real person.
+- Quality over quantity: 2 strong Shorts beat 3 rushed ones. Keep the weekly long video: it shows a real channel, not a Shorts factory.
+- Sources in every description. No reused clips. Label realistic synthetic media if we ever use it (our drawings and TTS narration are not that).

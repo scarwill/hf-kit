@@ -117,9 +117,10 @@ function nlNext(sel, phrase) { const t = go(phrase); tl.set(NLCUR, { autoAlpha: 
 // ---------- end card (END .. END+TAIL) ----------
 function sEnd() { const e = D(stage, '', `position:absolute;inset:0;z-index:30;background:${SBG}`, 'sE');
   const V = FH > FW, top = V ? 620 : 300;
+  D(e, 'MERGE REPORT', `position:absolute;left:0;right:0;top:${top - 90}px;text-align:center;font:800 40px ${SBODY};letter-spacing:8px;color:${SB.blue}`, 'sEn');
   D(e, V ? 'New AI &amp; dev news<br>every day' : 'New AI &amp; dev news every day', `position:absolute;left:70px;right:70px;top:${top}px;text-align:center;font:800 104px/1.02 ${SHEAD};letter-spacing:-3px;color:${SB.ink}`, 'sEt');
   D(e, `<span style="display:inline-block;background:${SB.blue};color:#fff;font:800 48px ${SBODY};padding:24px 60px;border-radius:999px;box-shadow:0 18px 34px -14px ${SB.blue}">${V ? 'Follow' : 'Subscribe'}</span>`, `position:absolute;left:0;right:0;top:${top + (V ? 280 : 170)}px;text-align:center`, 'sEb'); return e; }
-function sEndBeats() { const t = END + .05; tl.set('#sE', { autoAlpha: 0 }, 0); tl.set('#sE', { autoAlpha: 1 }, t); tl.fromTo('#sEt', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .4, ease: 'power3.out' }, t); POP('#sEb', t + .35); PULSE('#sEb', t + 1.1, { s: 1.06 }); tl.set({}, {}, END + TAIL); }
+function sEndBeats() { const t = END + .05; tl.set('#sE', { autoAlpha: 0 }, 0); tl.set('#sE', { autoAlpha: 1 }, t); tl.fromTo(['#sEn', '#sEt'], { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .4, ease: 'power3.out', stagger: .08 }, t); POP('#sEb', t + .35); PULSE('#sEb', t + 1.1, { s: 1.06 }); tl.set({}, {}, END + TAIL); }
 
 function sBegin(scs) {
   nlStart(scs); NLT.push([scs[0], HEAD]);

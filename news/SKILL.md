@@ -5,10 +5,13 @@ description: "Run the user's AI + Dev news YouTube channel end to end: find toda
 
 # NEWS: the AI + Dev news channel (research -> script -> video)
 
-The user runs a faceless AI + developer news channel for a US / UK audience. Voice = the user's English TTS. Talk to the user in Hinglish, short and clear.
+The user runs **Merge Report**, a faceless AI + developer news channel for a US / UK audience. Voice = the user's English TTS. Talk to the user in Hinglish, short and clear.
 Locked decisions live in `~/nkit/news/BRAND.md`: read it at the start of every session. If the user changes a decision, update BRAND.md (ask before pushing).
 
 **THIS SKILL ONLY.** Do not also follow `light`, `netlightml`, `net-script`, `net-thumb`, `kurzgesagt-explainer-video` or other video skills.
+
+## Monetization safety (every video)
+YouTube demonetizes "inauthentic" (mass-produced, templated) channels. So in every video: real research and our own analysis, a different opening and layout from the last video, visuals made for this story, one consistent natural voice, sources in the description. Rushed or near-identical Shorts are worse than fewer Shorts. Full list: BRAND.md.
 
 ## Never skip a stop
 The user: "jab tak me na bolu banane mat lag jaana". Three stops, every time:
@@ -89,7 +92,7 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 
 ### 3d Deliver
 - Copy `index.html`, `bgm.m4a`, `assets/*` to `~/<slug>-hyperframes/` and send with SendUserFile (`display: 'attach'`).
-- `youtube.txt`: 3 honest titles, description (2-3 lines + **Sources** with every URL), hashtags (`#shorts` for Shorts, #ai #technews #programming ...), tags.
+- `youtube.txt`: 3 honest titles (channel: Merge Report), description (2-3 lines + **Sources** with every URL), hashtags (`#shorts` for Shorts, #ai #technews #programming ...), tags.
 - Hinglish message: length, scene list (what is shown), what is illustrative, render steps:
   `mkdir assets` · copy the voice as `assets\<audio name>` (the exact name in index.html) · `bgm.m4a` and every image into `assets\` · `dir assets` (watch for `.m4a.m4a`) · `npx hyperframes render --output <name>.mp4`.
 - Upload time (BRAND.md: ~8 pm IST, one hour later after 1 Nov).
