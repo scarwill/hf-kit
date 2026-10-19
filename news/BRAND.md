@@ -1,36 +1,46 @@
-# News channel look (locked 17 Oct 2026, updated: blue + black only)
+# AI + Dev news channel: locked decisions (updated 19 Oct 2026)
 
-Decided with the user. The `news` kit and skill must follow this; the old neon look in `news.js` is retired for this channel.
+Decided with the user. The `news` skill and kit follow this file.
+
+## Channel
+- **Niche:** AI news + developer news. About 60 % AI (new models from OpenAI / Google / Anthropic / Meta / xAI / DeepSeek..., Hugging Face trending and open models, AI agents, AI tools, AI failures and hacks), 30 % coding and dev tools (GitHub viral repos, languages, editors, open source), 10 % cloud and security (only big ones: AWS / Azure / GCP outages, price changes, big hacks that hit developers).
+- **Not covered:** gadgets and phones unless the story is about AI or developers, crypto prices, politics / celebrity drama, unconfirmed leaks (or say "reportedly"), tiny updates.
+- **Audience:** US / UK. Voice: English (the user's TTS). The user talks to Claude in Hinglish.
+- **Angle that sets us apart:** every story says what it means for developers, and shows the real thing (repo, model page, docs, code, a demo run by us when possible).
 
 ## Format
-- **Shorts only for now:** 1080 x 1920, one story per Short, about 30-45 s of voice.
-- Long videos (5-6 min, 1920 x 1080) come later, once the channel has subscribers and is monetized. Same look.
+- **Every day:** 2-3 Shorts (1080x1920, one story each, 30-45 s).
+- **Every weekend:** 1 long video "This Week in Tech" (1920x1080, 6-8 min): a deep dive on the week's biggest story (~3 min), "stories you missed" that had no Short (~3 min), updates on the week's Shorts (~1 min).
+- **Big Story rule:** a story that scores 9+/10 (major model launch, outage or hack that hits developers, huge deal, viral open-source release everyone talks about) gets a Short at once and its own long video (4-6 min) the same or next day, without waiting for the weekend. At most 1-2 Big Story long videos a week. The weekend video then gives it only a short update.
+- **Slow day:** an evergreen Short (how X works, a free AI tool, the week so far) instead of a weak story.
 
-## Colours (light theme "Clean Blue", blue + black only, no teal)
+## Upload times (India time, IST)
+- Shorts and long videos: about **8 pm IST** (= US East morning, UK afternoon). Weekdays 7:30-9:30 pm, weekends 6:30-8:30 pm.
+- After 1 Nov 2026 (US clock change): one hour later (weekdays 8:30-10:30 pm, weekends 7:30-9:30 pm). UK changes on 25 Oct.
+- News beats perfect timing: never hold a fresh story for hours just to hit the slot.
+
+## Look (light theme "Clean Blue": blue + black only)
 | token | hex | use |
 |---|---|---|
-| bg | `#F5F8FA` | page background, with a soft blue glow `#E3ECFF` top-right and `#EEF2F7` bottom-left |
-| ink | `#0F172A` | headlines, main text |
+| bg | `#F5F8FA` | background, soft blue glow `#E3ECFF` top-right, `#EEF2F7` bottom-left |
+| ink | `#0F172A` | headlines, values, everything that is not the accent |
 | soft | `#5B6678` | labels, secondary text |
-| card | `#FFFFFF` | cards, chips (2 px border `#E2E8F0`, soft shadow) |
-| line | `#E2E8F0` | borders, row dividers |
-| blue | `#2563EB` | the only accent: key word in a headline, source/date pill (tint `#E3ECFF`), numbers in chips, section tags ("THE CATCH"), quote highlight (`#C7D7FE`), quote card tint `#F1F5FF` |
-| black | `#0F172A` (= ink) | everything else: headlines, values, strong labels. Blue + black are the whole brand. |
-| red | `#E11D48` | problems / risks only (not legal, failed, delayed) |
+| card / line | `#FFFFFF` / `#E2E8F0` | cards, chips, borders, soft shadows |
+| blue | `#2563EB` | the only accent: key word in a headline, pills, numbers, tags, highlights (`#C7D7FE`, tint `#E3ECFF`) |
+| red | `#E11D48` | problems only: stamps like HACKED, "not for public roads", X marks |
 
-No neon, no glow lines, no dark backgrounds (dark photos are fine inside their rounded frames).
+- Fonts: headlines **Inter Tight** 800-900, body **Inter**, code **JetBrains Mono**.
+- No neon, no mascot, no intro (the hook is on screen from frame 0), no header / footer / progress bar. End card: "New AI & dev news every day" + Follow (Shorts) / Subscribe (long).
+- Shorts safe zone: text above y 1590, and left of x 940 below y 900. Long: 50 px from every edge.
+- Fireship-style energy, own identity: something new every 1-1.5 s in Shorts (every 3-4 s in long videos), hand-drawn red arrows and circles, highlighter, slam stamps, real screenshots, typed code.
 
-## Type
-- Headlines: **Inter Tight** 800, tight tracking (-3 px at 112 px).
-- Body, chips, tables: **Inter** 600-800.
-- Shorts sizes: headline 100-120 px, chips 40 px, table rows 42-46 px, labels 32 px minimum.
+## Thumbnails (long videos)
+- Weekly: "1 big + 2 small" (`thumb.js` layout `big3`): badge THIS WEEK IN TECH, the strongest story big with 2-5 words, two small numbered stories. Prefer stories that had no Short.
+- Big Story: layout `single`, badge BIG STORY.
+- Real photos / screenshots only, nothing the video does not deliver, a "?" when a claim is a rumour.
 
-## Layout (Shorts)
-- Side margin 70 px. Content column x 70-940 wherever y > 900 (the right edge has the like / comment buttons).
-- Nothing important below y 1590 (title, channel name and music bar sit there).
-- Photos: rounded 36 px, 10 px white border, soft shadow, credit "Photo: <owner>" bottom-right, always moving slowly (Ken Burns).
-- Pill on top with source + date, then the headline, then the photo, then 1-2 info chips.
-
-## Content rules that stay
-- Every fact from a checked source; source + date on screen.
-- Photos from official press kits / newsrooms or free-licence libraries, credited. No ripped video, no redrawn logos.
+## Content rules
+- Every fact from a checked source (primary source, or two reputable reports); sources listed in the description.
+- Official press photos, official logo files, real page screenshots, credited. No ripped video clips, no movie / meme images, no redrawn logos or fake UI.
+- Humour yes, swearing and jokes about groups of people no.
+- Say what is illustrative, say "reportedly" for anything not confirmed, and give the honest caveat (for example "this happened in internal training, not in ChatGPT").

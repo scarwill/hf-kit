@@ -1,3 +1,7 @@
+// ===================== ENGINE for the news look (loaded by build.py BEFORE look.js) =====================
+// For the AI + Dev news channel only these engine pieces are used: D, nlScene, nlStart/nlNext (overridden in look.js), NEXT, CUE, nlBox, nlSvg,
+// nlType + TYPE + CARET, COUNT, arw, nlDraw, nlShow. The rest of this file is the retired neon look (nl* windows, nw* cards, orb-free intro):
+// build.py BANS those parts, use the s* parts of look.js instead.
 // ===================== NEWS  (neon-tech look for the daily tech news channel, `news` skill) =====================
 // Build:  python3 ~/hf-kit/news/nbuild.py video.js audio.m4a      (lint + phrase check + build; cats premium.js + life.js + this + video.js, HEAD 2.6 / TAIL 3.6)
 // Look:   navy-black bg + navy glow on top, NO grid, glowing windows/chips, mono labels. Titles = Space Grotesk, body = Inter, code/labels = JetBrains Mono.

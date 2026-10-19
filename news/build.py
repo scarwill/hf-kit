@@ -11,7 +11,8 @@ import json, sys, os, re
 K = os.path.dirname(os.path.abspath(__file__)); V = os.path.join(K, '..', 'video')
 args = [a for a in sys.argv[1:] if not a.startswith('--')]; FORCE = '--force' in sys.argv; BGM = '--no-bgm' not in sys.argv
 vid, aud = args[0], args[1]; out = args[2] if len(args) > 2 else 'index.html'
-HEAD, TAIL = 2.6, 3.6
+LONG = '--long' in sys.argv
+HEAD, TAIL = (0.2, 3.0) if LONG else (0.2, 1.8)
 M = json.load(open('meta.json')); AUD = M['END']; END = round(HEAD + AUD, 2)
 WJ = json.load(open('words.json')); TW = [[round(t + HEAD, 2), w] for t, w in WJ]
 V0 = open(vid, encoding='utf-8').read()
@@ -21,10 +22,11 @@ E = lambda m: err.append(m); Wn = lambda m: warn.append(m)
 # ---------------- 1. lint ----------------
 BAN = {r'k[A-Z]\w*|chat|pill|card|bubble|charB|charP|botB|botP|person|wtext|useTheme|ic|ico': 'other looks (Kurz / Infographics) - news uses nl* + nw* parts only',
        r'nlOrb|cOrb|ORB_\w+': 'no mascot / orb in the news channel - the story visuals carry every scene',
+       r'nw[A-Z]\w*|nlWin|nlChip|nlLab|nlTag|nlHero|nlCode|nlBars|nlCurve|nlNet|nlEmbed|nlAttn|nlRow|nlMark|nlShot|nlCursor|nlDocs|nlLoop|nlBowl|nlBound|nlConf|nlMatmul|nlVec|nlEq|nlUser|nlBig|nlText|nlTokens': 'old neon part of news.js - use the s* parts of look.js (sPill, sHead, sShot, sCard, sChip, sStamp, sCode, sArrow, sCircle, sBig...)',
        r'nlCmd': 'no bottom narrator line in news',
        r'nlNext': "use NEXT('#sN', 'first words') - it adds the whoosh cue and the scene checks",
-       r'nlInit|nlIntro|nlOutro|nwIntro|nwOutro|nlSetup': "use nwSetup(s, { channel, date }) once at the top of build (nlSetup is the light kit)",
-       r'nlStart|nlIntroBeats|nlOutroBeats|nwIntroBeats|nwOutroBeats|nlBegin|nlFinish|houseBeats|houseEnd|houseStart': 'use nwBegin([...]) first and nwFinish() last in beats'}
+       r'nlInit|nlIntro|nlOutro|nlSetup': "use sSetup(s) once at the top of build",
+       r'nlStart|nlIntroBeats|nlOutroBeats|nlBegin|nlFinish|houseBeats|houseEnd|houseStart': 'use sBegin([...]) first and sFinish() last in beats'}
 REDEF = r'(?:const|let|var|function)\s+(arw|CUES|CUE|NEXT|NWB|NWSTORY|nwSetup|nwBegin|nwFinish|nwStory|STORY|nwHead|MARK|nwPost|POST|nwSpec|SPEC|nwTime|TIMELINE|TIME_GO|nwCo|nwRecap|RECAP|nwSignal|nlShot|SHOT_FOCUS|nlShotHL|nlCursor|CURSOR|CLICK|houseStart|houseBeats|houseEnd|D|NL|HERO|TYPE|W|go|tl)\b'
 code = []
 for i, l in enumerate(V0.split('\n'), 1):
@@ -40,7 +42,7 @@ for i, l in enumerate(V0.split('\n'), 1):
     for m in re.finditer(r"\b(?:PULSE)\(\s*'#(\w+)'", l2):
         if re.search(r"nlHero\(\s*'" + m.group(1) + "'", V0): E(f'HERO     line {i}: never PULSE the hero #{m.group(1)} (it jumps) - pulse a part inside it')
 src = '\n'.join(code)
-for need, why in (('nwSetup(', 'first line of build'), ('nwBegin(', 'first line of beats'), ('nwFinish(', 'last line of beats'), ('nwStory(', 'one story opener per story')):
+for need, why in (('sSetup(', 'first line of build'), ('sBegin(', 'first line of beats'), ('sFinish(', 'last line of beats')):
     if need not in src: E(f'MISSING  {need}) - {why}')
 
 # ---------------- 2. phrases, scene by scene ----------------
@@ -78,25 +80,25 @@ print('scene starts (video time):')
 for j, (_, t, nm) in enumerate(starts):
     d = (starts[j + 1][1] if j + 1 < len(starts) else END) - t
     print(f'  {nm:<8} {int(t // 60)}:{t % 60:05.2f}  {d:5.1f}s')
-    if d > 25: Wn(f'LONG     scene {nm} lasts {d:.1f}s - split it or make sure something new moves every 3-4 s')
+    if d > (25 if LONG else 12): Wn(f'LONG     scene {nm} lasts {d:.1f}s - split it or make sure something new moves every 3-4 s')
 print(f'phrases checked: {len(starts)} scene starts, {nW} W()')
 
 for m in warn: print('WARN ', m)
 for m in err: print('ERROR', m)
-if err and not FORCE: sys.exit(f'lbuild: {len(err)} errors, {len(warn)} warnings - index.html NOT written. Fix the errors and run again.')
+if err and not FORCE: sys.exit(f'build: {len(err)} errors, {len(warn)} warnings - index.html NOT written. Fix the errors and run again.')
 
 # ---------------- 3. build ----------------
 js_src = ''.join(open(os.path.join(V, f), encoding='utf-8').read() + '\n' for f in ('premium.js', 'life.js'))
-js_src += open(os.path.join(K, 'news.js'), encoding='utf-8').read() + '\n' + V0
-js = (f"const VERT=false;\nconst TW={json.dumps(TW, separators=(',', ':'))};\nconst HEAD={HEAD};\nconst END={END};\nconst TAIL={TAIL};\nconst TITLE={json.dumps(M.get('title'))};\n"
+js_src += open(os.path.join(K, 'news.js'), encoding='utf-8').read() + '\n' + open(os.path.join(K, 'look.js'), encoding='utf-8').read() + '\n' + V0
+js = (f"const VERT={'false' if LONG else 'true'};\nconst TW={json.dumps(TW, separators=(',', ':'))};\nconst HEAD={HEAD};\nconst END={END};\nconst TAIL={TAIL};\nconst TITLE={json.dumps(M.get('title'))};\n"
       + js_src + "\n" + open(os.path.join(V, 'kit.js'), encoding='utf-8').read())
 h = open(os.path.join(V, 'template.html'), encoding='utf-8').read()
 h = h.replace('family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700',
-              'family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800')
+              'family=Inter+Tight:wght@700;800;900&family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800')
 DUR = round(END + TAIL, 2)
 m = re.search(r"channel\s*:\s*(['\"])(.+?)\1", src); CH = m.group(2) if m else 'Tech News'
 for a, b in (('%%DUR%%', str(DUR)), ('%%HEAD%%', str(HEAD)), ('%%AUD%%', str(AUD)), ('%%AUDIO%%', aud),
-             ('%%TITLE%%', CH), ('%%W%%', '1920'), ('%%H%%', '1080'), ('%%JS%%', js)):
+             ('%%TITLE%%', CH), ('%%W%%', '1920' if LONG else '1080'), ('%%H%%', '1080' if LONG else '1920'), ('%%JS%%', js)):
     h = h.replace(a, b)
 if BGM:
     tag = f'<audio id="bgm" data-start="0" data-duration="{DUR}" data-track-index="1" data-volume="1" src="assets/bgm.m4a"></audio>'

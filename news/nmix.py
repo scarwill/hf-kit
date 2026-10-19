@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# NEWS audio in one command (run in the video folder AFTER ncheck.js, which writes cues.json):
-#   python3 ~/hf-kit/news/nmix.py index.html <voice audio> <mood>        mood: dark | lofi | upbeat | calm | cinematic
+# NEWS audio in one command (run in the video folder AFTER check.js, which writes cues.json):
+#   python3 ~/nkit/news/nmix.py index.html <voice audio> <mood>        mood: dark | lofi | upbeat | calm | cinematic
 # 1. score.py makes music.wav (mood track) + sfx.wav (the sound cues) for the whole timeline (DUR, HEAD, END read from index.html)
 # 2. measures voice / music / sfx loudness and mixes: music about 13 dB under the voice mean, cue peaks about 10 dB under the voice peak
 # 3. writes bgm.m4a and checks that the cues land on their beat times (±0.05 s)
@@ -15,7 +15,7 @@ MU = float(sys.argv[sys.argv.index('--music') + 1]) if '--music' in sys.argv els
 h = open(html, encoding='utf-8').read()
 DUR = float(re.search(r'data-composition-id="main" data-start="0" data-duration="([\d.]+)"', h).group(1))
 END = float(re.search(r'const END=([\d.]+);', h).group(1)); HEAD = float(re.search(r'const HEAD=([\d.]+);', h).group(1))
-if not os.path.exists('cues.json'): sys.exit('cues.json missing: run node ~/hf-kit/news/ncheck.js index.html first')
+if not os.path.exists('cues.json'): sys.exit('cues.json missing: run node ~/nkit/news/check.js index.html first')
 cues = json.load(open('cues.json'))
 subprocess.run([sys.executable, os.path.join(K, 'score.py'), 'cues.json', str(DUR), str(HEAD), str(END), 'music.wav', 'sfx.wav', mood], check=True)
 
