@@ -7,9 +7,10 @@
 Needs: numpy, pillow, pycairo + ffmpeg on PATH. Nothing else.
 Maths is real: V(n) = pi^(n/2) / Gamma(n/2 + 1) for the unit ball (peak 5.264 at n = 5, 0.0258 at n = 20),
 and the ball fills V(n) / 2^n of the cube that just holds it (78.5 %, 52.4 %, 0.25 % in 2D, 3D, 10D).
-The 2D and 3D pictures are true orthographic shadows of the square and cube around the radius-1 ball.
-The 10D picture puts all 1024 corners at their true distance sqrt(10) = 3.16 from the centre (direction taken
-from a turning shadow of the 10-cube), against the ball's radius of 1.
+The 4D / 5D ball is drawn like the tesseract: slices of the hypersphere (smaller spheres pushed out along the
+new axes) rotated in 4D / 5D and projected down with perspective. Its inner glow is proportional to V(n).
+The 10D shell puts all 1024 corners of the 10-cube at their true distance sqrt(10) = 3.16 from the centre
+(directions from a turning 10D -> 3D shadow), around the ball of radius 1.
 """
 import math
 import os
@@ -58,16 +59,18 @@ PHRASES = [
     "So, where would you hide in the tenth dimension?", # 28
 ]
 
-CX, CY = 540, 880          # centre of the main object
-R_BALL = 280               # radius 1 in px for the opening ball
+CX, CY = 540, 860          # centre of the hero object
 
-CYAN = (0.20, 0.85, 1.00)
-TEAL = (0.37, 0.92, 0.83)
-GOLD = (1.00, 0.80, 0.32)
+BALL = (0.30, 0.80, 1.00)  # the ordinary 3D ball
+WCOL = (1.00, 0.78, 0.30)  # 4th direction (as in the tesseract)
+VCOL = (1.00, 0.42, 0.75)  # 5th direction
 RED = (1.00, 0.36, 0.42)
 VIOLET = (0.62, 0.48, 1.00)
+TEAL = (0.37, 0.92, 0.83)
+GOLD = (1.00, 0.82, 0.40)
 TXT = (0.95, 0.96, 1.00)
 DIM = (0.62, 0.68, 0.82)
+DIRC = [(1.0, 0.36, 0.42), (0.36, 0.95, 0.55), (0.35, 0.62, 1.0)]  # cube edges along x y z
 
 
 def sm(x):
@@ -85,6 +88,11 @@ def mix(c1, c2, u):
 
 def vol(n):
     return math.pi ** (n / 2) / math.gamma(n / 2 + 1)
+
+
+NMAX = 20
+VOLS = {n: vol(n) for n in range(1, NMAX + 1)}
+VPEAK = VOLS[5]
 
 
 # ---------------------------------------------------------------- sync
@@ -115,241 +123,338 @@ def init(t_list, speech_end, dur):
     BG = make_bg()
 
 
-# ---------------------------------------------------------------- bar graph (volume vs dimension)
-NMAX = 20
-GX0, GX1, GBASE, GUNIT = 120, 1000, 1290, 112      # graph box, px per unit of volume
-SLOT = (GX1 - GX0) / NMAX
-VOLS = [vol(n) for n in range(1, NMAX + 1)]
-
-
-def bar_x(n):
-    return GX0 + (n - 0.5) * SLOT
-
-
-def bar_on(n):
-    """time each bar starts growing"""
-    if n <= 3:
-        return T[8] - 0.25 + 0.22 * (n - 1)
-    if n == 4:
-        return T[9]
-    if n == 5:
-        return T[11]
-    if n == 6:
-        return T[13] + 0.3
-    a, b = T[15], T[16] + 1.4                             # 7..20 cascade
+# ---------------------------------------------------------------- timeline
+def dim_on(n):
+    """time the readout switches to n dimensions"""
+    fixed = {1: T[5] + 0.4, 2: T[5] + 0.4, 3: T[7] + 0.2, 4: T[9], 5: T[11], 6: T[14]}
+    if n in fixed:
+        return fixed[n]
+    a, b = T[15] + 0.2, T[16] + 1.4                       # 7..20 cascade
     return a + (n - 7) / (NMAX - 7) * (b - a)
 
 
-def bar_col(n, t):
-    if n == 5:
-        return mix(TEAL, GOLD, rp(t, T[12], T[12] + 0.4))
-    if n == 6:
-        return mix(TEAL, RED, rp(t, T[14], T[14] + 0.4))
-    if n > 6:
-        return mix(RED, VIOLET, (n - 7) / (NMAX - 7))
-    return TEAL
+def dim_now(t):
+    return max([n for n in range(2, NMAX + 1) if dim_on(n) <= t], default=0)
 
 
-# ---------------------------------------------------------------- d-cube shadows
-def cube_data(d):
-    bits = np.array([[(v >> i) & 1 for i in range(d)] for v in range(2 ** d)], float) * 2 - 1
-    edges = np.array([(a, a ^ (1 << i)) for a in range(2 ** d) for i in range(d) if a < a ^ (1 << i)])
-    return bits, edges
+def vol_now(t):
+    """volume shown by the inner glow, eased from one dimension to the next"""
+    v = VOLS[3]
+    for n in range(4, NMAX + 1):
+        v += (VOLS[n] - VOLS[n - 1]) * rp(t, dim_on(n), dim_on(n) + 0.4)
+    return v
 
 
-CUBES = {d: cube_data(d) for d in (2, 3, 10)}
+def flat(t):
+    """1 = full 3D, 0 = squashed flat (the 2D moments)"""
+    return 1 - rp(t, T[3], T[3] + 0.7) + rp(t, T[6], T[6] + 1.0) - rp(t, T[21], T[21] + 0.7) + rp(t, T[23], T[23] + 0.9)
 
 
-def basis(d, t):
-    """d x 2 orthonormal projection (columns = screen x, screen y), slowly turning"""
-    if d == 2:
-        return np.eye(2)
-    if d == 3:
-        yaw, pitch = 0.55 + 0.35 * t, 0.45
-        cy_, sy_ = math.cos(yaw), math.sin(yaw)
-        cp, sp = math.cos(pitch), math.sin(pitch)
-        ry = np.array([[cy_, 0, sy_], [0, 1, 0], [-sy_, 0, cy_]])
-        rx = np.array([[1, 0, 0], [0, cp, -sp], [0, sp, cp]])
-        return (rx @ ry)[:2].T
-    th = math.pi * np.arange(d) / d
-    b = np.stack([np.cos(th), np.sin(th)], 1) * math.sqrt(2 / d)    # Petrie-style shadow of the 10-cube
-    rot = np.eye(d)
-    for (i, j), w in (((0, 3), 0.21), ((2, 7), -0.17), ((4, 9), 0.13)):
-        a = w * t
-        g = np.eye(d)
-        g[i, i] = g[j, j] = math.cos(a)
-        g[i, j], g[j, i] = -math.sin(a), math.sin(a)
-        rot = rot @ g
-    return rot @ b
+def s4(t):
+    return rp(t, T[8], T[8] + 1.3) * (1 - rp(t, T[19], T[19] + 0.9))
 
 
-FILL = {2: vol(2) / 4, 3: vol(3) / 8, 10: vol(10) / 2 ** 10}
-SCALE = {2: 300, 3: 255, 10: 125}
+def s5(t):
+    return rp(t, T[10], T[10] + 1.3) * (1 - rp(t, T[19], T[19] + 0.9))
 
 
-def draw_cube(c, d, t, a, glow):
-    """shadow of the d-cube plus the radius-1 ball inside it"""
-    if a < 0.003:
-        return
-    bits, edges = CUBES[d]
-    s = SCALE[d]
-    p = bits @ basis(d, t)
-    X, Y = CX + s * p[:, 0], CY - s * p[:, 1]
-    # ball (its shadow is a disc of radius 1 in every dimension)
-    g = cairo.RadialGradient(CX - 0.35 * s, CY - 0.35 * s, 0.05 * s, CX, CY, s)
-    g.add_color_stop_rgba(0, *TEAL, 0.55 * a * (1 - 0.6 * glow))
-    g.add_color_stop_rgba(1, *mix(TEAL, (0.1, 0.3, 0.5), 0.6), 0.28 * a * (1 - 0.6 * glow))
-    c.set_source(g)
-    c.arc(CX, CY, s, 0, 2 * math.pi)
-    c.fill()
-    c.set_source_rgba(*TEAL, 0.9 * a * (1 - 0.5 * glow))
-    c.set_line_width(4)
-    c.arc(CX, CY, s, 0, 2 * math.pi)
-    c.stroke()
-    if d == 10:
-        # 1024 corners at their true distance sqrt(10) from the centre, direction from the shadow above
-        ang = np.arctan2(p[:, 1], p[:, 0])
-        rr = math.sqrt(10) * s
-        X, Y = CX + rr * np.cos(ang), CY - rr * np.sin(ang)
-        c.set_source_rgba(*mix(CYAN, GOLD, glow), (0.25 + 0.2 * glow) * a)
-        c.set_line_width(1.5)
-        c.arc(CX, CY, rr, 0, 2 * math.pi)
-        c.stroke()
-        if glow > 0:                                                 # distances: 1 to the ball, 3.16 to a corner
-            k = int(np.argmin(np.abs(ang - math.radians(35))))
-            c.set_source_rgba(*GOLD, glow * a)
-            c.set_line_width(4)
-            c.move_to(CX, CY)
-            c.line_to(X[k], Y[k])
-            c.stroke()
-            c.set_source_rgba(*TEAL, glow * a)
-            c.move_to(CX, CY)
-            c.line_to(CX - s, CY)
-            c.stroke()
-    else:
-        c.set_source_rgba(*CYAN, 0.95 * a)
-        c.set_line_width(4.5)
-        for i, j in edges:
-            c.move_to(X[i], Y[i])
-            c.line_to(X[j], Y[j])
-        c.stroke()
-    # corners
-    rad = 3.0 if d == 10 else 7.0
-    c.set_source_rgba(*mix((1, 1, 1), GOLD, glow), (0.7 + 0.3 * glow) * a)
-    for x, y in zip(X, Y):
-        c.arc(x, y, rad + (1.5 if d == 10 else 5) * glow, 0, 2 * math.pi)
+def ease_angle(x, rate, lag=1.2):
+    return rate * (x - lag * (1 - math.exp(-x / lag))) if x > 0 else 0.0
+
+
+def wrap(a):
+    return (a + math.pi) % (2 * math.pi) - math.pi
+
+
+def scale(t):
+    return 260 - 135 * rp(t, T[25], T[25] + 1.3)          # camera pulls back for the 10D shell
+
+
+def camera(t):
+    v = flat(t)
+    return v * (0.5 + 0.25 * t), v * 0.40                 # yaw, pitch (face-on when flat)
+
+
+# ---------------------------------------------------------------- the n-ball wireframe
+RING = np.linspace(0, 2 * math.pi, 65)
+CT, ST = np.cos(RING), np.sin(RING)
+LAT5 = [math.radians(a) for a in (-60, -30, 0, 30, 60)]
+PHI4 = [math.radians(a) for a in (-58, -28, 28, 58)]       # slices along w
+PSI5 = [math.radians(a) for a in (-42, 42)]                 # slices along v
+
+
+def sphere(rho, w0, v0, lats, nlon, sq, col, a):
+    out = []
+    for la in lats:
+        P = np.zeros((65, 5))
+        P[:, 0], P[:, 1], P[:, 2] = rho * math.cos(la) * CT, rho * math.sin(la), rho * math.cos(la) * ST * sq
+        P[:, 3], P[:, 4] = w0, v0
+        out.append((P, col, a))
+    for k in range(nlon):
+        lo = math.pi * k / nlon * sq                      # meridians fan out of the flat circle
+        P = np.zeros((65, 5))
+        P[:, 0], P[:, 1], P[:, 2] = rho * CT * math.cos(lo), rho * ST, rho * CT * math.sin(lo)
+        P[:, 3], P[:, 4] = w0, v0
+        out.append((P, col, a))
+    return out
+
+
+def great_circle(i, j, amp, col, a):
+    P = np.zeros((65, 5))
+    P[:, i], P[:, j] = CT, ST * amp
+    return [(P, col, a)]
+
+
+def hyperball(t):
+    sq, g4, g5 = flat(t), s4(t), s5(t)
+    rings = sphere(1, 0, 0, LAT5, 6, sq, BALL, 1.0)
+    if g4 > 0.002:
+        for ph in PHI4:
+            rings += sphere(math.cos(ph * g4), math.sin(ph * g4), 0, [0.0], 2, sq, WCOL, g4)
+        rings += great_circle(0, 3, g4, WCOL, g4) + great_circle(1, 3, g4, WCOL, g4)
+    if g5 > 0.002:
+        for ps in PSI5:
+            c, v0 = math.cos(ps * g5), math.sin(ps * g5)
+            rings += sphere(c, 0, v0, [0.0], 2, sq, VCOL, g5)
+        rings += great_circle(2, 4, g5, VCOL, g5) + great_circle(1, 4, g5, VCOL, g5)
+    return rings
+
+
+def project5(P, t):
+    """5D -> 4D -> 3D (perspective) -> rotate view -> screen; P is (..., 5)"""
+    x, y, z, w, v = (P[..., i] for i in range(5))
+    a4 = wrap(ease_angle(t - T[8], 0.6) + ease_angle(t - T[13], 0.5)) * s4(t)
+    a5 = wrap(ease_angle(t - T[10], 0.45) + ease_angle(t - T[13], 0.4)) * s5(t)
+    c, s = math.cos(a5), math.sin(a5)
+    z, v = z * c - v * s, z * s + v * c
+    c, s = math.cos(a4), math.sin(a4)
+    x, w = x * c - w * s, x * s + w * c
+    c, s = math.cos(a4 * 0.45), math.sin(a4 * 0.45)
+    y, w = y * c - w * s, y * s + w * c
+    k5 = 4.0 / (4.0 - v)
+    x, y, z, w = x * k5, y * k5, z * k5, w * k5
+    k4 = 4.0 / (4.0 - w)
+    x, y, z = x * k4, y * k4, z * k4
+    return view3(x, y, z, t)
+
+
+def view3(x, y, z, t, persp=True):
+    yaw, pitch = camera(t)
+    cy_, sy_ = math.cos(yaw), math.sin(yaw)
+    x, z = x * cy_ + z * sy_, -x * sy_ + z * cy_
+    cp, sp = math.cos(pitch), math.sin(pitch)
+    y, z = y * cp - z * sp, y * sp + z * cp
+    f = 7.0 / (7.0 - z) if persp else np.ones_like(z)
+    S = scale(t)
+    return CX + S * x * f, CY - S * y * f, f
+
+
+def tint(t):
+    """object colour drift: red once it starts shrinking, violet towards 20D, back to normal for the cube part"""
+    back = 1 - rp(t, T[19], T[19] + 0.9)
+    r = rp(t, T[13], T[13] + 0.7) * back
+    vi = rp(t, T[15], T[16] + 1.4) * back
+    return r, vi
+
+
+def wire_alpha(t):
+    """the wireframe thins out as the volume drops"""
+    back = rp(t, T[19], T[19] + 0.9)
+    a = 0.35 + 0.65 * min(1.0, vol_now(t) / VPEAK) if t > T[13] else 1.0
+    return a * (1 - back) + back
+
+
+def draw_hyperball(c, t, a=1.0):
+    rings = hyperball(t)
+    P = np.stack([r[0] for r in rings])
+    X, Y, F = project5(P, t)
+    r6, vi = tint(t)
+    wa = wire_alpha(t) * a
+    # inner glow = volume
+    fill = rp(t, T[7], T[7] + 0.6) * (1 - rp(t, T[19], T[19] + 0.9)) * vol_now(t) / VPEAK
+    fill += 0.55 * rp(t, T[19], T[19] + 0.9)
+    peak = rp(t, T[12], T[12] + 0.3) * (1 - rp(t, T[13], T[13] + 0.8))
+    if fill > 0.003:
+        R = scale(t)
+        col = mix(mix(mix(BALL, GOLD, peak), RED, r6), VIOLET, vi)
+        g = cairo.RadialGradient(CX - 0.3 * R, CY - 0.3 * R, 0.05 * R, CX, CY, 1.1 * R)
+        g.add_color_stop_rgba(0, *col, 0.65 * fill * a)
+        g.add_color_stop_rgba(1, *col, 0.10 * fill * a)
+        c.set_source(g)
+        c.arc(CX, CY, 1.1 * R, 0, 2 * math.pi)
         c.fill()
-
-
-def cube_scenes(t):
-    """[(dim, alpha)] for the part after 'Here is why'"""
-    a0 = rp(t, T[19] + 0.3, T[19] + 0.9)
-    k3a = 1 - rp(t, T[21] - 0.1, T[21] + 0.4)          # first 3D (phrase 20)
-    k2 = rp(t, T[21] - 0.1, T[21] + 0.4) * (1 - rp(t, T[23] - 0.1, T[23] + 0.4))
-    k3b = rp(t, T[23] - 0.1, T[23] + 0.4) * (1 - rp(t, T[25] - 0.1, T[25] + 0.5))
-    k10 = rp(t, T[25] - 0.1, T[25] + 0.5)
-    return [(3, a0 * (k3a + k3b)), (2, a0 * k2), (10, a0 * k10)]
-
-
-# ---------------------------------------------------------------- opening ball (wireframe sphere)
-LAT = [math.radians(a) for a in (-60, -30, 0, 30, 60)]
-LON = [math.pi * k / 6 for k in range(6)]
-RING = np.linspace(0, 2 * math.pi, 97)
-
-
-def draw_ball(c, t, a):
-    if a < 0.003:
-        return
-    pulse = 1 + 0.035 * math.sin(2 * math.pi * 0.9 * (t - T[1])) * rp(t, T[1], T[1] + 0.4) * (1 - rp(t, T[3] - 0.3, T[3]))
-    R = R_BALL * pulse
-    wire = 1 - rp(t, T[3], T[3] + 0.6) + rp(t, T[6], T[6] + 0.7)      # 3D look off in phrase 3-5, back at 6
-    disk = rp(t, T[5], T[5] + 0.6) * (1 - rp(t, T[6], T[6] + 0.6))
-    shade = rp(t, T[7], T[7] + 0.6)
-    if disk > 0:                                                     # area of the circle
-        c.set_source_rgba(*TEAL, 0.35 * disk * a)
+    # area of the circle (2D moment)
+    pie = rp(t, T[5], T[5] + 0.3) * (1 - rp(t, T[6], T[6] + 0.6))
+    if pie > 0:
+        R = scale(t)
+        c.set_source_rgba(*TEAL, 0.38 * pie * a)
         c.move_to(CX, CY)
         c.arc(CX, CY, R, -math.pi / 2, -math.pi / 2 + 2 * math.pi * rp(t, T[5], T[5] + 0.9))
         c.close_path()
         c.fill()
-    if shade > 0:                                                    # volume of the sphere
-        g = cairo.RadialGradient(CX - 0.35 * R, CY - 0.35 * R, 0.05 * R, CX, CY, R)
-        g.add_color_stop_rgba(0, *TEAL, 0.45 * shade * a)
-        g.add_color_stop_rgba(1, 0.05, 0.25, 0.45, 0.25 * shade * a)
-        c.set_source(g)
-        c.arc(CX, CY, R, 0, 2 * math.pi)
-        c.fill()
-    if wire > 0.003:
-        yaw, pitch = 0.35 * t, 0.38
-        cy_, sy_, cp, sp = math.cos(yaw), math.sin(yaw), math.cos(pitch), math.sin(pitch)
-
-        def proj(x, y, z):
-            x, z = x * cy_ + z * sy_, -x * sy_ + z * cy_
-            y, z = y * cp - z * sp, y * sp + z * cp
-            return CX + R * x, CY - R * y, z
-
-        rings = [(np.cos(la) * np.cos(RING), np.full_like(RING, np.sin(la)), np.cos(la) * np.sin(RING)) for la in LAT]
-        rings += [(np.cos(RING) * np.cos(lo), np.sin(RING), np.cos(RING) * np.sin(lo)) for lo in LON]
-        c.set_line_width(2.6)
-        for x, y, z in rings:
-            px, py, pz = proj(x, y, z)
-            for k in range(len(RING) - 1):
-                front = (pz[k] + pz[k + 1]) / 2
-                c.set_source_rgba(*CYAN, (0.16 + 0.5 * max(0, front)) * wire * a)
-                c.move_to(px[k], py[k])
-                c.line_to(px[k + 1], py[k + 1])
-                c.stroke()
-    c.set_source_rgba(*CYAN, a)                                      # outline = the circle itself
-    c.set_line_width(5)
-    c.arc(CX, CY, R, 0, 2 * math.pi)
-    c.stroke()
-    ra = rp(t, T[0] + 0.2, T[0] + 0.8) * (1 - rp(t, T[3], T[3] + 0.5))   # radius line
-    if ra > 0:
-        c.set_source_rgba(*GOLD, ra * a)
-        c.set_line_width(5)
-        c.move_to(CX, CY)
-        c.line_to(CX + R * rp(t, T[0] + 0.2, T[0] + 0.9), CY)
+    order = []
+    for ri, (_, col, ra) in enumerate(rings):
+        col = mix(mix(mix(col, GOLD, 0.6 * peak), RED, r6), VIOLET, vi)
+        for s0 in range(0, 64, 8):
+            depth = float(F[ri, s0:s0 + 9].mean())
+            order.append((depth, ri, s0, col, ra))
+    order.sort(key=lambda o: o[0])
+    for depth, ri, s0, col, ra in order:
+        al = min(1.0, 0.30 + 1.6 * (depth - 0.82)) * ra * wa
+        if al < 0.01:
+            continue
+        c.set_source_rgba(*col, al)
+        c.set_line_width(1.6 + 3.2 * (depth - 0.75))
+        c.move_to(X[ri, s0], Y[ri, s0])
+        for k in range(s0 + 1, s0 + 9):
+            c.line_to(X[ri, k], Y[ri, k])
         c.stroke()
-        c.arc(CX, CY, 9, 0, 2 * math.pi)
-        c.fill()
 
 
-def draw_graph(c, t, a):
+# ---------------------------------------------------------------- cube around the ball, and the 10D shell
+BITS3 = np.array([[(v >> i) & 1 for i in range(3)] for v in range(8)], float) * 2 - 1
+EDGES3 = [(a, a ^ (1 << i), i) for a in range(8) for i in range(3) if a < a ^ (1 << i)]
+BITS10 = np.array([[(v >> i) & 1 for i in range(10)] for v in range(1024)], float) * 2 - 1
+FRAME10 = np.linalg.qr(np.random.default_rng(7).standard_normal((10, 3)))[0]   # orthonormal 10D -> 3D
+FILL = {2: vol(2) / 4, 3: vol(3) / 8, 10: vol(10) / 2 ** 10}
+
+
+def cube_alpha(t):
+    return rp(t, T[20], T[20] + 0.6) * (1 - rp(t, T[25], T[25] + 0.8))
+
+
+def draw_cube(c, t):
+    a = cube_alpha(t)
     if a < 0.003:
         return
-    c.set_source_rgba(*DIM, 0.6 * a)                                 # axes
-    c.set_line_width(3)
-    c.move_to(GX0 - 10, GBASE)
-    c.line_to(GX1 + 10, GBASE)
+    size = 1.0 + 0.45 * (1 - rp(t, T[20] + 0.2, T[20] + 1.5))     # closes in until it just holds the ball
+    sq = flat(t)
+    P = BITS3 * size
+    X, Y, F = view3(P[:, 0], P[:, 1], P[:, 2] * sq, t)
+    # 2D moment: tint the corners of the square that the circle misses
+    ca = rp(t, T[22], T[22] + 0.4) * (1 - rp(t, T[23], T[23] + 0.4))
+    if ca > 0:
+        c.set_fill_rule(cairo.FILL_RULE_EVEN_ODD)
+        c.set_source_rgba(*RED, 0.30 * ca * a)
+        for v in (0, 1, 3, 2):
+            c.line_to(X[v], Y[v])
+        c.close_path()
+        c.new_sub_path()
+        c.arc(CX, CY, scale(t), 0, 2 * math.pi)
+        c.fill()
+        c.set_fill_rule(cairo.FILL_RULE_WINDING)
+    for i0, j0, ax in sorted(EDGES3, key=lambda e: F[e[0]] + F[e[1]]):
+        depth = (F[i0] + F[j0]) / 2
+        c.set_source_rgba(*DIRC[ax], min(1.0, 0.45 + 1.4 * (depth - 0.8)) * a)
+        c.set_line_width(2.5 + 6 * (depth - 0.75))
+        c.move_to(X[i0], Y[i0])
+        c.line_to(X[j0], Y[j0])
+        c.stroke()
+    c.set_source_rgba(1, 1, 1, 0.95 * a)
+    for x, y, f in zip(X, Y, F):
+        c.arc(x, y, 6.5 * f, 0, 2 * math.pi)
+        c.fill()
+
+
+def shell_frame(t):
+    E = FRAME10.copy()
+    for (i, j), w in (((0, 3), 0.21), ((2, 7), -0.17), ((4, 9), 0.13), ((1, 6), 0.09)):
+        a = w * t
+        g = np.eye(10)
+        g[i, i] = g[j, j] = math.cos(a)
+        g[i, j], g[j, i] = -math.sin(a), math.sin(a)
+        E = g @ E
+    return E
+
+
+def draw_shell(c, t):
+    a = rp(t, T[25] + 0.1, T[25] + 0.7)
+    if a < 0.003:
+        return
+    glow = rp(t, T[27], T[27] + 0.6)
+    d = BITS10 @ shell_frame(t)
+    d /= np.linalg.norm(d, axis=1, keepdims=True) + 1e-9
+    r = math.sqrt(10) * (0.15 + 0.85 * rp(t, T[25] + 0.1, T[25] + 1.4))   # corners burst out to sqrt(10)
+    X, Y, _ = view3(d[:, 0] * r, d[:, 1] * r, d[:, 2] * r, t, persp=False)
+    yaw, pitch = camera(t)
+    zz = (-d[:, 0] * math.sin(yaw) + d[:, 2] * math.cos(yaw)) * math.cos(pitch) + d[:, 1] * math.sin(pitch)
+    col = mix(BALL, GOLD, glow)
+    for k in np.argsort(zz):
+        front = (zz[k] + 1) / 2
+        c.set_source_rgba(*col, (0.2 + 0.55 * front) * a)
+        c.arc(X[k], Y[k], (1.8 + 2.6 * front) * (1 + 0.4 * glow), 0, 2 * math.pi)
+        c.fill()
+    if glow > 0:                                                     # distances: 1 to the ball, 3.16 to a corner
+        S = scale(t)
+        an = math.radians(35)
+        c.set_line_width(4)
+        c.set_source_rgba(*GOLD, glow * a)
+        c.move_to(CX, CY)
+        c.line_to(CX + math.sqrt(10) * S * math.cos(an), CY - math.sqrt(10) * S * math.sin(an))
+        c.stroke()
+        c.set_source_rgba(*TEAL, glow * a)
+        c.move_to(CX, CY)
+        c.line_to(CX - S, CY)
+        c.stroke()
+
+
+# ---------------------------------------------------------------- volume strip (small, under the object)
+SX0, SBASE, SSLOT, SUNIT = 140, 1572, 40, 15
+
+
+def strip_alpha(t):
+    return rp(t, T[5] + 0.3, T[5] + 0.7) * (1 - rp(t, T[19], T[19] + 0.4))
+
+
+def draw_strip(c, t):
+    a = strip_alpha(t)
+    if a < 0.003:
+        return
+    c.set_source_rgba(*DIM, 0.45 * a)
+    c.set_line_width(2)
+    c.move_to(SX0 - 6, SBASE)
+    c.line_to(SX0 + NMAX * SSLOT + 6, SBASE)
     c.stroke()
     for n in range(1, NMAX + 1):
-        g = rp(t, bar_on(n), bar_on(n) + 0.5)
+        g = rp(t, dim_on(n), dim_on(n) + 0.35)
         if g <= 0:
             continue
-        h = VOLS[n - 1] * GUNIT * g
-        x = bar_x(n)
-        col = bar_col(n, t)
+        h = VOLS[n] * SUNIT * g
+        col = GOLD if n == 5 else (mix(RED, VIOLET, (n - 6) / (NMAX - 6)) if n >= 6 else BALL)
         c.set_source_rgba(*col, 0.9 * a)
-        c.rectangle(x - SLOT * 0.34, GBASE - h, SLOT * 0.68, h)
+        c.rectangle(SX0 + (n - 1) * SSLOT + 8, SBASE - h, SSLOT - 16, h)
         c.fill()
-        c.set_source_rgba(1, 1, 1, 0.9 * a)
-        c.rectangle(x - SLOT * 0.34, GBASE - h - 2, SLOT * 0.68, 4)
-        c.fill()
-    ca = rp(t, T[17], T[17] + 1.2)                                   # trend curve through the bar tops
-    if ca > 0:
-        xs = np.linspace(0.6, NMAX + 0.4, 200)
-        ys = np.array([math.pi ** (n / 2) / math.gamma(n / 2 + 1) for n in xs])
-        k_end = int(len(xs) * ca)
+    tr = rp(t, T[17], T[17] + 1.2)                                  # trend through the bar tops
+    if tr > 0:
         c.set_source_rgba(*GOLD, 0.9 * a)
-        c.set_line_width(4)
-        c.set_dash([14, 10])
-        for k in range(max(1, k_end)):
-            px, py = GX0 + (xs[k] - 0.5) * SLOT, GBASE - ys[k] * GUNIT
+        c.set_line_width(2.5)
+        c.set_dash([8, 6])
+        xs = np.linspace(0.6, 0.6 + (NMAX - 0.2) * tr, 120)
+        for k, n in enumerate(xs):
+            px, py = SX0 + (n - 0.5) * SSLOT, SBASE - vol(n) * SUNIT
             (c.move_to if k == 0 else c.line_to)(px, py)
         c.stroke()
         c.set_dash([])
 
 
-# ---------------------------------------------------------------- drawing helpers
+def draw_shapes(c, t):
+    draw_cube(c, t)
+    draw_hyperball(c, t, 1 - 0.35 * rp(t, T[27], T[27] + 0.6))
+    draw_shell(c, t)
+    draw_strip(c, t)
+    a = rp(t, T[0] + 0.2, T[0] + 0.8) * (1 - rp(t, T[3], T[3] + 0.5))          # radius line r = 1
+    if a > 0:
+        S = scale(t)
+        c.set_source_rgba(*GOLD, a)
+        c.set_line_width(5)
+        c.move_to(CX, CY)
+        c.line_to(CX + S * rp(t, T[0] + 0.2, T[0] + 0.9), CY)
+        c.stroke()
+        c.arc(CX, CY, 9, 0, 2 * math.pi)
+        c.fill()
+
+
+# ---------------------------------------------------------------- text
 def make_bg():
     y = np.linspace(0, 1, H)[:, None, None]
     g = np.array([0.05, 0.06, 0.13]) * (1 - y) + np.array([0.012, 0.014, 0.035]) * y
@@ -377,8 +482,7 @@ def text(c, s, x, y, size, col, a=1.0, face="Inter", wt=cairo.FONT_WEIGHT_BOLD, 
     c.set_font_size(size)
     tw = c.text_extents(s).x_advance
     if tw > maxw:                                                    # never run off the screen
-        size *= maxw / tw
-        c.set_font_size(size)
+        c.set_font_size(size * maxw / tw)
         tw = maxw
     for dx, dy, rgba in ((0, 4, (0, 0, 0, 0.6 * a)), (0, 0, (*col, a))):
         c.set_source_rgba(*rgba)
@@ -386,7 +490,7 @@ def text(c, s, x, y, size, col, a=1.0, face="Inter", wt=cairo.FONT_WEIGHT_BOLD, 
         c.show_text(s)
 
 
-def wrap(c, s, size, maxw):
+def wrap_lines(c, s, size, maxw):
     c.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
     c.set_font_size(size)
     lines, cur = [], ""
@@ -400,10 +504,24 @@ def wrap(c, s, size, maxw):
     return lines + [cur]
 
 
-def chip(c, s, t, t_on, t_off, col, y=1450, size=58):
+def chip(c, s, t, t_on, t_off, col, y=1440, size=56):
     a = rp(t, t_on, t_on + 0.3) * (1 - rp(t, t_off, t_off + 0.3))
     pop = 1 + 0.12 * (1 - rp(t, t_on, t_on + 0.35))
     text(c, s, W / 2, y, size * pop, col, a)
+
+
+def readout(c, t):
+    """live 'nD  volume x' counter during the dimension climb"""
+    n = dim_now(t)
+    a = strip_alpha(t)
+    if n < 2 or a < 0.003:
+        return
+    v = VOLS[n]
+    num = f"{v:.3f}" if v < 0.1 else f"{v:.2f}"
+    word = "area" if n == 2 else "volume"
+    col = GOLD if n == 5 else (mix(RED, VIOLET, (n - 6) / (NMAX - 6)) if n >= 6 else TEAL)
+    pop = 1 + 0.10 * (1 - rp(t, dim_on(n), dim_on(n) + 0.3))
+    text(c, f"{n}D   {word}  {num}", W / 2, 1440, 58 * pop, col, a)
 
 
 def meter(c, t, frac, t_on, t_off, label, col):
@@ -411,8 +529,7 @@ def meter(c, t, frac, t_on, t_off, label, col):
     if a < 0.003:
         return
     f = frac * rp(t, t_on, t_on + 1.0)
-    pct = 100 * f
-    num = f"{pct:.2f}%" if frac < 0.01 else f"{pct:.0f}%"
+    num = f"{100 * f:.2f}%" if frac < 0.01 else f"{100 * f:.0f}%"
     text(c, f"{label} {num}", W / 2, 1430, 56, col, a)
     x0, wd, y0, ht = W / 2 - 330, 660, 1470, 20
     c.set_source_rgba(1, 1, 1, 0.15 * a)
@@ -423,49 +540,29 @@ def meter(c, t, frac, t_on, t_off, label, col):
     c.fill()
 
 
-def draw_shapes(c, t):
-    ball_a = 1 - rp(t, T[8] - 0.4, T[8])
-    draw_ball(c, t, ball_a)
-    graph_a = rp(t, T[8] - 0.4, T[8]) * (1 - rp(t, T[19], T[19] + 0.4))
-    draw_graph(c, t, graph_a)
-    glow = rp(t, T[27], T[27] + 0.6)
-    for d, a in cube_scenes(t):
-        draw_cube(c, d, t, a, glow if d == 10 else 0.0)
-
-
 def draw_text(c, t):
     end = rp(t, T[28], T[28] + 0.5)
     pa = 1 - rp(t, T[19], T[19] + 0.4)
     text(c, "Does a ball grow forever?", W / 2, 250, 70, TXT, pa)
-    text(c, "volume of a radius 1 ball", W / 2, 330, 42, TEAL, rp(t, T[8] - 0.4, T[8]) * pa,
-         wt=cairo.FONT_WEIGHT_NORMAL)
     text(c, "Ball inside a cube", W / 2, 250, 70, TXT, rp(t, T[19] + 0.3, T[19] + 0.7) * (1 - end))
-    # opening ball
-    text(c, "r = 1", CX + R_BALL / 2, CY - 24, 50, GOLD, rp(t, T[0] + 0.5, T[0] + 0.9) * (1 - rp(t, T[3], T[3] + 0.5)))
-    chip(c, "2D circle", t, T[3] + 0.2, T[5] - 0.2, CYAN)
-    chip(c, "Area ≈ 3.14", t, T[5] + 0.5, T[6] - 0.1, TEAL)
-    chip(c, "3D sphere", t, T[6] + 0.1, T[7] - 0.1, CYAN)
-    chip(c, "Volume ≈ 4.19", t, T[7] + 0.3, T[8] - 0.3, TEAL)
-    # graph: axis labels, readouts, peak stamp
-    ga = rp(t, T[8] - 0.4, T[8]) * (1 - rp(t, T[19], T[19] + 0.4))
-    for n in (1, 5, 10, 15, 20):
-        text(c, str(n), bar_x(n), GBASE + 42, 32, DIM, ga, wt=cairo.FONT_WEIGHT_NORMAL)
-    text(c, "dimension", W / 2, GBASE + 86, 32, DIM, ga, wt=cairo.FONT_WEIGHT_NORMAL)
-    chip(c, "4D  →  4.93", t, T[9], T[10] - 0.1, TEAL, y=1460)
-    chip(c, "5D  →  5.26", t, T[11], T[13] - 0.1, GOLD, y=1460)
-    chip(c, "6D  →  5.17", t, T[14], T[15] - 0.1, RED, y=1460)
-    chip(c, "20D  →  0.026", t, T[16] + 0.6, T[17] - 0.1, VIOLET, y=1460)
-    chip(c, "→ 0", t, T[18], T[19], GOLD, y=1460, size=70)
-    pk = rp(t, T[12], T[12] + 0.25) * ga
-    text(c, "PEAK", bar_x(5), GBASE - VOLS[4] * GUNIT - 36, 46 * (1 + 0.3 * (1 - pk)), GOLD, pk)
-    # cube part: fill meters
+    # dimension tag under the title, like the tesseract labels
+    tags = [("3D", T[0], T[3], BALL), ("2D", T[3] + 0.3, T[6], TEAL), ("3D", T[6] + 0.3, T[8], BALL),
+            ("4D", T[8] + 0.3, T[10], WCOL), ("5D", T[10] + 0.3, T[13], VCOL)]
+    for s, t0, t1, col in tags:
+        chip(c, s, t, t0, t1 - 0.3, col, y=345, size=52)
+    text(c, "r = 1", CX + scale(t) / 2, CY - 24, 50, GOLD, rp(t, T[0] + 0.5, T[0] + 0.9) * (1 - rp(t, T[3], T[3] + 0.5)))
+    readout(c, t)
+    pk = rp(t, T[12], T[12] + 0.25) * strip_alpha(t)
+    text(c, "PEAK", SX0 + 4.5 * SSLOT, SBASE - VOLS[5] * SUNIT - 14, 26, GOLD, pk)
+    # cube part
     meter(c, t, FILL[2], T[22], T[23] - 0.2, "circle fills", TEAL)
     meter(c, t, FILL[3], T[24], T[25] - 0.2, "sphere fills", TEAL)
     meter(c, t, FILL[10], T[26], T[28], "10D ball fills", GOLD)
     ca = rp(t, T[27] + 0.3, T[27] + 0.8) * (1 - end)
-    text(c, "1024 corners", W / 2, CY - SCALE[10] * math.sqrt(10) - 40, 46, GOLD, ca)
-    text(c, "\u221a10 \u2248 3.16", CX + 255, CY - 20, 40, GOLD, ca)
-    text(c, "1", CX - SCALE[10] / 2, CY - 18, 44, TEAL, ca)
+    S = scale(t)
+    text(c, "1024 corners", W / 2, CY - S * math.sqrt(10) - 40, 46, GOLD, ca)
+    text(c, "√10 ≈ 3.16", CX + 345, CY - S * math.sqrt(10) * 0.62 - 50, 42, GOLD, ca)
+    text(c, "1", CX - S / 2, CY - 18, 44, TEAL, ca)
     # end card
     text(c, "Where would you hide", W / 2, 300, 72, TXT, end, face="Inter Display")
     text(c, "in the 10th dimension?", W / 2, 390, 72, GOLD, end, face="Inter Display")
@@ -475,20 +572,21 @@ def draw_text(c, t):
     k = max([i for i in range(len(T)) if T[i] <= t + 0.05], default=-1)
     if 0 <= k < 28:
         a = rp(t, T[k] - 0.05, T[k] + 0.15) * (1 - rp(t, SPEECH_END, SPEECH_END + 0.4))
-        for j, ln in enumerate(wrap(c, PHRASES[k], 54, 900)):
-            text(c, ln, W / 2, 1640 + j * 70, 54, TXT, a)
+        for j, ln in enumerate(wrap_lines(c, PHRASES[k], 54, 900)):
+            text(c, ln, W / 2, 1650 + j * 70, 54, TXT, a)
 
 
 def render(t):
     surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
     c = cairo.Context(surf)
     c.set_line_cap(cairo.LINE_CAP_ROUND)
+    c.set_line_join(cairo.LINE_JOIN_ROUND)
     draw_shapes(c, t)
     surf.flush()
     L = np.ndarray((H, W, 4), np.uint8, surf.get_data()).astype(np.float32) / 255
     rgb, a = L[..., [2, 1, 0]], L[..., 3:4]
     fl = 0.0
-    for tf in (T[12], T[27]):
+    for tf in (T[8] + 0.6, T[10] + 0.6, T[12], T[25] + 0.4, T[27]):
         if 0 <= t - tf < 1:
             fl += 0.05 * math.exp(-(t - tf) / 0.2)
     out = BG * (1 - a) + rgb + blur(rgb, 4, 5) * 0.6 + blur(rgb, 8, 10) * 0.5 + fl
@@ -556,30 +654,23 @@ def make_sound(path):
     def hz(m):
         return 440 * 2 ** ((m - 69) / 12)
 
-    # opening: radius drawn, flatten to a circle, area fills, back to a sphere
-    put(chime(hz(76)), T[0] + 0.9, 0.08)
-    put(whoosh(1.0), T[3], 0.08)
-    put(chime(hz(79)), T[5] + 0.9, 0.09)
-    put(whoosh(1.0), T[6], 0.08)
-    put(chime(hz(81)), T[7] + 0.4, 0.09)
-    put(whoosh(1.0), T[8] - 0.5, 0.08)
-    # bars land: pitch follows the bar height, the peak gets a big low chime
-    for k in range(1, NMAX + 1):
-        t0 = bar_on(k) + 0.5
-        m = 64 + 5 * VOLS[k - 1]
-        if k <= 6:
-            put(chime(hz(m), 1.5), t0, 0.08, -0.6 + 1.2 * k / NMAX)
+    put(chime(hz(76)), T[0] + 0.9, 0.08)                             # radius line lands
+    for t0 in (T[3], T[6], T[8], T[10], T[19], T[21], T[23]):        # flatten / inflate / sprout / collapse
+        put(whoosh(1.2), t0, 0.09)
+    put(chime(hz(79)), T[5] + 0.9, 0.09)                             # area filled
+    for n_ in range(2, NMAX + 1):                                    # readout steps, pitch follows the volume
+        m = 62 + 5 * VOLS[n_]
+        if n_ <= 6:
+            put(chime(hz(m), 1.5), dim_on(n_), 0.08, -0.5 + n_ / NMAX)
         else:
-            put(tick(hz(m + 12)), t0, 0.05, -0.6 + 1.2 * k / NMAX)
-    put(chime(hz(57), 3.0), T[12], 0.15)
-    put(chime(hz(81), 1.5), T[16] + 0.6, 0.07)
-    # cube part: meters lock in, corners light up, end question
-    put(whoosh(1.0), T[19] + 0.3, 0.08)
+            put(tick(hz(m + 12)), dim_on(n_), 0.05, -0.5 + n_ / NMAX)
+    put(chime(hz(57), 3.0), T[12], 0.15)                             # peak
+    put(chime(hz(79), 1.6), T[20] + 1.5, 0.09)                       # cube touches the ball
     for t0, m in ((T[22] + 1.0, 79), (T[24] + 1.0, 76), (T[26] + 1.0, 72)):
-        put(chime(hz(m), 1.6), t0, 0.08)
-    put(whoosh(1.0), T[25] - 0.1, 0.08)
+        put(chime(hz(m), 1.6), t0, 0.08)                             # meters lock in
+    put(whoosh(1.6), T[25], 0.12)                                    # corners burst out
     for m in (72, 76, 79, 84):
-        put(chime(hz(m), 3.0), T[27] + 0.1, 0.06)
+        put(chime(hz(m), 3.0), T[27] + 0.1, 0.06)                    # corners light up
     put(chime(hz(81), 2.5), T[28], 0.10)
 
     mix_ *= np.minimum(1, tt / 1.0) * np.minimum(1, (DUR - tt) / 1.0)
