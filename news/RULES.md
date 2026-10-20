@@ -8,6 +8,7 @@
 - Shorts safe zone: every text part above y 1590, and left of x 940 below y 900 (check.js SAFE). Long: 50 px from every edge.
 
 ## Every scene
+- One drawn metaphor per scene (our SVG / D drawings), text only to support it. Long videos: a near text-free breather about every 45 s.
 - One main visual that MOVES: photo with `KB`, screenshot with `SZOOM` + `SHL` highlight, typed `sCode`, counter `sCount` + `COUNT`, table `TABLE`, drawing in `nlBox`, arrow / circle `sDraw`, stamp `STAMP`.
 - Shorts: something new every 1-1.5 s (check.js GAP > 2.5 s). Long: every 3-4 s (GAP > 4 s).
 - First frame of a scene already shows its main part (hard cut, no empty frames). Fill a scene early with a part at `{ to: .3 }` and raise it on the word.
@@ -30,7 +31,7 @@
 ## Code
 - Every top-level part needs an id; position with left/top (GSAP transforms override CSS transform). A plain `D(...)` part needs `position:absolute` in its css.
 - Children of a card show with the card: give them ids and FADE / POP them to reveal later (POP and fromTo hide from frame 0).
-- `fromTo` needs autoAlpha in both from and to; no colour tweens, no onUpdate, finite repeats, no emoji, comments on their own line.
+- `fromTo` needs autoAlpha in both from and to (the check shim ignores from-only autoAlpha); no colour tweens, no onUpdate, finite repeats, no emoji, comments on their own line.
 - Never use `stage`, `document.body` or old neon parts (`nl*` windows, `nw*` cards): build.py bans them.
 - `CUE(t, kind)` next to its beat: `hit` big reveals and stamps, `err` problems, `tick` rows / list items, `pop` new parts, `chime` confirmations, `type` typed text, `whoosh` comes with NEXT.
 

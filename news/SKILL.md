@@ -5,7 +5,7 @@ description: "Run the user's AI + Dev news YouTube channel end to end: find toda
 
 # NEWS: the AI + Dev news channel (research -> script -> video)
 
-The user runs **Merge Report**, a faceless AI + developer news channel for a US / UK audience. Voice = the user's English TTS. Talk to the user in Hinglish, short and clear.
+The user runs **Merge Report**, a faceless AI + developer news channel for a US / UK audience. Voice = the user's English TTS (Clipchamp, one voice for the channel). Talk to the user in Hinglish, short and clear.
 Locked decisions live in `~/nkit/news/BRAND.md`: read it at the start of every session. If the user changes a decision, update BRAND.md (ask before pushing).
 
 **THIS SKILL ONLY.** Do not also follow `light`, `netlightml`, `net-script`, `net-thumb`, `kurzgesagt-explainer-video` or other video skills.
@@ -52,9 +52,10 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 6. Reply with ONE table: #, story in one line, category, score, what we can show, source links. Then your pick: Short 1 / Short 2 (/ Short 3), and which stories go to the weekend video. Slow day: 3 evergreen ideas instead of weak stories. Upload time reminder (BRAND.md). **Stop.**
 
 ## Step 2: scripts (TTS-ready, one per Short)
-- Shorts: 30-45 s = about 95-135 words. One story. Big Story long: 4-6 min. Weekly long: 6-8 min (deep dive ~3 min, stories you missed ~3 min, updates ~1 min).
+- Shorts: 30-45 s = about 95-120 words (Clipchamp voice: 137 words = 51 s). One story. Big Story long: 4-6 min. Weekly long: 6-8 min (deep dive ~3 min, stories you missed ~3 min, updates ~1 min).
 - Structure: **hook in the first 2 s** (the claim or the villain, no "hey guys") -> the story as a story (who, what, when) -> 1-2 proofs (number, quote, screenshot line) -> **the "but"** (catch / twist / honest caveat) -> **what it means for developers / you** (one line) -> short ending line that can loop.
 - Plain spoken English, short sentences, one idea per line, numbers written as spoken ("three hundred and sixty two"), no emoji / URLs / markdown. One sentence per line in `script_N.txt`.
+- Lists of names: few commas ("Lloyds HSBC and Royal Mail"): the TTS pauses at every comma and the aligner then misplaces the words.
 - Light humour is fine; no swearing, no jokes about groups of people, no other creator's catchphrases ("It is [date] and you're watching...").
 - Honesty: say "reportedly" for anything unconfirmed, give the caveat in the script (internal test vs real product, test coins worth $0, rumour vs announced).
 - `sources_N.md`: every URL with its date, every fact / number / quote next to its source, then "script line -> source". Unverified = `[CHECK]` and tell the user.
@@ -109,6 +110,12 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 - Never paste kit code into video.js; build.py rejects redefinitions.
 
 ## Pitfalls
+- Less text, more drawing (BRAND.md): plan one drawn metaphor per scene before writing parts.
+- `fromTo` needs `autoAlpha` in both from and to, or the check sheets (gsap shim) never show the part.
+- s* parts are hidden until a beat shows them: show a scene's tag on its first frame with `FADE('#id', t - .02, { d: .05 })`.
+- Shorts: spread the layout over y 150-1550; big numbers below y 900 must stay narrower than x 940 (about 230-250 px font for "$1,700").
+- Sites with ads (The Register...) move between pageshot runs: crop with PIL from the same run's `_full.png` and phrase boxes, never from a later run's coordinates.
+- Aligner wrong inside one sentence (nverify CHECK on a word, words out of order): find the word onsets from the audio energy (50 ms RMS, silences) and fix those times in words.json, then rebuild.
 - A part without `position:absolute` flows in the page and lands in the wrong place (the s* parts already have it).
 - Template classes can clash: do not invent class names like `ln`, `ch`, `tx`, `bar`; use an `s`-prefixed name.
 - Big Ken Burns zooms move the photo, not the frame: keep important parts of the photo away from the edges.
