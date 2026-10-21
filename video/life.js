@@ -17,6 +17,8 @@ function glowRing(par, cx, cy, r, col, id, w = 8) { return S('circle', { id, cx,
 // ENDING (every video): call last inside beats. Camera eases back to (cx,cy,z) as the last words finish, focus (selector of the final
 // visual) gets a pulse, then the screen fades to black. build.py makes the video TAIL s longer than the audio.
 function outro(cx, cy, z = .9, focus) { if (typeof flushTalks === 'function') flushTalks(); const T2 = END + (typeof TAIL === 'number' ? TAIL : 3.1); tl.set('#fadeEnd', { autoAlpha: 0 }, 0);
+  // no tail (build.py --no-head, YouTube Short): ease the camera back during the last words, no fade, the video ends on the last word
+  if (T2 <= END) { CAM(Math.max(0, END - 2.4), cx, cy, z, 2.3, 'sine.inOut'); if (focus) PULSE(focus, END - 1.2, { s: 1.06 }); tl.set({}, {}, END); return; }
   CAM(END - .4, cx, cy, z, 2.8, 'sine.inOut');
   if (focus) tl.to(focus, { scale: 1.12, transformOrigin: '50% 50%', duration: .6, yoyo: true, repeat: 3, ease: 'sine.inOut' }, END + .1);
   tl.fromTo('#fadeEnd', { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.3, ease: 'power1.in' }, T2 - 1.4); tl.set({}, {}, T2); }
@@ -26,6 +28,8 @@ function outro(cx, cy, z = .9, focus) { if (typeof flushTalks === 'function') fl
 // hero: selector of a group built at build time (NOT hid()), cx/cy: its centre, s: the scene element.
 function intro(s, hero, cx, cy, o = {}) {
   const h0 = typeof HEAD === 'number' ? HEAD : 1.5, kids = [...document.querySelector(hero).children];
+  // no silent intro (build.py --no-head): frame 0 already shows the hero, the camera only settles in; no black fade, no title row
+  if (h0 <= 0) { tl.set(['#fadeIn', '#streak'], { autoAlpha: 0 }, 0); tl.set(hero, { autoAlpha: 1 }, 0); CUT(0, cx, cy + 40, (o.z1 ?? 1.0) * 1.12); CAM(.02, cx, cy + 40, o.z1 ?? 1.0, 2.4, 'sine.inOut'); return; }
   tl.fromTo('#fadeIn', { autoAlpha: 1 }, { autoAlpha: 0, duration: .8, ease: 'power1.out' }, 0);
   tl.set('#streak', { autoAlpha: 0, rotation: 18 }, 0); tl.fromTo('#streak', { autoAlpha: 1, x: 0 }, { autoAlpha: 1, x: 2900, duration: .9, ease: 'power2.inOut' }, .2); tl.set('#streak', { autoAlpha: 0 }, 1.2);
   CUT(0, cx, cy, o.z0 ?? 2.0); CAM(.05, cx, cy + 40, o.z1 ?? 1.45, h0 + .6, 'power2.out');

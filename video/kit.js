@@ -27,7 +27,12 @@ const TH = THEMES[VIDEO.theme] || VIDEO.theme || THEMES.green; { const r = $('#r
 
 // ---------- timing ----------
 const NW = TW.map(w => w[1]);
-const norm = p => p.split(/\s+/).map(w => w.toLowerCase().replace(/[^a-z0-9]/g, '')).filter(Boolean);
+// Hindi (Devanagari) phrase words are romanized exactly like hindi.py / align.py, so W('मेथुसेला') and W('methuselaa') both match
+const HV = { 'अ': 'a', 'आ': 'aa', 'इ': 'i', 'ई': 'ii', 'उ': 'u', 'ऊ': 'uu', 'ए': 'e', 'ऐ': 'ai', 'ओ': 'o', 'औ': 'au', 'ऋ': 'ri', 'ऑ': 'o' }, HM = { 'ा': 'aa', 'ि': 'i', 'ी': 'ii', 'ु': 'u', 'ू': 'uu', 'े': 'e', 'ै': 'ai', 'ो': 'o', 'ौ': 'au', 'ृ': 'ri', 'ॉ': 'o', 'ॅ': 'e' };
+const HC = Object.fromEntries([...'कखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसह'].map((c, i) => [c, 'k kh g gh n ch chh j jh n t th d dh n t th d dh n p ph b bh m y r l v sh sh s h'.split(' ')[i]]));
+function romanize(w) { w = w.replace(/\u093c/g, ''); let o = ''; for (let i = 0; i < w.length; i++) { const c = w[i], nx = w[i + 1] || '';
+  if (HC[c]) { o += HC[c]; if (HM[nx]) { o += HM[nx]; i++; } else if (nx === '\u094d') i++; else o += 'a'; } else if (HV[c]) o += HV[c]; else if (c === '\u0902' || c === '\u0901') o += 'n'; else if (c === '\u0903') o += 'h'; else o += c; } return o; }
+const norm = p => p.split(/\s+/).map(w => (/[\u0900-\u097F]/.test(w) ? romanize(w) : w).toLowerCase().replace(/[^a-z0-9]/g, '')).filter(Boolean);
 function findp(p, from) { const q = norm(p); for (let i = 0; i < TW.length; i++) { if (TW[i][0] < from) continue; let ok = true; for (let j = 0; j < q.length; j++) if (NW[i + j] !== q[j]) { ok = false; break; } if (ok) return TW[i][0]; } console.warn('PHRASE NOT FOUND: ' + p); return null; }
 let CUR = 0, NXT = END;
 function at(p, dflt) { if (typeof p === 'number') return p; if (!p) return dflt ?? CUR; const t = findp(p, CUR - 0.06); if (t === null) return dflt ?? CUR; if (t > NXT + 0.2) console.warn('PHRASE OUTSIDE SCENE: ' + p + ' @' + t); return t; }
@@ -213,7 +218,9 @@ $$('.draw').forEach(p => { const L = p.getTotalLength(); p.__len = L; p.style.st
 tl.set('.scene', { autoAlpha: 0 }, 0);
 SCN.forEach((x, i) => {
   const t0 = Math.max(0, x.t - .2), m = i % 3, from = m === 0 ? { autoAlpha: 0, scale: .97 } : m === 1 ? { autoAlpha: 0, x: 60 } : { autoAlpha: 0, y: 40 };
-  tl.fromTo(x.id, from, { autoAlpha: 1, scale: 1, x: 0, y: 0, duration: .45, ease: 'power2.out' }, t0);
+  // no silent intro (build.py --no-head, HEAD = 0): the first scene is fully visible on frame 0 (no fade from black)
+  if (i === 0 && typeof HEAD !== 'undefined' && HEAD === 0) tl.set(x.id, { autoAlpha: 1, scale: 1, x: 0, y: 0 }, 0);
+  else tl.fromTo(x.id, from, { autoAlpha: 1, scale: 1, x: 0, y: 0, duration: .45, ease: 'power2.out' }, t0);
   if (i < SCN.length - 1) tl.to(x.id, { autoAlpha: 0, duration: .35, ease: 'power1.in' }, SCN[i + 1].t - .05);
 });
 SCN.forEach((x, i) => { sc(i); B(CUR); x.beats && x.beats(); });

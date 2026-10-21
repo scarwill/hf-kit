@@ -155,3 +155,48 @@ function kWALK(id, t, dx, d = 1.6) { const n = Math.max(2, Math.round(d / .4));
 
 // look toward something: eyes + head shift a little (dir -1 left / 1 right, dy px up/down). Works for kBean.
 function kGaze(id, t, dir, dy = 0, d = .4) { tl.to('#' + id + 'E', { x: dir * 5, y: dy * .4, duration: d, ease: 'power2.inOut' }, t); tl.to('#' + id + 'H', { rotation: dir * 4, y: dy * .3, transformOrigin: '50% 100%', duration: d, ease: 'power2.inOut' }, t); B(t); }
+
+// ===================== kBean ELBOWS + KNEES (2-bone IK, front view) =====================
+// kIK(id, side, tx, ty)       arm with an elbow: hides id+'aN' (side 1, right) / id+'aF' (side -1, left) and draws upper arm + forearm so the
+//                             hand lands on (tx, ty) in kBean LOCAL coords (feet at 0, head top ~ -510; shoulders at x ±70, y -318; reach ~154).
+//                             The elbow bends down/outward like a real arm. New arm id: id+'aNk' / id+'aFk' (drawn in front of the head,
+//                             so hand-on-chin works). Returns the miss in px (0 = hand on target). Poses: chin, phone, hip, point, wave.
+// kIKLeg(id, side, fx, fy, o) leg with a knee: hides id+'lN' / id+'lF', ankle lands on (fx, fy) (hips at x ±24, y -150; reach ~144); the knee
+//                             bends outward (front view). Shoes keep kBean's own shape and direction; the shin ends inside the shoe.
+//                             o.front: true draws the leg on top (e.g. a raised foot on a box drawn after the character). Returns {knee, miss}.
+// kDrop(id, dy)               lower the whole upper body by dy (squat / sit) while the shadow stays on the ground; then put the feet back with
+//                             kIKLeg(id, ±1, ±60, -dy). Squat, jump (feet up at -60), dance (one knee up), step on a box.
+// Build-time only (call before beats); animate the new groups like any other (POP / BOING), never re-solve inside beats.
+function kIK(id, side, tx, ty, o = {}) {
+  const old = document.getElementById(id + (side > 0 ? 'aN' : 'aF')), M = old.parentNode; old.style.display = 'none';
+  const top = old.querySelector('path').getAttribute('stroke'), sk = o.skin || (old.querySelector('circle') || {}).getAttribute?.('fill') || '#f3cfb3';
+  const sx = side * 70, sy = -318, L1 = 74, L2 = 80;
+  const dx = tx - sx, dy = ty - sy, d = Math.min(Math.max(Math.hypot(dx, dy), Math.abs(L1 - L2) + 1), L1 + L2 - .5);
+  const a = Math.atan2(dy, dx), b = Math.acos((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d));
+  const [ex, ey] = [a + b, a - b].map(t => [sx + L1 * Math.cos(t), sy + L1 * Math.sin(t)]).sort((u, v) => (v[1] + .6 * side * v[0]) - (u[1] + .6 * side * u[0]))[0];
+  const fa = Math.atan2(ty - ey, tx - ex), hx = ex + L2 * Math.cos(fa), hy = ey + L2 * Math.sin(fa);
+  const g = S('g', { id: id + (side > 0 ? 'aNk' : 'aFk') }, M), cap = { fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' };
+  S('path', Object.assign({ d: `M${sx} ${sy} L${ex} ${ey}`, stroke: top, 'stroke-width': 32 }, cap), g);
+  S('path', Object.assign({ d: `M${ex} ${ey} L${hx} ${hy}`, stroke: top, 'stroke-width': 30 }, cap), g);
+  S('path', Object.assign({ d: `M${ex} ${ey} L${ex + 22 * Math.cos(fa)} ${ey + 22 * Math.sin(fa)}`, stroke: kDark(top, .25), 'stroke-width': 30, opacity: .45 }, cap), g);   // elbow crease
+  kBall(g, hx, hy, 17, sk, null, null, null);
+  return Math.hypot(hx - tx, hy - ty);
+}
+function kIKLeg(id, side, fx, fy, o = {}) {
+  const old = document.getElementById(id + (side > 0 ? 'lN' : 'lF')), M = old.parentNode; old.style.display = 'none';
+  const [pr, sh] = old.querySelectorAll('rect,path'), pants = pr.getAttribute('fill'), shoe = sh.getAttribute('fill');
+  const hx = side * 24, hy = -150, L1 = 72, L2 = 72;
+  const dx = fx - hx, dy = fy - hy, d = Math.min(Math.max(Math.hypot(dx, dy), 8), L1 + L2 - .5);
+  const a = Math.atan2(dy, dx), b = Math.acos((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d));
+  const [kx, ky] = [a + b, a - b].map(t => [hx + L1 * Math.cos(t), hy + L1 * Math.sin(t)]).sort((u, v) => side * v[0] - side * u[0])[0];
+  const fa = Math.atan2(fy - ky, fx - kx), ax = kx + L2 * Math.cos(fa), ay = ky + L2 * Math.sin(fa);
+  const g = S('g', { id: id + (side > 0 ? 'lNk' : 'lFk') }, M), cap = { fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' };
+  if (!o.front) M.insertBefore(g, old);
+  S('path', Object.assign({ d: `M${hx} ${hy} L${kx} ${ky}`, stroke: pants, 'stroke-width': 34 }, cap), g);
+  const se = Math.min(10, L2 - 2);   // shin stops inside the shoe: its round end never peeks under the sole
+  S('path', Object.assign({ d: `M${kx} ${ky} L${ax - se * Math.cos(fa)} ${ay - se * Math.sin(fa)}`, stroke: kDark(pants, .12), 'stroke-width': 32 }, cap), g);
+  const y = ay + 8;   // shoe: same shape and direction as kBean's own (toes point right)
+  S('path', { d: `M${ax - 20} ${y - 8} Q${ax - 20} ${y - 26} ${ax} ${y - 26} Q${ax + 26} ${y - 26} ${ax + 30} ${y - 8} Q${ax + 30} ${y + 2} ${ax + 16} ${y + 2} L${ax - 14} ${y + 2} Q${ax - 20} ${y + 2} ${ax - 20} ${y - 8} Z`, fill: shoe }, g);
+  return { knee: [kx, ky], miss: Math.hypot(ax - fx, ay - fy) };
+}
+function kDrop(id, dy) { const M = document.getElementById(id + 'B'); M.setAttribute('transform', `translate(0 ${dy})`); M.querySelector('ellipse').setAttribute('transform', `translate(0 ${-dy})`); }
