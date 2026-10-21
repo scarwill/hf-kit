@@ -41,6 +41,10 @@ Decided with the user. The `news` skill and kit follow this file.
 - Long videos: a "breather" scene about every 45 s with almost no text (a big number, a drawing, one line).
 - Big Story: the Short goes out first, the long video the next day; pin the long video's link in the Short's comments.
 
+## Captions (decided 21 Oct 2026)
+- Shorts have word-by-word captions: 2-4 words at a time, the word being spoken turns blue, Inter Tight 800, dark ink on a white rounded card with a soft shadow. Place them in a fixed band (about y 1380-1540), inside the safe zone; scene layouts keep that band free.
+- Long videos: no captions for now (ask the user before adding them).
+
 ## Thumbnails (long videos)
 - Weekly: "1 big + 2 small" (`thumb.js` layout `big3`): badge THIS WEEK IN TECH, the strongest story big with 2-5 words, two small numbered stories. Prefer stories that had no Short.
 - Big Story: layout `single`, badge BIG STORY.

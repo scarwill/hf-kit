@@ -122,6 +122,34 @@ function sEnd() { const e = D(stage, '', `position:absolute;inset:0;z-index:30;b
   D(e, `<span style="display:inline-block;background:${SB.blue};color:#fff;font:800 48px ${SBODY};padding:24px 60px;border-radius:999px;box-shadow:0 18px 34px -14px ${SB.blue}">${V ? 'Follow' : 'Subscribe'}</span>`, `position:absolute;left:0;right:0;top:${top + (V ? 280 : 170)}px;text-align:center`, 'sEb'); return e; }
 function sEndBeats() { const t = END + .05; tl.set('#sE', { autoAlpha: 0 }, 0); tl.set('#sE', { autoAlpha: 1 }, t); tl.fromTo(['#sEn', '#sEt'], { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .4, ease: 'power3.out', stagger: .08 }, t); POP('#sEb', t + .35); PULSE('#sEb', t + 1.1, { s: 1.06 }); tl.set({}, {}, END + TAIL); }
 
+// ---------- word-by-word captions (Shorts, BRAND.md Captions): band y 1380-1540, keep scene parts out of it ----------
+// sCaptions(text): text = the script, one token per spoken word in words.json. '1.107{5}' shows one token for 5 spoken words.
+// Chunks of up to 3 words (new chunk after . ? ! , or a pause); the spoken word turns blue. Beats are added by sFinish.
+const SCAPS = [];
+function sCaptions(text, y = 1390) {
+  const css = document.createElement('style'); css.textContent = `
+  .scapk{position:absolute;left:0;right:0;top:0;text-align:center}
+  .scapc{display:inline-block;max-width:870px;background:${SB.card};border:2px solid ${SB.line};border-radius:28px;padding:14px 34px 18px;box-shadow:0 18px 40px -18px rgba(15,23,42,.45);font:800 68px/1.15 ${SHEAD};letter-spacing:-1px;color:${SB.ink};white-space:nowrap}
+  .scapw{position:relative;display:inline-block;margin:0 .13em}
+  .scapb{position:absolute;left:0;top:0;color:${SB.blue}}`; document.head.appendChild(css);
+  const toks = text.split(/\s+/).filter(Boolean).map(t => { const m = t.match(/^(.*?)\{(\d+)\}(.*)$/); return m ? [m[1] + m[3], +m[2]] : [t, 1]; });
+  const n = toks.reduce((a, [, k]) => a + k, 0);
+  if (n !== TW.length) console.error(`LOOK: sCaptions has ${n} spoken words, words.json has ${TW.length}`);
+  const L = D(stage, '', `position:absolute;left:70px;width:870px;top:${y}px;height:150px;z-index:25;pointer-events:none`, 'sCap');
+  let i = 0, ck = null, prevT = -9, prevTxt = '.';
+  toks.forEach(([txt, k]) => { const t0 = TW[Math.min(i, TW.length - 1)][0];
+    if (!ck || ck.w.length >= 3 || /[.?!,]$/.test(prevTxt) || t0 - prevT > .75) { const id = 'sCap' + SCAPS.length; ck = { id, w: [], el: D(L, '<span class="scapc"></span>', '', id, 'scapk') }; SCAPS.push(ck); }
+    const wid = ck.id + 'w' + ck.w.length, safe = txt.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    ck.el.firstChild.insertAdjacentHTML('beforeend', `<span class="scapw">${safe}<span class="scapb" id="${wid}">${safe}</span></span>`);
+    ck.w.push([wid, t0]); i += k; prevT = TW[Math.min(i - 1, TW.length - 1)][0]; prevTxt = txt; });
+}
+function sCapBeats() {
+  SCAPS.forEach((c, j) => { const t0 = c.w[0][1] - .06, nx = j + 1 < SCAPS.length ? SCAPS[j + 1].w[0][1] - .06 : END + .05, last = c.w[c.w.length - 1][1];
+    tl.set('#' + c.id, { autoAlpha: 0 }, 0); tl.fromTo('#' + c.id, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .1, ease: 'power2.out' }, t0);
+    tl.set('#' + c.id, { autoAlpha: 0 }, Math.min(nx, last + 1.2));
+    c.w.forEach(([wid, t], k) => { tl.set('#' + wid, { autoAlpha: 0 }, 0); tl.set('#' + wid, { autoAlpha: 1 }, t); if (k + 1 < c.w.length) tl.set('#' + wid, { autoAlpha: 0 }, c.w[k + 1][1]); }); });
+}
+
 function sBegin(scs) {
   nlStart(scs); NLT.push([scs[0], HEAD]);
   [...document.querySelectorAll('.nsc')].map(e => '#' + e.id).forEach(sc => { if (scs.indexOf(sc) < 0) console.error(`LOOK: scene ${sc} exists but is missing from sBegin([...])`); });
@@ -129,5 +157,5 @@ function sBegin(scs) {
 }
 function sFinish() {
   if (NLCUR !== NLSC[NLSC.length - 1]) console.error(`LOOK: video ends on ${NLCUR}, not on the last scene ${NLSC[NLSC.length - 1]}`);
-  tl.set(NLCUR, { autoAlpha: 0 }, END + .05); sEndBeats(); CUE(END + .05, 'whoosh'); CUE(END + .4, 'pop');
+  tl.set(NLCUR, { autoAlpha: 0 }, END + .05); if (SCAPS.length) sCapBeats(); sEndBeats(); CUE(END + .05, 'whoosh'); CUE(END + .4, 'pop');
 }
