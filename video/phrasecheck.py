@@ -1,10 +1,11 @@
 # usage: python3 phrasecheck.py video.js   (run in the video folder, after align.py -> words.json; no rendering, < 1 s)
 # Checks every go('..') / W('..') timing phrase: NOTFOUND, OUTSIDE AREA, or AMBIGUOUS = the phrase occurs more than once in its area,
 # so W() fires on the FIRST one (bug: W('something') fired 6 s early). Areas = the go('..') phrases in source order.
-import json, re, sys
+import json, re, sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from hindi import tok
 src = open(sys.argv[1] if len(sys.argv) > 1 else 'video.js', encoding='utf-8').read()
 w = json.load(open('words.json')); T = [t for t, _ in w]; Wd = [x for _, x in w]
-norm = lambda p: [y for y in (re.sub(r'[^a-z0-9]', '', x.lower()) for x in p.split()) if y]
+norm = lambda p: [y for y in (tok(x) for x in p.split()) if y]   # Hindi phrases are romanized like align.py does
 def occ(p):
     q = norm(p); return [T[i] for i in range(len(Wd) - len(q) + 1) if Wd[i:i + len(q)] == q]
 calls = [(m.start(), m.group(1), m.group(2)) for m in re.finditer(r"\b(go|W)\('([^']+)'\)", src)]

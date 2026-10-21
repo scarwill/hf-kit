@@ -43,6 +43,10 @@ function kBall(par, cx, cy, r, base, dark, lite, id, rim) {
   return g;
 }
 // shade ANY shape already in the DOM (path/rect/ellipse): adds core shadow + highlight clipped to it. Call right after drawing it.
+// kPivot(g, px, py): kShade's clipped ellipses make getBBox much bigger than what you see, so transformOrigin '50% 100%' lands far
+// below the object. kPivot adds an invisible box so the bbox centre sits exactly on (px, py); then scale with transformOrigin '50% 50%'
+// (e.g. a tree growing from its base: kPivot(tree, x, groundY); tl.fromTo(tree, {scale:.1, transformOrigin:'50% 50%'}, {scale:1, ...})).
+function kPivot(g, px, py) { const b = g.getBBox(), hx = Math.max(px - b.x, b.x + b.width - px), hy = Math.max(py - b.y, b.y + b.height - py); S('rect', { x: px - hx, y: py - hy, width: 2 * hx, height: 2 * hy, fill: 'none' }, g); return g; }
 function kShade(par, el, dark, lite, k = 1) {
   const base = el.getAttribute('fill') || '#888'; dark = dark || kDark(base); lite = lite || kLite(base);
   const bb = el.getBBox(), d = kDefs(par), cl = S('g', { 'clip-path': kClip(d, el) }, par), r = Math.max(bb.width, bb.height);

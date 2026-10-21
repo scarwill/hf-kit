@@ -15,6 +15,8 @@
 //            kShield(par, cx, bottomY, rx, ry, col, id)  kUWand(par, cx, cy, s, id) (waves id+'w')  kCrossM(par, cx, cy, r, id) + kXDRAW(id, t)  kZigD(x1, y1, x2, y2) zig-zag ray path  kFlame(par, cx, bottomY, s, id) (shrink id+'f')
 // SPACE:     kShip(par, cx, cy, s, id) side-view craft  kShipCut(par, defs, cx, cy, w, h, id) cutaway, returns the cabin floor y  kTreadmill  kHospital(par, cx, groundY, s, id) building
 // EFFECT:    kBeam(par, defs, x, feetY, id) + kBEAM(id, t0, dur)  teleport beam with rings + rising sparks (hide/squeeze the person yourself)
+// MEDIA:     kPhoto(par, defs, cx, cy, w, h, PH.key, id, cap, col, {sub, credit}) + kPHOTO(id, t, d) / kPHOTOOUT(id, t)  real licensed photo in a Kurz frame (photos.py)
+//            kSubscribe(par, cx, cy, id, s) + kSUB(id, t, hostId)  SUBSCRIBE -> SUBSCRIBED end card with a bell (on the last line, >= 2 s)
 // Rules learned on that video: people sleep indoors (kHomeRoom), patients lie in kHospRoom, an animal stands (kBearUp) whenever the line is not about sleep.
 const K_FUR = '#2e2738', K_FURD = '#17121f', K_FURL = '#5d4f72', K_MUZ = '#c79c6e';
 function kBearHead(H, id, s = 1) {
@@ -398,3 +400,44 @@ function kBEAM(id, t0, dur = 1) { tl.fromTo('#' + id, { autoAlpha: 0, scaleX: .1
   [0, 1, 2].forEach(k => tl.fromTo('#' + id + 'r' + k, { scale: .3, transformOrigin: '50% 50%' }, { scale: 1.3, duration: .6, ease: 'power2.out' }, t0 + k * .08));
   for (let k = 0; k < 14; k++) tl.fromTo('#' + id + 's' + k, { y: 60 }, { y: -160 - (k % 4) * 40, duration: dur, ease: 'power1.out' }, t0);
   tl.to('#' + id, { autoAlpha: 0, scaleX: .1, duration: .3, ease: 'power2.in' }, t0 + dur - .3); }
+
+// ===================== REAL PHOTOS + SUBSCRIBE END CARD =====================
+// kPhoto(par, defs, cx, cy, w, h, ph, id, cap, col, o)  a real photo (PH.key from photos.py) in a Kurz frame: dark rounded card with a soft
+//      shadow, glowing rim in col, slow zoom on the image (id+'im'), caption pill below (cap, <= 4 words) and an optional info pill (o.sub),
+//      small credit in the corner (ph.credit, or o.credit). Hidden until kPHOTO(id, t, d) (pop + zoom for d s); kPHOTOOUT(id, t) hides it.
+//      Use it when the script names a REAL thing (place, landmark, animal, object, person, event). Never caption a photo as something it
+//      does not show (Methuselah's location is secret -> its photos say "bristlecone" / "Methuselah Grove", never "Methuselah").
+function kPhoto(par, defs, cx, cy, w, h, ph, id, cap, col, o = {}) {
+  const g = S('g', { id }, par), x = cx - w / 2, y = cy - h / 2;
+  S('rect', { x: x - 12, y: y - 12, width: w + 24, height: h + 24, rx: 36, fill: '#0b0a26', opacity: .9, filter: 'url(#fSh)' }, g);
+  const cp = S('clipPath', { id: id + 'cp' }, defs); S('rect', { x, y, width: w, height: h, rx: 26 }, cp);
+  const cg = S('g', { 'clip-path': `url(#${id}cp)` }, g);
+  S('image', { id: id + 'im', href: ph.src, x, y, width: w, height: h, preserveAspectRatio: 'xMidYMid slice' }, cg);
+  S('rect', { x, y: y + h - 70, width: w, height: 70, fill: kLG(defs, [[0, '#000000', 0], [1, '#000000', .6]]) }, cg);
+  const cr = o.credit ?? ph.credit; if (cr) wtext(g, x + w - 20, y + h - 18, cr, 17, '#ffffff', 'end', 500).setAttribute('opacity', .8);
+  nBloom(S('rect', { x, y, width: w, height: h, rx: 26, fill: 'none', stroke: col, 'stroke-width': 6 }, g));
+  if (cap) nPill(g, cx, y + h + 6, cap, col, id + 'p', 36, { ink: '#0b0a26' });
+  if (o.sub) nPill(g, cx, y + h + 66, o.sub, '#16123a', id + 's', 27, { ink: '#e8e6ff' });
+  hidId(id); return g; }
+const kPHOTO = (id, t, d = 3) => { nPOP('#' + id, t, { s: .7 }); tl.fromTo('#' + id + 'im', { scale: 1 }, { scale: 1.08, transformOrigin: '50% 50%', duration: d, ease: 'none' }, t); };
+const kPHOTOOUT = (id, t) => OUT('#' + id, t, { d: .3 });
+// kSubscribe(par, cx, cy, id, s)  shaded SUBSCRIBE button + bell; kSUB(id, t, host) pops it at t, presses it at t+1.1 -> grey SUBSCRIBED
+//      with a check, bell rings; host = a mascot id (nAxo) that turns happy and waves. Needs >= 2 s: start it on the last line's words
+//      (Shorts have no silent outro). Layers id+'a' (red) / id+'b' (grey) swap visibility (no colour tweens).
+function kSubscribe(par, cx, cy, id, s = 1) {
+  const g = S('g', { id }, par), w = 430 * s, h = 104 * s;
+  const a = S('g', { id: id + 'a' }, g); kShade(a, S('rect', { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: h / 2, fill: '#ff2d3c', filter: 'url(#fSh)' }, a), '#b3101c', '#ff7a84');
+  wtext(a, cx - 30 * s, cy + 16 * s, 'SUBSCRIBE', 46 * s, '#ffffff', 'middle', 800);
+  const b = S('g', { id: id + 'b' }, g); kShade(b, S('rect', { x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: h / 2, fill: '#3b3766', filter: 'url(#fSh)' }, b), '#24204a', '#5d58a0');
+  wtext(b, cx - 44 * s, cy + 14 * s, 'SUBSCRIBED', 40 * s, '#e8e6ff', 'middle', 800);
+  S('path', { d: `M${cx + 92 * s} ${cy - 2 * s} L${cx + 106 * s} ${cy + 14 * s} L${cx + 132 * s} ${cy - 16 * s}`, stroke: '#7dffb0', 'stroke-width': 9 * s, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, b);
+  const bl = S('g', { id: id + 'bl' }, g), bx = cx + 160 * s, by = cy;
+  kShade(bl, S('path', { d: `M${bx - 26 * s} ${by + 18 * s} Q${bx - 24 * s} ${by - 30 * s} ${bx} ${by - 32 * s} Q${bx + 24 * s} ${by - 30 * s} ${bx + 26 * s} ${by + 18 * s} Z`, fill: '#ffd23f' }, bl), '#c99a12', '#fff2a8');
+  kBall(bl, bx, by + 24 * s, 8 * s, '#ffd23f'); S('rect', { x: bx - 5 * s, y: by - 42 * s, width: 10 * s, height: 12 * s, rx: 5 * s, fill: '#ffd23f' }, bl);
+  hidId(id); hidId(id + 'b'); return g; }
+function kSUB(id, t, host) {
+  nPOP('#' + id, t, { s: .4 });
+  tl.to('#' + id, { scale: .9, transformOrigin: '50% 50%', duration: .1, yoyo: true, repeat: 1, ease: 'power1.inOut' }, t + 1.1);
+  tl.set('#' + id + 'a', { autoAlpha: 0 }, t + 1.15); tl.set('#' + id + 'b', { autoAlpha: 1 }, t + 1.15);   // SUBSCRIBE readable >= 1 s
+  tl.fromTo('#' + id + 'bl', { rotation: -18, transformOrigin: '50% 0%' }, { rotation: 18, transformOrigin: '50% 0%', duration: .12, yoyo: true, repeat: 5, ease: 'sine.inOut' }, t + 1.25);
+  if (host) { nMOOD(host, t + 1.15, 'happy'); nWAVE(host, t + 1.25); } }

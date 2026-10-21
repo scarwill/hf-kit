@@ -1,5 +1,7 @@
 # usage: python3 align.py <audio> <script.txt>   -> words.json, meta.json (END, title or None, sentences)
+# Hindi scripts work as they are: '।' / '॥' end a sentence, Devanagari words are stored romanized (hindi.py), W() takes Hindi or roman phrases.
 import numpy as np, re, json, sys, subprocess, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); from hindi import tok   # Hindi (Devanagari) words -> a-z tokens
 # sentence breaks: silences >= BIGT s. 0.2 (was 0.3): some narrators pause only ~0.2 s between sentences; with 0.3 two sentences merged
 # and every later sentence drifted 3-9 s late (visuals came after the words). Override: BIGT=0.3 python3 align.py ...
 BIGT=float(os.environ.get('BIGT','0.2'))
@@ -22,10 +24,10 @@ cs=np.concatenate([[0],np.cumsum(speech)])/100
 sp=lambda a,b: cs[min(n,int(round(b*100)))]-cs[min(n,int(round(a*100)))]
 paras=[l.strip() for l in open(scr,encoding='utf-8') if l.strip()]
 # line 1 is a spoken TITLE only if it is short and has no sentence ending; otherwise it is a normal sentence
-_w=paras[0].split(); TITLE=len(paras)>1 and len(_w)<=12 and not paras[0].rstrip().endswith('.') and sum(w[:1].isupper() or not w[:1].isalpha() for w in _w)>=0.6*len(_w)
+_w=paras[0].split(); TITLE=len(paras)>1 and len(_w)<=12 and not paras[0].rstrip().endswith(('.','।','॥')) and sum(w[:1].isupper() or not w[:1].isalpha() for w in _w)>=0.6*len(_w)
 sents=[]
 for k,p in enumerate(paras):
-    ss=[p] if (k==0 and TITLE) else [s.strip() for s in re.findall(r'[^.?!]+[.?!]+["”]?|[^.?!]+$',p) if s.strip()]
+    ss=[p] if (k==0 and TITLE) else [s.strip() for s in re.findall(r'[^.?!।॥]+[.?!।॥]+["”]?|[^.?!।॥]+$',p) if s.strip()]
     sents+=ss
 w=lambda t:1+len(t)/10
 L=np.array([sum(w(t) for t in s.split()) for s in sents])
@@ -52,7 +54,7 @@ gaps=[st[i+1][0]-st[i][1] for i in range(M-1)]
 print(f'END={END:.2f} sentences={M} gap min/max={min(gaps):.2f}/{max(gaps):.2f} (expect ~0.3-0.8)')
 for (a,b),s,e in zip(st,sents,L*rate):
     if abs((b-a)-e)>max(1.5,0.5*e): print(f'  check {a:7.2f}-{b:7.2f} d={b-a:.2f} e={e:.2f} {s[:60]}')
-def wt(t): return len(re.sub(r'[^A-Za-z0-9]','',t))+1.5
+def wt(t): return len(tok(t))+1.5   # Hindi words are weighted by their romanized length too
 TW=[]
 for (a,b),s in zip(st,sents):
     parts=[p for p in re.split(r'(?<=[,;:?])\s+',s) if p.strip()]
@@ -79,7 +81,7 @@ for (a,b),s in zip(st,sents):
             t=c0
             while t<c1 and sp(c0,t)<acc/tw*tot2: t+=0.01
             while t<c1 and not speech[min(int(t*100),n-1)]: t+=0.01
-            TW.append([round(t,2),re.sub(r'[^a-z0-9]','',t_.lower())]); acc+=wt(t_)
+            TW.append([round(t,2),tok(t_)]); acc+=wt(t_)
 json.dump(TW,open('words.json','w'))
 json.dump({'END':round(END,2),'title':paras[0] if TITLE else None,'sents':[[round(a,2),round(b,2),s] for (a,b),s in zip(st,sents)]},open('meta.json','w'))
 print('words',len(TW),'title:',paras[0] if TITLE else None)
