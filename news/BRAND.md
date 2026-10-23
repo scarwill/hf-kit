@@ -1,9 +1,10 @@
-# Merge Report: locked decisions for the AI + Dev news channel (updated 23 Oct 2026)
+# Merge Report: locked decisions for the AI + Dev news channel (updated 23 Oct 2026, no weekly video)
 
 Decided with the user. The `news` skill and kit follow this file.
 
 ## Channel
 - **Name:** Merge Report (handle @mergereport, or the closest free one). Profile picture: `brand/dp.png` (white MR on blue). Banner: `brand/banner.png` (2560x1440, text inside the phone-safe centre 1546x423). Sources of both: `brand/*.html`.
+- **Channel keywords** (YouTube Studio > Settings > Channel > Keywords, 433 / 500 chars): `brand/channel_keywords.txt`.
 - **Niche:** AI news + developer news. About 60 % AI (new models from OpenAI / Google / Anthropic / Meta / xAI / DeepSeek..., Hugging Face trending and open models, AI agents, AI tools, AI failures and hacks), 30 % coding and dev tools (GitHub viral repos, languages, editors, open source), 10 % cloud and security (only big ones: AWS / Azure / GCP outages, price changes, big hacks that hit developers).
 - **Not covered:** gadgets and phones unless the story is about AI or developers, crypto prices, politics / celebrity drama, unconfirmed leaks (or say "reportedly"), tiny updates.
 - **Audience:** US / UK. Voice: English TTS from Clipchamp, the same voice and speed in every video. The user talks to Claude in Hinglish.
@@ -11,8 +12,8 @@ Decided with the user. The `news` skill and kit follow this file.
 
 ## Format
 - **Every day:** 2-3 Shorts (1080x1920, one story each, 30-45 s = about 120 words max with the Clipchamp voice; 137 words came out at 51 s).
-- **Every weekend:** 1 long video "This Week in Tech" (1920x1080, 6-8 min): a deep dive on the week's biggest story (~3 min), "stories you missed" that had no Short (~3 min), updates on the week's Shorts (~1 min).
-- **Big Story rule:** a story that scores 9+/10 (major model launch, outage or hack that hits developers, huge deal, viral open-source release everyone talks about) gets a Short at once and its own long video (4-6 min) the same or next day, without waiting for the weekend. At most 1-2 Big Story long videos a week. The weekend video then gives it only a short update.
+- **No weekly / weekend video** (decided 23 Oct 2026). Long videos are made only on the day a story feels big enough, when the user decides it is (see Big Story rule).
+- **Big Story rule:** a story that scores 9+/10 (major model launch, outage or hack that hits developers, huge deal, viral open-source release everyone talks about) gets a Short at once and its own long video (4-6 min) the same or next day. Claude may flag a candidate; the user decides which stories get a long video. At most 1-2 Big Story long videos a week.
 - **Slow day:** an evergreen Short (how X works, a free AI tool, the week so far) instead of a weak story.
 
 ## Upload times (India time, IST)
@@ -43,13 +44,15 @@ Decided with the user. The `news` skill and kit follow this file.
 - Long videos: a "breather" scene about every 45 s with almost no text (a big number, a drawing, one line).
 - Big Story: the Short goes out first, the long video the next day; pin the long video's link in the Short's comments.
 
+## Music (decided 23 Oct 2026)
+- Every video gets its own custom BGM made for that story (generators and steps in `music/README.md`). Never the plain nmix.py moods, never the same style twice in a row. Hit / stop / drop on the story's twist, resolve on the end card. Always send a voice + music preview with the delivery.
+
 ## Captions (decided 21 Oct 2026)
 - Shorts have word-by-word captions: 2-4 words at a time, the word being spoken turns blue, Inter Tight 800, light text on a dark navy rounded card (`#111A2B`, border `#24324A`). Place them in a fixed band (about y 1380-1540), inside the safe zone; scene layouts keep that band free.
 - Long videos: no captions for now (ask the user before adding them).
 
 ## Thumbnails (long videos)
 - Dark "Night Blue" like the videos (since 23 Oct 2026): navy-black bg with a blue glow, white headline with the key word in light blue `#60A5FA`, blue badge, photos in a thin `#2A3B5C` frame.
-- Weekly: "1 big + 2 small" (`thumb.js` layout `big3`): badge THIS WEEK IN TECH, the strongest story big with 2-5 words, two small numbered stories. Prefer stories that had no Short.
 - Big Story: layout `single`, badge BIG STORY.
 - Real photos / screenshots only, nothing the video does not deliver, a "?" when a claim is a rumour.
 
@@ -63,5 +66,5 @@ Decided with the user. The `news` skill and kit follow this file.
 - Faceless + TTS is allowed, but every video must clearly be made with care: own research, own script, own analysis ("what it means for developers"), visuals built for that story.
 - Never the same layout twice in a row: change the opening visual, scene order and parts from video to video. No fixed "template" Short.
 - One consistent, natural voice for the channel (the user's own voice is best). Never a voice that imitates a real person.
-- Quality over quantity: 2 strong Shorts beat 3 rushed ones. Keep the weekly long video: it shows a real channel, not a Shorts factory.
+- Quality over quantity: 2 strong Shorts beat 3 rushed ones. Big Story long videos (when the user picks one) show a real channel, not a Shorts factory.
 - Sources in every description. No reused clips. Label realistic synthetic media if we ever use it (our drawings and TTS narration are not that).
