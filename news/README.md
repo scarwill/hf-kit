@@ -1,6 +1,6 @@
 # news/ — kit for the AI + Dev news channel (`news` skill)
 
-Light "Clean Blue" look (blue + black), Shorts 1080x1920 and long videos 1920x1080, real screenshots and press photos, Fireship-style pace.
+Dark "Night Blue" look (navy-black + blue, since 23 Oct 2026), Shorts 1080x1920 and long videos 1920x1080, real screenshots and press photos, Fireship-style pace.
 Decisions: `BRAND.md`. Rules card: `RULES.md`. Skill: `SKILL.md` (upload it to claude.ai as the `news` skill). Covered stories: `log.md`.
 
 | file | what |

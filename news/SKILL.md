@@ -1,6 +1,6 @@
 ---
 name: "news"
-description: "Run the user's AI + Dev news YouTube channel end to end: find today's AI / developer / Hugging Face / GitHub / cloud-security news (verified, scored), propose daily Shorts, a weekly 'This Week in Tech' long video and Big Story videos, write TTS-ready English scripts with sources, then build the video in the channel's light blue + black look (real screenshots with highlights, press photos, typed code, stamps, arrows, counters, own music + sound cues) as HyperFrames index.html + bgm.m4a synced to the user's TTS audio, plus thumbnails and YouTube text. Use when the user says news / news skill, 'aaj ka kya hai', asks for today's or this week's tech / AI news, a news Short, a weekly or Big Story video, or a news thumbnail."
+description: "Run the user's AI + Dev news YouTube channel end to end: find today's AI / developer / Hugging Face / GitHub / cloud-security news (verified, scored), propose daily Shorts, a weekly 'This Week in Tech' long video and Big Story videos, write TTS-ready English scripts with sources, then build the video in the channel's dark navy + blue look (real screenshots with highlights, press photos, typed code, stamps, arrows, counters, own music + sound cues) as HyperFrames index.html + bgm.m4a synced to the user's TTS audio, plus thumbnails and YouTube text. Use when the user says news / news skill, 'aaj ka kya hai', asks for today's or this week's tech / AI news, a news Short, a weekly or Big Story video, or a news thumbnail."
 ---
 
 # NEWS: the AI + Dev news channel (research -> script -> video)
@@ -77,7 +77,7 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 - `video.js`: `const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => { sSetup(s); ...parts...; return () => { sBegin(['#s1', ...]); ...beats...; sFinish(); }; } }] };`
 - Scenes: `nlScene(s, 'sN', '')` (no titles in this look). Shorts: 6-9 scenes of 3-8 s. Long: scenes of 6-15 s, build in batches of ~6 scenes.
 - **Parts (look.js)**, all `(par, id, ...)`; text parts are checked for the safe zone:
-  - `sPill(par,id,x,y,txt)` source/date pill · `sHead(par,id,x,y,w,html,fs)` headline (`<b>` blue) · `sTag(par,id,x,y,txt)` section tag · `sSub(par,id,x,y,w,txt)` grey line · `sChip(par,id,x,y,html)` chip (`<b>` blue) · `sCard(par,id,x,y,w,h)` white card · `sBig(par,id,x,y,html,c)` huge number
+  - `sPill(par,id,x,y,txt)` source/date pill · `sHead(par,id,x,y,w,html,fs)` headline (`<b>` light blue `SB.acc`) · `sTag(par,id,x,y,txt)` section tag · `sSub(par,id,x,y,w,txt)` grey line · `sChip(par,id,x,y,html)` chip (`<b>` blue) · `sCard(par,id,x,y,w,h)` white card · `sBig(par,id,x,y,html,c)` huge number
   - `sPhoto(par,id,x,y,w,h,src,credit,pos)` + `KB(id,t,d,{s,x,y},{s,x,y})` slow zoom/pan (always move photos)
   - `sShot(par,id,x,y,w,src,url,nw,nh,vh)` screenshot card (nw/nh = image pixels, vh = visible height) -> `el.hl(hid,px,py,pw,ph)` + `SHL(hid,t)` highlight sweep, `SZOOM(id,t,d,s0,s1,y0,y1)`
   - `sStamp(par,id,cx,y,txt,c,rot,fs)` + `STAMP(id,t)` slam stamp (red for problems)

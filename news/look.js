@@ -1,53 +1,54 @@
-// ===================== LOOK: AI + Dev news channel, light "Clean Blue" (blue + black only). Shorts 1080x1920 and long 1920x1080. =====================
+// ===================== LOOK: AI + Dev news channel, dark "Night Blue" (navy-black + blue, decided 23 Oct 2026). Shorts 1080x1920 and long 1920x1080. =====================
 // Loads AFTER news.js (build.py): news.js is only the ENGINE here (D, nlScene, nlStart, NEXT, CUE, nlBox, nlType/TYPE, COUNT...). Its old neon parts are banned by build.py.
 // This file sets the look, the scene cut (hard cut + punch-in) and the end card. No intro: the hook is on screen from frame 0. FW/FH = frame size (premium.js).
 // build:  sSetup(s)  ->  nlScene(s, 'sN', '') per idea      beats: sBegin(['#s1', ...]) FIRST -> NEXT('#sN', 'first words') -> sFinish() LAST
 // Shorts safe zones: text above y 1590, and left of x 940 below y 900 (Shorts buttons / title). Text parts carry class 'stxt' so check.js can see them.
 // Long videos: keep 60 px from every edge.
-const SB = { bg: '#F5F8FA', ink: '#0F172A', soft: '#5B6678', card: '#FFFFFF', line: '#E2E8F0', blue: '#2563EB', tint: '#E3ECFF', red: '#E11D48', hl: 'rgba(37,99,235,.22)' };
+// acc = lighter blue for accent TEXT on the dark bg (headline <b>, tags, pills); blue = fills, highlights, buttons. dark = ink colour for text drawn on white (real screenshots, white labels).
+const SB = { bg: '#070B14', ink: '#F1F5F9', soft: '#94A3B8', card: '#111A2B', line: '#24324A', blue: '#3B82F6', acc: '#60A5FA', tint: '#1B2B4D', red: '#E11D48', hl: 'rgba(59,130,246,.35)', dark: '#0F172A' };
 const SHEAD = "'Inter Tight',Inter,sans-serif", SBODY = "Inter,'Helvetica Neue',sans-serif", SMONO = "'JetBrains Mono','DejaVu Sans Mono',monospace";
-const SBG = `radial-gradient(900px 700px at 100% 0%,#E3ECFF 0%,transparent 60%),radial-gradient(900px 800px at 0% 100%,#EEF2F7 0%,transparent 60%),${SB.bg}`;
+const SBG = `radial-gradient(900px 700px at 100% 0%,#13244A 0%,transparent 60%),radial-gradient(900px 800px at 0% 100%,#0E1626 0%,transparent 60%),${SB.bg}`;
 
 function sSetup(s) {
   nlInit(s);
   const css = document.createElement('style'); css.textContent = `
   #root{background:${SBG}!important;font-family:${SBODY}}
   .nttl{display:none!important}
-  .spill{position:absolute;display:flex;gap:14px;align-items:center;font:800 32px ${SBODY};letter-spacing:2px;color:${SB.blue};background:${SB.tint};border-radius:999px;padding:14px 28px;white-space:nowrap}
+  .spill{position:absolute;display:flex;gap:14px;align-items:center;font:800 32px ${SBODY};letter-spacing:2px;color:#93B4FF;background:#13244A;border-radius:999px;padding:14px 28px;white-space:nowrap}
   .spill i{width:14px;height:14px;border-radius:50%;background:${SB.blue}}
   .shead{position:absolute;font:800 100px/1.0 ${SHEAD};letter-spacing:-3px;color:${SB.ink}}
-  .shead b{color:${SB.blue};font-weight:800}
-  .stag{position:absolute;font:800 32px ${SBODY};letter-spacing:4px;color:${SB.blue};white-space:nowrap}
+  .shead b{color:${SB.acc};font-weight:800}
+  .stag{position:absolute;font:800 32px ${SBODY};letter-spacing:4px;color:${SB.acc};white-space:nowrap}
   .ssub{position:absolute;font:600 40px/1.25 ${SBODY};color:${SB.soft}}
-  .schip{position:absolute;display:flex;gap:16px;align-items:center;background:${SB.card};border:2px solid ${SB.line};border-radius:22px;padding:18px 28px;font:700 40px ${SBODY};color:${SB.ink};box-shadow:0 12px 28px -16px rgba(15,23,42,.35);white-space:nowrap}
-  .schip b{color:${SB.blue}}
-  .scard{position:absolute;background:${SB.card};border:2px solid ${SB.line};border-radius:36px;box-shadow:0 30px 70px -30px rgba(15,23,42,.4)}
-  .sshot{position:absolute;background:${SB.card};border-radius:30px;overflow:hidden;box-shadow:0 34px 70px -24px rgba(15,23,42,.35),0 0 0 8px #fff}
-  .sshot .bar{height:58px;display:flex;align-items:center;gap:10px;padding:0 22px;border-bottom:2px solid ${SB.line};font:600 24px ${SBODY};color:${SB.soft};white-space:nowrap;background:#F8FAFC}
-  .sshot .bar i{width:13px;height:13px;border-radius:50%;background:#CBD5E1}
+  .schip{position:absolute;display:flex;gap:16px;align-items:center;background:${SB.card};border:2px solid ${SB.line};border-radius:22px;padding:18px 28px;font:700 40px ${SBODY};color:${SB.ink};box-shadow:0 12px 28px -16px rgba(0,0,0,.8);white-space:nowrap}
+  .schip b{color:${SB.acc}}
+  .scard{position:absolute;background:${SB.card};border:2px solid ${SB.line};border-radius:36px;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)}
+  .sshot{position:absolute;background:${SB.card};border-radius:30px;overflow:hidden;box-shadow:0 34px 70px -24px rgba(0,0,0,.7),0 0 0 6px #1B2740}
+  .sshot .bar{height:58px;display:flex;align-items:center;gap:10px;padding:0 22px;border-bottom:2px solid ${SB.line};font:600 24px ${SBODY};color:${SB.soft};white-space:nowrap;background:#0F1828}
+  .sshot .bar i{width:13px;height:13px;border-radius:50%;background:#334155}
   .sshot .vp{position:relative;overflow:hidden}
   .sshot .im{position:absolute;left:0;top:0;transform-origin:50% 0%}
   .sshot .im img{display:block;width:100%}
   .shl{position:absolute;border-radius:6px;background:${SB.hl};border-bottom:5px solid ${SB.blue};transform-origin:0 50%}
   .sstamp{position:absolute;display:flex;justify-content:center;width:0}
-  .sstamp span{display:inline-block;white-space:nowrap;font:900 88px ${SHEAD};letter-spacing:-1px;padding:10px 30px;border:9px solid currentColor;border-radius:18px;background:rgba(255,255,255,.92)}
+  .sstamp span{display:inline-block;white-space:nowrap;font:900 88px ${SHEAD};letter-spacing:-1px;padding:10px 30px;border:9px solid currentColor;border-radius:18px;background:rgba(7,11,20,.88)}
   .sbig{position:absolute;font:900 240px/1 ${SHEAD};letter-spacing:-8px;color:${SB.ink};white-space:nowrap}
-  .scode{position:absolute;background:#0F172A;border-radius:28px;padding:34px 40px;box-shadow:0 30px 70px -30px rgba(15,23,42,.6)}
+  .scode{position:absolute;background:#0B1222;border:2px solid ${SB.line};border-radius:28px;padding:34px 40px;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)}
   .scode .scl{font:600 40px/1.5 ${SMONO};color:#E2E8F0;white-space:pre;height:60px}
   .scode .sch{visibility:hidden}
   .scode .scl.hl{color:#93B4FF}
-  .sphoto{position:absolute;border-radius:30px;overflow:hidden;background:#CBD5E1;box-shadow:0 34px 70px -24px rgba(15,23,42,.35),0 0 0 8px #fff}
+  .sphoto{position:absolute;border-radius:30px;overflow:hidden;background:#1B2740;box-shadow:0 34px 70px -24px rgba(0,0,0,.7),0 0 0 6px #1B2740}
   .sphoto img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;display:block}
-  .scr{position:absolute;right:16px;bottom:14px;font:600 28px ${SBODY};color:#fff;background:rgba(0,0,0,.45);padding:4px 14px;border-radius:10px}
-  .stable{position:absolute;background:${SB.card};border:2px solid ${SB.line};border-radius:32px;box-shadow:0 30px 70px -30px rgba(15,23,42,.4)}
+  .scr{position:absolute;right:16px;bottom:14px;font:600 30px ${SBODY};color:#fff;background:rgba(0,0,0,.55);padding:4px 14px;border-radius:10px}
+  .stable{position:absolute;background:${SB.card};border:2px solid ${SB.line};border-radius:32px;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)}
   .srow{display:flex;justify-content:space-between;align-items:center;gap:30px;padding:26px 40px;border-bottom:2px solid ${SB.line};font:600 40px ${SBODY};color:${SB.soft};white-space:nowrap}
   .srow:last-child{border-bottom:0}
   .srow b{font:800 44px ${SBODY};color:${SB.ink}}
-  .squote{position:absolute;background:#F1F5FF;border:2px solid ${SB.line};border-radius:32px;padding:40px 46px;box-shadow:0 30px 70px -30px rgba(15,23,42,.4)}
+  .squote{position:absolute;background:${SB.card};border:2px solid ${SB.line};border-radius:32px;padding:40px 46px;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)}
   .squote .q{font:800 60px/1.12 ${SHEAD};letter-spacing:-1px;color:${SB.ink}}
   .squote .w{font:600 30px ${SBODY};color:${SB.soft};margin-top:20px}
   .smk{position:relative;display:inline-block}
-  .smk .smb{position:absolute;left:-6px;right:-6px;bottom:6px;height:38%;background:#C7D7FE;border-radius:6px;transform-origin:0 50%}
+  .smk .smb{position:absolute;left:-6px;right:-6px;bottom:6px;height:38%;background:#1E40AF;border-radius:6px;transform-origin:0 50%}
   .smk .smt{position:relative}`;
   document.head.appendChild(css); sEnd(); return s;
 }
@@ -117,7 +118,7 @@ function nlNext(sel, phrase) { const t = go(phrase); tl.set(NLCUR, { autoAlpha: 
 // ---------- end card (END .. END+TAIL) ----------
 function sEnd() { const e = D(stage, '', `position:absolute;inset:0;z-index:30;background:${SBG}`, 'sE');
   const V = FH > FW, top = V ? 620 : 300;
-  D(e, 'MERGE REPORT', `position:absolute;left:0;right:0;top:${top - 90}px;text-align:center;font:800 40px ${SBODY};letter-spacing:8px;color:${SB.blue}`, 'sEn');
+  D(e, 'MERGE REPORT', `position:absolute;left:0;right:0;top:${top - 90}px;text-align:center;font:800 40px ${SBODY};letter-spacing:8px;color:${SB.acc}`, 'sEn');
   D(e, V ? 'New AI &amp; dev news<br>every day' : 'New AI &amp; dev news every day', `position:absolute;left:70px;right:70px;top:${top}px;text-align:center;font:800 104px/1.02 ${SHEAD};letter-spacing:-3px;color:${SB.ink}`, 'sEt');
   D(e, `<span style="display:inline-block;background:${SB.blue};color:#fff;font:800 48px ${SBODY};padding:24px 60px;border-radius:999px;box-shadow:0 18px 34px -14px ${SB.blue}">${V ? 'Follow' : 'Subscribe'}</span>`, `position:absolute;left:0;right:0;top:${top + (V ? 280 : 170)}px;text-align:center`, 'sEb'); return e; }
 function sEndBeats() { const t = END + .05; tl.set('#sE', { autoAlpha: 0 }, 0); tl.set('#sE', { autoAlpha: 1 }, t); tl.fromTo(['#sEn', '#sEt'], { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .4, ease: 'power3.out', stagger: .08 }, t); POP('#sEb', t + .35); PULSE('#sEb', t + 1.1, { s: 1.06 }); tl.set({}, {}, END + TAIL); }
@@ -129,9 +130,9 @@ const SCAPS = [];
 function sCaptions(text, y = 1390) {
   const css = document.createElement('style'); css.textContent = `
   .scapk{position:absolute;left:0;right:0;top:0;text-align:center}
-  .scapc{display:inline-block;max-width:870px;background:${SB.card};border:2px solid ${SB.line};border-radius:28px;padding:14px 34px 18px;box-shadow:0 18px 40px -18px rgba(15,23,42,.45);font:800 68px/1.15 ${SHEAD};letter-spacing:-1px;color:${SB.ink};white-space:nowrap}
+  .scapc{display:inline-block;max-width:870px;background:${SB.card};border:2px solid ${SB.line};border-radius:28px;padding:14px 34px 18px;box-shadow:0 18px 40px -18px rgba(0,0,0,.8);font:800 68px/1.15 ${SHEAD};letter-spacing:-1px;color:${SB.ink};white-space:nowrap}
   .scapw{position:relative;display:inline-block;margin:0 .13em}
-  .scapb{position:absolute;left:0;top:0;color:${SB.blue}}`; document.head.appendChild(css);
+  .scapb{position:absolute;left:0;top:0;color:${SB.acc}}`; document.head.appendChild(css);
   const toks = text.split(/\s+/).filter(Boolean).map(t => { const m = t.match(/^(.*?)\{(\d+)\}(.*)$/); return m ? [m[1] + m[3], +m[2]] : [t, 1]; });
   const n = toks.reduce((a, [, k]) => a + k, 0);
   if (n !== TW.length) console.error(`LOOK: sCaptions has ${n} spoken words, words.json has ${TW.length}`);

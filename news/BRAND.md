@@ -1,4 +1,4 @@
-# Merge Report: locked decisions for the AI + Dev news channel (updated 21 Oct 2026)
+# Merge Report: locked decisions for the AI + Dev news channel (updated 23 Oct 2026)
 
 Decided with the user. The `news` skill and kit follow this file.
 
@@ -20,16 +20,18 @@ Decided with the user. The `news` skill and kit follow this file.
 - After 1 Nov 2026 (US clock change): one hour later (weekdays 8:30-10:30 pm, weekends 7:30-9:30 pm). UK changes on 25 Oct.
 - News beats perfect timing: never hold a fresh story for hours just to hit the slot.
 
-## Look (light theme "Clean Blue": blue + black only)
+## Look (dark theme "Night Blue", decided 23 Oct 2026; replaces the light "Clean Blue")
 | token | hex | use |
 |---|---|---|
-| bg | `#F5F8FA` | background, soft blue glow `#E3ECFF` top-right, `#EEF2F7` bottom-left |
-| ink | `#0F172A` | headlines, values, everything that is not the accent |
-| soft | `#5B6678` | labels, secondary text |
-| card / line | `#FFFFFF` / `#E2E8F0` | cards, chips, borders, soft shadows |
-| blue | `#2563EB` | the only accent: key word in a headline, pills, numbers, tags, highlights (`#C7D7FE`, tint `#E3ECFF`) |
+| bg | `#070B14` | background (navy-black), soft blue glow `#13244A` top-right, `#0E1626` bottom-left |
+| ink | `#F1F5F9` | headlines, values, everything that is not the accent |
+| soft | `#94A3B8` | labels, secondary text |
+| card / line | `#111A2B` / `#24324A` | cards, chips, captions, code, borders, deep shadows |
+| blue / acc | `#3B82F6` / `#60A5FA` | the only accent. `blue` for fills, highlights, buttons, numbers; `acc` (lighter) for accent TEXT on the dark bg: key word in a headline, tags, chip words, the spoken caption word. Pills: text `#93B4FF` on `#13244A`. Highlight `rgba(59,130,246,.35)`, tint `#1B2B4D` |
 | red | `#E11D48` | problems only: stamps like HACKED, "not for public roads", X marks |
+| dark | `#0F172A` | text drawn on white things (labels on white shapes) |
 
+- Real screenshots stay as they are (white pages in a dark browser card); photos get a thin `#1B2740` frame.
 - Fonts: headlines **Inter Tight** 800-900, body **Inter**, code **JetBrains Mono**.
 - No neon, no mascot, no intro (the hook is on screen from frame 0), no header / footer / progress bar. End card: "New AI & dev news every day" + Follow (Shorts) / Subscribe (long).
 - Shorts safe zone: text above y 1590, and left of x 940 below y 900. Long: 50 px from every edge.
@@ -42,7 +44,7 @@ Decided with the user. The `news` skill and kit follow this file.
 - Big Story: the Short goes out first, the long video the next day; pin the long video's link in the Short's comments.
 
 ## Captions (decided 21 Oct 2026)
-- Shorts have word-by-word captions: 2-4 words at a time, the word being spoken turns blue, Inter Tight 800, dark ink on a white rounded card with a soft shadow. Place them in a fixed band (about y 1380-1540), inside the safe zone; scene layouts keep that band free.
+- Shorts have word-by-word captions: 2-4 words at a time, the word being spoken turns blue, Inter Tight 800, light text on a dark navy rounded card (`#111A2B`, border `#24324A`). Place them in a fixed band (about y 1380-1540), inside the safe zone; scene layouts keep that band free.
 - Long videos: no captions for now (ask the user before adding them).
 
 ## Thumbnails (long videos)

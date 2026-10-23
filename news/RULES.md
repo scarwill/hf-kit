@@ -3,7 +3,7 @@
 `cat ~/nkit/news/RULES.md` before writing each batch. Full decisions: `BRAND.md`.
 
 ## Look
-- Light "Clean Blue": bg #F5F8FA, ink #0F172A, the only accent blue `SB.blue`, red `SB.red` ONLY for problems (HACKED, X, not legal). No neon, no mascot, no intro, no header / footer / progress bar.
+- Dark "Night Blue" (since 23 Oct 2026): bg #070B14, ink #F1F5F9, card #111A2B, the only accent blue `SB.blue` (fills) / `SB.acc` (accent text), text on white shapes `SB.dark`, red `SB.red` ONLY for problems (HACKED, X, not legal). No neon, no mascot, no intro, no header / footer / progress bar.
 - Headlines `sHead` (Inter Tight 800, `<b>` = blue word). Shorts: 90-120 px. Long: 100-130 px. Body >= 30 px (Shorts) / 28 px (long), labels >= 30 / 28 px.
 - Shorts safe zone: every text part above y 1590, and left of x 940 below y 900 (check.js SAFE). Long: 50 px from every edge.
 
