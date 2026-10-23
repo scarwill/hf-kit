@@ -2,7 +2,7 @@
 // Build:  python3 ~/hf-kit/light/lbuild.py video.js audio.m4a      (lint + phrase check + build; cats premium.js + life.js + this + video.js, HEAD 2.6 / TAIL 3.6)
 // Look:   navy-black bg + navy glow on top, NO grid, glowing windows/chips, mono labels. Titles = Space Grotesk, body = Inter, code/labels = JetBrains Mono.
 // Colour = meaning (never decoration):  DATA green · MODEL blue · OUTPUT yellow · ERROR pink · ACCENT purple = ONLY the <b> word in a title.
-// Host: the Model ORB, always in the same bottom-right corner (cOrb), eyes fixed up-left. The caret types only in intro/outro and inside a scene's own window.
+// Host: the Model ORB, always in the same bottom-right corner (cOrb), eyes rest up-left; it blinks every ~3 s and looks into the camera now and then (automatic, nlOrbLife). The caret types only in intro/outro and inside a scene's own window.
 // RULE #1: SHOW, DON'T WRITE. Every scene has a moving visual (net, curve, matrix, dots, loop, code...). Text = 1-4 word labels. Voice says the sentences.
 const NL = { bg: '#05070d', data: '#34e0b0', model: '#6cc8ff', out: '#ffcc4d', err: '#ff6b81', acc: '#b48cff', ink: '#eef2f6', dim: '#8e9aae', line: 'rgba(255,255,255,.09)' };
 const NLMONO = "'JetBrains Mono','DejaVu Sans Mono',monospace", NLHEAD = "'Space Grotesk',Inter,sans-serif", NLBODY = "Inter,'Space Grotesk',sans-serif";
@@ -79,8 +79,10 @@ function nlOrb(par, id, cx, cy, r = 120, c = NL.model) {
   const C = S('g', { id: id + 'C', opacity: 0 }, v); [-1, 1].forEach(sd => S('path', { d: `M${o + sd * r * .3 - r * .09} ${o - r * .02} Q${o + sd * r * .3} ${o + r * .06} ${o + sd * r * .3 + r * .09} ${o - r * .02}`, stroke: '#fff', 'stroke-width': Math.max(2, r * .04), fill: 'none', 'stroke-linecap': 'round' }, C));
   return e;
 }
-// orb beats (all add a beat): assemble with eyes opening / blink / think (nodes ripple) / bounce / surprised / sleep.  No ORB_LOOK: the eyes stay fixed up-left.
+// orb beats (all add a beat): assemble with eyes opening / blink / think (nodes ripple) / bounce / surprised / sleep / ORB_CAM (look into the camera).  No ORB_LOOK: the eyes rest up-left.
 function ORB_ON(id, t) { B(t); tl.set('#' + id, { autoAlpha: 1 }, t); tl.set('#' + id + 'E', { autoAlpha: 0 }, t); tl.fromTo('.' + id + 'n', { scale: 0, transformOrigin: '50% 50%' }, { scale: 1, duration: .25, stagger: .006 }, t); tl.fromTo(['#' + id + 'l', '#' + id + 'g'], { opacity: 0 }, { opacity: 1, duration: .4 }, t + .3); tl.set('#' + id + 'E', { autoAlpha: 1 }, t + .7); tl.fromTo('#' + id + 'E', { scaleY: .1, transformOrigin: '50% 50%' }, { scaleY: 1, duration: .15 }, t + .7); return t + .85; }
+// ORB_CAM(id, t, d): eyes turn to the camera (centre) for d seconds with a blink in the middle, then back to their up-left rest
+function ORB_CAM(id, t, d = 1.6) { B(t); TO('#' + id + 'E', t, { x: 0, y: 0, duration: .25, ease: 'power2.out' }); ORB_BLINK(id, t + d * .45); return TO('#' + id + 'E', t + d, { x: -12, y: -7, duration: .3, ease: 'power2.inOut' }); }
 function ORB_BLINK(id, t) { B(t); return tl.to('#' + id + 'E', { scaleY: .1, transformOrigin: '50% 50%', duration: .07, yoyo: true, repeat: 1 }, t); }
 function ORB_THINK(id, t, d = 1.2) { B(t); return tl.to('.' + id + 'n', { scale: 1.7, transformOrigin: '50% 50%', duration: .18, yoyo: true, repeat: 1, stagger: d / 46 }, t); }
 function ORB_BOUNCE(id, t, n = 2) { B(t); return tl.to('#' + id, { y: -16, duration: .22, yoyo: true, repeat: n * 2 - 1, ease: 'sine.inOut' }, t); }
@@ -295,33 +297,94 @@ function nlBegin(scs) {
   NLHL.forEach(h => tl.set('#' + h, { autoAlpha: 0 }, 0));
   CUE(.4, 'type', 13, .05); CUE(1.0, 'blip'); CUE(1.9, 'chime');
 }
+// orb life (automatic, called by nlFinish): in every scene with a corner orb it blinks every 2.6-4.2 s and looks into the camera (ORB_CAM)
+// at 35 % of the scene, again at 75 % in scenes longer than 11 s. Set NL_ORB_LIFE = false in video.js build to switch it off.
+let NL_ORB_LIFE = true;
+function nlOrbLife() { if (!NL_ORB_LIFE) return;
+  NLT.forEach(([sel, t0], i) => { const t1 = i + 1 < NLT.length ? NLT[i + 1][1] : END, o = ORBS.find(([, p]) => '#' + p === sel); if (!o) return; const id = o[0];
+    for (let tb = t0 + 1.4 + rnd(i) * .8; tb < t1 - .6; tb += 2.6 + rnd(i * 7 + tb) * 1.6) ORB_BLINK(id, tb);
+    [.35, .75].forEach((f, k) => { if (!k || t1 - t0 >= 11) ORB_CAM(id, t0 + (t1 - t0) * f); }); }); }
 function nlFinish() {
+  nlOrbLife();
   if (NLCUR !== NLSC[NLSC.length - 1]) console.error(`LIGHT: video ends on ${NLCUR}, not on the last scene ${NLSC[NLSC.length - 1]} (a NEXT is missing)`);
   OUT(NLCUR, END + .1, { d: .3 }); nlOutroBeats(); CUE(END + .2, 'whoosh'); CUE(END + .5, 'type', 18, .045); CUE(END + 2.4, 'down');
 }
 
 // ---- real pages: screenshot inside a browser window + scroll/zoom focus, highlight box, cursor + click ----
-// nlShot(par,id,x,y,w,h,src,url,nw,nh): src = 'assets/<file>.png', nw/nh = the image's real pixel size (python3 -c "from PIL import Image; print(Image.open('assets/x.png').size)").
+// FIRST: python3 ~/hf-kit/light/lfind.py assets/<file>.png  (OCR -> assets/<file>.boxes.json, embedded by lbuild). Highlights and the cursor are placed
+// BY PHRASE from that OCR, never by hand-typed pixels (lbuild refuses numbers in nlShotHL).
+// nlShot(par,id,x,y,w,h,src,url,nw,nh): src = 'assets/<file>.png', nw/nh = the image's real pixel size. Crop the page to the part the voice talks about
+// first (lcheck SMALLSHOT: page text must be >= 9 px tall on screen).
+const NLSHOT = {}; window.__NLFOCUS = [];
 function nlShot(par, id, x, y, w, h, src, url, nw, nh) {
   const e = nlWin(par, id, x, y, w, h, NL.model, url), vh = h - 50, ih = Math.round(w * nh / nw);
   const vp = D(e, '', `position:absolute;left:0;top:50px;width:${w}px;height:${vh}px;overflow:hidden;background:#0d1117`, id + 'vp');
   D(vp, `<img src="${src}" style="width:${w}px;height:${ih}px;display:block">`, `position:absolute;left:0;top:0;width:${w}px;height:${ih}px;transform-origin:0 0`, id + 'im');
-  e.dataset.vw = w; e.dataset.vh = vh; e.dataset.ih = ih; return e;
+  e.dataset.vw = w; e.dataset.vh = vh; e.dataset.ih = ih; e.dataset.src = src; e.classList.add('nshot');
+  if (typeof NLBOXES === 'undefined' || !NLBOXES[src]) console.error(`LIGHT: nlShot('${id}') ${src} has no OCR boxes - run: python3 ~/hf-kit/light/lfind.py ${src}`);
+  else if (NLBOXES[src].w !== nw || NLBOXES[src].h !== nh) console.error(`LIGHT: nlShot('${id}') nw/nh ${nw}x${nh} but ${src} is ${NLBOXES[src].w}x${NLBOXES[src].h}`);
+  NLSHOT[id] = { src, k: w / nw, vw: w, vh, ih, f: [] }; return e;
 }
 // SHOT_FOCUS(id,t,px,py,s,d): bring image point (px,py) (px of the image as shown at scale 1) to the centre of the window at zoom s. s=1 = plain scroll.
+// Use nlShotXY(id, 'phrase') for px,py. lcheck CUTTEXT fails when a zoom/scroll leaves a word cut by the window edge.
 function SHOT_FOCUS(id, t, px, py, s = 1, d = 1.1) {
   const e = document.getElementById(id), vw = +e.dataset.vw, vh = +e.dataset.vh, ih = +e.dataset.ih;
   const x = Math.min(0, Math.max(vw - vw * s, vw / 2 - px * s)), y = Math.min(0, Math.max(vh - ih * s, vh / 2 - py * s));
+  if (NLSHOT[id]) NLSHOT[id].f.push([t, t + d, x, y, s]); window.__NLFOCUS.push([id, t, t + d]);
   return TO('#' + id + 'im', t, { x, y, scale: s, duration: d, ease: 'power2.inOut' });
 }
-// highlight box on the image (moves with scroll/zoom). Hidden at 0 automatically; POP('#hid', t) to show.
+// phrase -> box in ORIGINAL image px from the OCR words. 'A B C' = these words in a row on one OCR line; 'A..B' = from A to B on the same row
+// (a table row: 'E2D2..64'). o.n = which match (1 = top-most) when the phrase occurs more than once. Exact match only; when OCR misread the
+// word (dark pages: 'ncm' -> 'nem') the error shows what OCR read: pass { fuzzy: true } to accept 1-letter slips (2 for 8+ letters).
+const NLNZ = s => s.toLowerCase().replace(/[^a-z0-9.%]/g, '');
+function nlLev(a, b) { if (Math.abs(a.length - b.length) > 2) return 9; let p = [...Array(b.length + 1).keys()];
+  for (let i = 1; i <= a.length; i++) { const c = [i]; for (let j = 1; j <= b.length; j++) c.push(Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] !== b[j - 1]))); p = c; } return p[b.length]; }
+function nlHits(W, ph, fz) {
+  const same = (w, q) => w === q || (fz && q.length >= 3 && nlLev(w, q) <= (q.length >= 8 ? 2 : 1));
+  const dd = bs => { const o = []; bs.forEach(b => { if (!o.some(c => { const ix = Math.max(0, Math.min(b[0] + b[2], c[0] + c[2]) - Math.max(b[0], c[0])), iy = Math.max(0, Math.min(b[1] + b[3], c[1] + c[3]) - Math.max(b[1], c[1])); return ix * iy / (b[2] * b[3] + c[2] * c[3] - ix * iy) > .5; })) o.push(b); }); return o.sort((a, b) => Math.round(a[1] / 8) - Math.round(b[1] / 8) || a[0] - b[0]); };
+  if (ph.includes('..')) { const [a, b] = ph.split('..').map(x => x.trim()), out = [];
+    nlHits(W, a, fz).forEach(A => { const c = nlHits(W, b, fz).filter(B => B[0] > A[0] && Math.abs(A[1] + A[3] / 2 - B[1] - B[3] / 2) < Math.max(A[3], B[3]) * .6).sort((p, q) => p[0] - q[0]);
+      if (c.length) { const B = c[0], x0 = Math.min(A[0], B[0]), y0 = Math.min(A[1], B[1]); out.push([x0, y0, Math.max(A[0] + A[2], B[0] + B[2]) - x0, Math.max(A[1] + A[3], B[1] + B[3]) - y0, A[4] + ' .. ' + B[4]]); } }); return dd(out); }
+  const q = ph.split(/\s+/).map(NLNZ).filter(Boolean), out = [];
+  for (let i = 0; i < W.length; i++) { if (!same(NLNZ(W[i][0]), q[0])) continue; const seq = [W[i]];
+    for (let j = i + 1; seq.length < q.length && j < W.length && W[j][5] === W[i][5]; j++) { const n = NLNZ(W[j][0]); if (same(n, q[seq.length])) seq.push(W[j]); else if (n) break; }
+    if (seq.length === q.length) { const x0 = Math.min(...seq.map(s => s[1])), y0 = Math.min(...seq.map(s => s[2])); out.push([x0, y0, Math.max(...seq.map(s => s[1] + s[3])) - x0, Math.max(...seq.map(s => s[2] + s[4])) - y0, seq.map(s => s[0]).join(' ')]); } }
+  return dd(out);
+}
+// box of a phrase in DISPLAY px of the shot at scale 1 (what nlShotHL / SHOT_FOCUS use). Errors (LIGHT: HLMISS ...) when it is not found or ambiguous.
+function nlShotBox(id, ph, o = {}) { const S0 = NLSHOT[id]; if (!S0 || typeof NLBOXES === 'undefined' || !NLBOXES[S0.src]) return null;
+  const W = NLBOXES[S0.src].words; let h = nlHits(W, ph, false);
+  if (!h.length) { h = nlHits(W, ph, true); if (h.length && !o.fuzzy) { console.error(`LIGHT: HLMISS "${ph}" not on the page; OCR only has "${h.map(b => b[4]).join('" / "')}" - if that IS the text (OCR misread it) pass { fuzzy: true }, else fix the phrase`); return null; } }
+  if (!h.length) { console.error(`LIGHT: HLMISS "${ph}" not found in ${S0.src} - check: python3 ~/hf-kit/light/lfind.py ${S0.src} "${ph}"`); return null; }
+  if (h.length > 1 && !o.n) { console.error(`LIGHT: HLMISS "${ph}" occurs ${h.length}x in ${S0.src} - pass { n: 1..${h.length} } (1 = top-most) or a longer phrase / 'A..B'`); return null; }
+  const b = h[Math.min(h.length, o.n || 1) - 1]; return b.slice(0, 4).map(v => v * S0.k);
+}
+// centre of a phrase (display px) -> for SHOT_FOCUS(id, t, ...nlShotXY(id, 'phrase'), s)
+function nlShotXY(id, ph, o = {}) { const b = nlShotBox(id, ph, o); return b ? [b[0] + b[2] / 2, b[1] + b[3] / 2] : [0, 0]; }
+// highlight box around a phrase (moves with scroll/zoom). Hidden at 0 automatically; POP('#hid', t) to show.  nlShotHL(shot, hid, 'phrase', colour, { n, pad })
 const NLHL = [];
-const nlShotHL = (id, hid, px, py, w, h, c = NL.out) => { NLHL.push(hid); return D(document.getElementById(id + 'im'), '', `position:absolute;left:${px}px;top:${py}px;width:${w}px;height:${h}px;border:4px solid ${c};border-radius:10px;box-shadow:0 0 22px ${c},inset 0 0 18px ${c}55`, hid); };
-// mouse cursor: nlCursor(par,id,x,y) ; CURSOR(id,t,x,y,d) moves its tip to (x,y) ; CLICK(id,t) ring + press. Show it with nlShow('#id', t).
+const nlShotHL = (id, hid, ph, c = NL.out, o = {}) => { NLHL.push(hid);
+  if (typeof ph !== 'string') { console.error(`LIGHT: nlShotHL('${id}', '${hid}', ...) needs a phrase from the page, not pixel numbers`); return null; }
+  const b = nlShotBox(id, ph, o) || [0, 0, 0, 0], pd = o.pad ?? 6;
+  return D(document.getElementById(id + 'im'), '', `position:absolute;left:${b[0] - pd}px;top:${b[1] - pd}px;width:${b[2] + 2 * pd}px;height:${b[3] + 2 * pd}px;border:4px solid ${c};border-radius:10px;box-shadow:0 0 22px ${c},inset 0 0 18px ${c}55`, hid); };
 function nlCursor(par, id, x, y) {
   const e = D(par, `<svg width="44" height="54" viewBox="0 0 22 27"><path d="M2 2 L2 22 L7.5 17 L11 25 L14.5 23.5 L11 15.5 L18 15.5 Z" fill="#fff" stroke="#05070d" stroke-width="1.6" stroke-linejoin="round"/></svg>`, `position:absolute;left:${x - 4}px;top:${y - 4}px;width:44px;height:54px;z-index:6;filter:drop-shadow(0 4px 6px #000)`, id);
   D(par, '', `position:absolute;left:${x - 22}px;top:${y - 22}px;width:44px;height:44px;border-radius:50%;border:3px solid ${NL.out};z-index:5`, id + 'r');
-  NLHL.push(id + 'r'); e.dataset.x = x; e.dataset.y = y; return e;
+  NLHL.push(id + 'r'); (window.__NLCURS = window.__NLCURS || []).push(id); e.dataset.x = x; e.dataset.y = y; return e;
 }
 function CURSOR(id, t, x, y, d = .8) { const e = document.getElementById(id), dx = x - +e.dataset.x, dy = y - +e.dataset.y; TO(['#' + id, '#' + id + 'r'], t, { x: dx, y: dy, duration: d, ease: 'power2.inOut' }); return t + d; }
 function CLICK(id, t) { B(t); CUE(t, 'blip'); tl.fromTo('#' + id + 'r', { autoAlpha: 1, scale: .3 }, { autoAlpha: 0, scale: 1.6, duration: .45, ease: 'power2.out' }, t); tl.to('#' + id, { scale: .85, duration: .08, yoyo: true, repeat: 1, transformOrigin: '10% 10%' }, t); return t + .45; }
+// offset of element el inside ancestor anc (layout px, borders included)
+function nlOff(el, anc) { let x = 0, y = 0, e = el; while (e && e !== anc) { x += e.offsetLeft; y += e.offsetTop; e = e.offsetParent; if (e && e !== anc) { x += e.clientLeft; y += e.clientTop; } } return [x, y]; }
+// CURSOR_TO(cur, shot, 'phrase', t, d, {n}): moves the cursor tip onto the phrase in a screenshot. Knows the shot's zoom/scroll at the arrival
+// time (SHOT_FOCUS calls made BEFORE this line), so never compute cursor pixels by hand. Errors when the phrase is not visible then.
+function CURSOR_TO(id, shot, ph, t, d = .8, o = {}) { const S0 = NLSHOT[shot], b = nlShotBox(shot, ph, o); if (!S0 || !b) return t + d;
+  const ta = t + d; let st = [0, 0, 1]; S0.f.forEach(([t0, , x, y, s]) => { if (t0 <= ta + .01) st = [x, y, s]; });
+  const vx = st[0] + (b[0] + b[2] / 2) * st[2], vy = st[1] + (b[1] + b[3] * .55) * st[2];
+  if (vx < 4 || vy < 4 || vx > S0.vw - 4 || vy > S0.vh - 4) console.error(`LIGHT: CURSOR_TO('${id}') "${ph}" is outside the visible part of ${shot} at ${ta.toFixed(1)}s`);
+  const [ox, oy] = nlOff(document.getElementById(shot + 'vp'), document.getElementById(id).parentElement);
+  return CURSOR(id, t, ox + vx, oy + vy, d); }
+// a row of 'words' (rounded bars) for drawn pages / documents: from x0 to x1 inside an svg group g. Every bar ENDS at or before x1
+// (the last one is cut to fit, a stub < 16 px is dropped). Use this for every text-like line in a drawing (lcheck SVGOUT catches spills).
+function nlWords(g, x0, x1, y, h, seed, wmin = 24, wvar = 60, gap = 12, cls = null, c = NL.ink) { let x = x0;
+  while (x1 - x >= 16) { const w = Math.min(wmin + rnd(seed + x) * wvar, x1 - x); const at = { x, y, width: w, height: h, rx: h / 2, fill: c, opacity: .85 }; if (cls) at.class = cls; S('rect', at, g); x += w + gap; } }

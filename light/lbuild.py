@@ -2,6 +2,7 @@
 # LIGHT build:  python3 ~/hf-kit/light/lbuild.py video.js <audio e.g. talk.m4a> [index.html] [--no-bgm] [--force]
 # Run in the folder that has words.json + meta.json (align.py). LONG 1920x1080 only.
 # 1. LINT    banned helpers (other looks, nlOrb, nlCmd, ORB_LOOK, nlNext, house helpers pasted again) -> ERROR
+#            SHOTPX (nlShotHL with pixel numbers) / NOBOXES (nlShot image without lfind.py OCR boxes) -> ERROR
 # 2. PHRASES every go / NEXT / W phrase is checked against words.json scene by scene (NEXT knows the scene starts):
 #            NOTFOUND, SCENE START NOT AFTER THE PREVIOUS ONE, OUTSIDE (W fires in a later scene) -> ERROR ; AMBIGUOUS (phrase occurs again in the scene) -> WARN
 # 3. BUILD   premium.js + life.js + light.js + video.js + kit.js into template.html; adds the bgm track (assets/bgm.m4a) unless --no-bgm.
@@ -22,7 +23,7 @@ E = lambda m: err.append(m); Wn = lambda m: warn.append(m)
 BAN = {r'k[A-Z]\w*|chat|pill|card|bubble|charB|charP|botB|botP|person|wtext|useTheme|ic|ico': 'other looks (Kurz / Infographics) - Light uses nl* parts only',
        r'nlOrb': 'use cOrb(scene, id) - the orb is always in the bottom-right corner',
        r'nlCmd': 'no bottom-left narrator line in Light',
-       r'ORB_LOOK': 'the orb eyes stay fixed up-left',
+       r'ORB_LOOK': 'no free eye direction - the eyes rest up-left, the kit adds blinks and camera looks (ORB_CAM)',
        r'nlNext': "use NEXT('#sN', 'first words') - it adds the whoosh cue and the scene checks",
        r'nlInit|nlIntro|nlOutro': 'use nlSetup(s) once at the top of build',
        r'nlStart|nlIntroBeats|nlOutroBeats|houseBeats|houseEnd|houseStart': 'use nlBegin([...]) first and nlFinish() last in beats'}
@@ -39,6 +40,12 @@ for i, l in enumerate(V0.split('\n'), 1):
     for m in re.finditer(r"\b(?:PULSE)\(\s*'#(\w+)'", l2):
         if re.search(r"nlHero\(\s*'" + m.group(1) + "'", V0): E(f'HERO     line {i}: never PULSE the hero #{m.group(1)} (it jumps) - pulse a part inside it')
 src = '\n'.join(code)
+line_of = lambda pos: src.count('\n', 0, pos) + 1
+# screenshots: highlights / cursors by phrase only (OCR boxes from lfind.py), never hand-typed pixels
+for m in re.finditer(r"nlShotHL\(\s*'[^']*'\s*,\s*'[^']*'\s*,\s*-?\d", src): E(f"SHOTPX   line {line_of(m.start())}: nlShotHL with pixel numbers - give the phrase from the page: nlShotHL('shot', 'hl', 'phrase')")
+for m in re.finditer(r"nlShot\([^)]*?'(assets/[^']+\.(?:png|jpg|jpeg|webp))'", src):
+    bx = os.path.splitext(m.group(1))[0] + '.boxes.json'
+    if not os.path.exists(bx): E(f"NOBOXES  line {line_of(m.start())}: {m.group(1)} has no OCR boxes - run: python3 ~/hf-kit/light/lfind.py {m.group(1)}")
 for need, why in (('nlSetup(', 'first line of build'), ('nlBegin(', 'first line of beats'), ('nlFinish(', 'last line of beats')):
     if need not in src: E(f'MISSING  {need}) - {why}')
 
@@ -87,7 +94,12 @@ if err and not FORCE: sys.exit(f'lbuild: {len(err)} errors, {len(warn)} warnings
 # ---------------- 3. build ----------------
 js_src = ''.join(open(os.path.join(V, f), encoding='utf-8').read() + '\n' for f in ('premium.js', 'life.js'))
 js_src += open(os.path.join(K, 'light.js'), encoding='utf-8').read() + '\n' + V0
-js = (f"const VERT=false;\nconst TW={json.dumps(TW, separators=(',', ':'))};\nconst HEAD={HEAD};\nconst END={END};\nconst TAIL={TAIL};\nconst TITLE={json.dumps(M.get('title'))};\n"
+import glob
+BOXES = {}
+for bf in glob.glob('assets/*.boxes.json'):
+    for ext in ('.png', '.jpg', '.jpeg', '.webp'):
+        if os.path.exists(bf[:-11] + ext): BOXES[bf[:-11] + ext] = json.load(open(bf))
+js = (f"const VERT=false;\nconst NLBOXES={json.dumps(BOXES, separators=(',', ':'))};\nconst TW={json.dumps(TW, separators=(',', ':'))};\nconst HEAD={HEAD};\nconst END={END};\nconst TAIL={TAIL};\nconst TITLE={json.dumps(M.get('title'))};\n"
       + js_src + "\n" + open(os.path.join(V, 'kit.js'), encoding='utf-8').read())
 h = open(os.path.join(V, 'template.html'), encoding='utf-8').read()
 h = h.replace('family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700',

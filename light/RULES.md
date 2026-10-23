@@ -9,9 +9,15 @@ Long videos go wrong when these get forgotten halfway. `cat ~/lkit/light/RULES.m
 - When the voice talks ABOUT a text (prompt, command, query, error, code, formula, URL, name), show that exact text: typed in a window (`nlType` + `TYPE`), as code (`nlCode`), as a highlighted row (`nlRow` + `nlRowHL`), or big (`nlBig`).
 
 ## Orb (host)
-- `cOrb(scene, 'oN')` in every scene except the LAST. `ORB_ON('oN', t)` at the scene start. Same corner always; the kit fixes size, place and eyes.
+- `cOrb(scene, 'oN')` in every scene except the LAST. `ORB_ON('oN', t)` at the scene start. Same corner always; the kit fixes size and place, and makes it blink every ~3 s and look into the camera once or twice per scene (`nlOrbLife`). Extra beats: `ORB_THINK` / `ORB_WOW` / `ORB_BOUNCE` / `ORB_CAM`.
 - Never `nlOrb`, `ORB_LOOK`, `nlCmd`. Keep x < 1700 or y < 870 free of windows/chips (the orb corner).
 - "The model / the agent" as an object in the middle = `nlWin` + `nlNet`, not the orb.
+
+## Real pages (screenshots) - where the user found the most mistakes
+- Crop the page to the part the voice talks about, BETWEEN rows/columns. Then `python3 ~/lkit/light/lfind.py assets/x.png` (OCR boxes; `EDGE:` = the crop cut words -> crop again).
+- Highlights and cursors BY PHRASE only: `nlShotHL(shot, 'hl', 'the words')`, table row `'A..B'`, `CURSOR_TO(cur, shot, 'the words', t)`. Never pixel numbers (lbuild SHOTPX). HLMISS = phrase not on the page / ambiguous / OCR slip -> read the error, fix the phrase, `{ n }` or `{ fuzzy: true }` only after checking.
+- Prefer a crop over a zoom. Any zoom must leave lcheck CUTTEXT clean. SMALLSHOT = text under 9 px -> crop tighter.
+- After every batch with a screenshot: `node ~/lkit/light/lshotcheck.js index.html --from A --to B` and read EVERY `out/pages_NN.png` (full size).
 
 ## Visuals
 - Every scene: at least one MOVING technical visual (net, curve, matrix, dots, loop, code, bars, custom drawing). lcheck NOVISUAL = fix.
@@ -19,7 +25,7 @@ Long videos go wrong when these get forgotten halfway. `cat ~/lkit/light/RULES.m
 - Two scenes in a row never use the same main visual type. Window + rows + chips as the main visual: at most 1 scene in 3.
 - One `nlHero` = the story's main object, glides with `HERO(...)`. Never rebuild it, never `PULSE` it, never `IN` it after a `HERO` move (use `FADE`).
 - Wires: start at the centre of the source edge, end on the target edge, arrowhead `arw(g, x, y, c, 'r'|'l'|'u'|'d')` for flow. Re-check wires after moving a part.
-- Things inside a window/frame fit fully inside it. A moving ball/packet/dot never sits frozen: it moves continuously and lands ON its word.
+- Things inside a window/frame fit fully inside it. Text-like lines in a drawn page = `nlWords(...)` only (lcheck SVGOUT = a drawing spills out of its box). A moving ball/packet/dot never sits frozen: it moves continuously and lands ON its word.
 - Frame never > 75% empty. Fill a scene's first seconds with the coming parts at `{ to: .3 }`, then `TO(..., { autoAlpha: 1 })` on the word.
 
 ## Sync
@@ -38,3 +44,5 @@ Long videos go wrong when these get forgotten halfway. `cat ~/lkit/light/RULES.m
 - Look ONLY at contact sheets (`out/sheet_NN.png`, `out/motion_NN.png`). Never Read single frames.
 - Per batch: 1 lcheck (`--from --to`), its 1-2 sheets, 1 motion sheet per moving thing. Whole video at the end: the full lcheck sheets once.
 - After a fix: `lsheet.js index.html at <fixed times> --name fix` (one sheet), not a full re-check.
+- Screenshots: the full-size `out/pages_NN.png` from lshotcheck too (the small sheets hide a box on the wrong row).
+- **0 warnings is not "done".** The checkers do not see: a box on the right words at the wrong moment, a cursor covering the words being read, typed text that differs from the source, a drawing that is wrong but stays in its box, anything the user complained about before. Look for these yourself before every delivery.

@@ -10,6 +10,9 @@
 //   NOORB    the scene's corner orb is not visible 1.5 s after the scene start (forgot ORB_ON)
 //   NOVISUAL a scene has no drawn visual (svg / net / curve / cells / docs) -> every scene needs one
 //   GAP      > 5 s without any animation beat
+//   CUTTEXT  a screenshot word is cut by its window edge (zoom/scroll/crop cuts through text) -> crop or focus so whole lines show
+//   SMALLSHOT screenshot text under 9 px tall on screen -> crop the page to the part the voice talks about, or zoom
+//   SVGOUT   a drawing (nlBox svg) spills out of its own box (a line / word bar runs past the card or page) -> nlWords, fix sizes
 //   JS       page errors + kit guards (LIGHT: ...) + PHRASE NOT FOUND  -> always fix
 // --from/--to limit the check to a time range (video seconds) = check one batch of scenes.
 // Writes cues.json (sound cues for lmix.py) and contact sheets out/sheet_NN.png (one frame every --every s, 16 per sheet). Look at the SHEETS only.
@@ -27,7 +30,7 @@ require('./lsheet.js').testPage(src, 'nl_test.html'); fs.mkdirSync('out', { recu
   const meta = await p.evaluate(() => ({ end: END, tail: TAIL, head: HEAD, beats: window.__BEATS || [], sc: (typeof NLSC !== 'undefined' ? NLSC : []), nlt: window.__NLT || [], cues: window.__CUES || [], orbs: (typeof ORBS !== 'undefined' ? ORBS : []) }));
   fs.writeFileSync('cues.json', JSON.stringify(meta.cues));
   const W = []; const warn = (t, k, m) => W.push(`${String(t.toFixed(1)).padStart(6)}s  ${k.padEnd(8)} ${m}`);
-  const probe = () => {
+  const probe = (t) => {
     const op = e => { let o = 1; for (let x = e; x && x !== document.body; x = x.parentElement) { const cs = getComputedStyle(x); if (cs.visibility === 'hidden' || cs.display === 'none') return 0; o *= +cs.opacity; } return o; };
     const orbIds = (typeof ORBS !== 'undefined' ? ORBS : []).map(o => o[0]);
     const sc = [...document.querySelectorAll('.nsc')].find(s => op(s) > .5); const R = { sc: sc ? sc.id : null, cov: 0, txt: 0, small: [], out: [], ovf: [], ovl: [], vis: false };
@@ -43,17 +46,30 @@ require('./lsheet.js').testPage(src, 'nl_test.html'); fs.mkdirSync('out', { recu
     for (let i = 0; i < box.length; i++) for (let j = i + 1; j < box.length; j++) { const [a, ra] = box[i], [c, rc] = box[j]; if (a.contains(c) || c.contains(a)) continue;
       const ix = Math.max(0, Math.min(ra.right, rc.right) - Math.max(ra.left, rc.left)), iy = Math.max(0, Math.min(ra.bottom, rc.bottom) - Math.max(ra.top, rc.top)), sm = Math.min(ra.width * ra.height, rc.width * rc.height);
       if (sm > 0 && ix * iy / sm > .15) R.ovl.push((a.id || a.className) + ' x ' + (c.id || c.className)); }
+    const inF = id => (window.__NLFOCUS || []).some(([i, a, b]) => i === id && t > a - .1 && t < b + .1); R.cut = []; R.sshot = []; R.svgout = [];
+    if (typeof NLBOXES !== 'undefined') [...sc.querySelectorAll('.nshot')].filter(e => op(e) > .9 && !inF(e.id)).forEach(e => { const B = NLBOXES[e.dataset.src]; if (!B) return;
+      const ir = document.getElementById(e.id + 'im').getBoundingClientRect(), vr = document.getElementById(e.id + 'vp').getBoundingClientRect(), fx = ir.width / B.w, fy = ir.height / B.h, hs = [];
+      B.words.forEach(([tx, x, y, w, h]) => { if (tx.replace(/[^A-Za-z0-9]/g, '').length < 2) return; const L = ir.left + x * fx, T = ir.top + y * fy, Rr = L + w * fx, Bb = T + h * fy;
+        const inside = L >= vr.left - 1 && Rr <= vr.right + 1 && T >= vr.top - 1 && Bb <= vr.bottom + 1, apart = Rr <= vr.left || L >= vr.right || Bb <= vr.top || T >= vr.bottom;
+        const atEdge = x <= 3 || y <= 3 || x + w >= B.w - 3 || y + h >= B.h - 3;   // touches the image border = the crop itself cut this word
+        if (atEdge && !apart && R.cut.length < 2) { R.cut.push(`${e.id}: "${tx}" cut by the crop of ${e.dataset.src} - crop again between rows`); return; }
+        if (inside) hs.push(h * fy); else if (!apart && R.cut.length < 2) R.cut.push(`${e.id}: "${tx}" cut at the ${L < vr.left ? 'left' : Rr > vr.right ? 'right' : T < vr.top ? 'top' : 'bottom'} edge`); });
+      hs.sort((a, b) => a - b); const md = hs.length ? hs[hs.length >> 1] : 99; if (md < 9) R.sshot.push(`${e.id}: page text ~${md.toFixed(1)} px tall on screen (need >= 9) - crop ${e.dataset.src} or zoom`); });
+    [...sc.querySelectorAll('.nbox > svg')].filter(v => op(v) > .15 && !orbIds.some(o => (v.parentElement.id || '').startsWith(o))).forEach(v => { const w = +v.getAttribute('width'), h = +v.getAttribute('height'); if (!w || !h) return;
+      let bb; try { bb = v.getBBox(); } catch (er) { return; } const sp = Math.max(-bb.x, -bb.y, bb.x + bb.width - w, bb.y + bb.height - h);
+      if (sp > 6) R.svgout.push(`${v.parentElement.id || '?'}: drawing spills ${Math.round(sp)} px out of its ${w}x${h} box`); });
     R.corner = box.filter(([e, r]) => r.right > 1700 && r.bottom > 870).map(([e]) => e.id || e.className);
     const orb = (typeof ORBS !== 'undefined' ? ORBS : []).find(([, p]) => p === sc.id); R.orb = orb ? op(document.getElementById(orb[0] + 'N') || document.getElementById(orb[0])) > .3 : null;
     return R; };
   const seen = {}, scT = {};
   for (let t = Math.max(meta.head + .5, FROM); t < Math.min(meta.end, TO); t += 1) {
-    await p.evaluate(t => window.__timelines.main.seek(t), t); const r = await p.evaluate(probe); if (!r.sc) continue;
+    await p.evaluate(t => window.__timelines.main.seek(t), t); const r = await p.evaluate(probe, t); if (!r.sc) continue;
     (scT[r.sc] = scT[r.sc] || []).push(t); const once = (k, m) => { const key = r.sc + k + m; if (seen[key]) return; seen[key] = 1; warn(t, k, `[${r.sc}] ${m}`); };
     if (r.cov < .25 && t - scT[r.sc][0] > 1.5) warn(t, 'EMPTY', `[${r.sc}] only ${Math.round(r.cov * 100)}% covered`);
     if (r.txt > 110) once('TEXT', `${r.txt} chars on screen`);
     r.small.forEach(s => once('SMALL', s)); r.out.forEach(s => once('OUT', s)); r.ovf.forEach(s => once('OVERFLOW', s)); r.ovl.forEach(s => once('OVERLAP', s));
     if (!r.vis) once('NOVISUAL', 'no drawn visual in this scene');
+    r.cut.forEach(s => once('CUTTEXT', s)); r.sshot.forEach(s => once('SMALLSHOT', s)); r.svgout.forEach(s => once('SVGOUT', s));
     r.corner.forEach(x => once('ORBCORNER', x + ' sits in the orb corner (keep x<1700 or y<870 free)'));
     if (r.orb === false && t - scT[r.sc][0] > 1.5) once('NOORB', 'corner orb not visible - ORB_ON it at the scene start');
   }

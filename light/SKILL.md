@@ -16,7 +16,7 @@ The user's channel is **Netlight ML** (`netlight.ml`): data science, ML and AI e
 
 ## Why this skill works the way it does
 Netlight videos broke on long scripts for three reasons, and this skill removes all three. Keep it that way:
-1. **The rules live in the kit, not in your memory.** The orb corner, fixed eyes, no grid, sound cues and scene checks are built into `light.js`. `lbuild.py` refuses banned helpers, and `lcheck.js` reports `LIGHT:` guard errors. Never paste helpers into video.js and never work around a guard.
+1. **The rules live in the kit, not in your memory.** The orb corner and its life (blinks, camera looks), no grid, sound cues and scene checks are built into `light.js`. `lbuild.py` refuses banned helpers, and `lcheck.js` reports `LIGHT:` guard errors. Never paste helpers into video.js and never work around a guard.
 2. **Phrase errors block the build.** `lbuild.py` checks every `go` / `NEXT` / `W` phrase scene by scene against words.json. NOTFOUND, OUTSIDE and SCENE are errors. Fix them; never ignore them or `--force` a delivery.
 3. **Context budget.** Every image you Read stays in context. Too many single screenshots fill it, and then rules get forgotten halfway through the video. So:
    - look ONLY at contact sheets (16 frames per image);
@@ -36,8 +36,9 @@ Netlight videos broke on long scripts for three reasons, and this skill removes 
 - **Colour = meaning, fixed all video:** DATA `NL.data` #34e0b0 · MODEL `NL.model` #6cc8ff · OUTPUT `NL.out` #ffcc4d · ERROR `NL.err` #ff6b81. Purple #b48cff appears ONLY as the `<b>word</b>` in a scene title.
 - **Background:** #05070d + navy glow. No grid, vignette, particles, captions, header, footer or progress bar (the kit already does this).
 - **Model Orb:**
-  - `cOrb(scene, id)` in every scene except the last; it always sits in the same bottom-right corner with eyes fixed up-left ("beech beech me aayega dimag khayega").
-  - Beats allowed: `ORB_ON`, `ORB_BLINK`, `ORB_THINK`, `ORB_WOW`, `ORB_BOUNCE`.
+  - `cOrb(scene, id)` in every scene except the last; it always sits in the same bottom-right corner ("beech beech me aayega dimag khayega").
+  - It is alive on its own: the kit (`nlOrbLife`, called by `nlFinish`) makes it blink every ~3 s and look into the camera (`ORB_CAM`) once or twice per scene, eyes resting up-left in between ("kabhi camere ki taraf bhi dekhna chahiye, blink zyada"). Don't add your own blink loops.
+  - Beats allowed on top: `ORB_ON`, `ORB_BLINK`, `ORB_THINK`, `ORB_WOW`, `ORB_BOUNCE`, `ORB_CAM`. Never `ORB_LOOK`.
   - "The model / the agent" as an object in the middle = `nlWin` + `nlNet`.
 - **Intro A "Boot"** (HEAD 2.6 s) and **Outro A** (TAIL 3.6 s) come from the kit; never change their text.
 - **Hook:** the strongest visual is on screen within 5 s of the voice starting. No frame is more than ~75 % empty.
@@ -87,14 +88,17 @@ When the script names a real paper, repo, site, post or doc, show the **real thi
    - Unstyled (blue links, "Skip to content") means a blocked host: find it with `node ~/lkit/light/netlog.js <url>`.
    - Already allowed: `github.githubassets.com`, `*.githubusercontent.com`, `arxiv.org`, `*.wikipedia.org`, `upload.wikimedia.org`.
    - For another host, tell the user: session title caret ⌄ → **Edit cloud environment** → **Network access: Custom** → add the host under **Allowed domains** → keep **Also include default list of common package managers** ticked → **Save changes**.
+   - **Crop it to the part the voice talks about** (a 2560 px page squeezed into an 800 px window is unreadable: lcheck SMALLSHOT). Crop BETWEEN rows/columns, never through text.
+   - **OCR it:** `python3 ~/lkit/light/lfind.py assets/<name>.png "phrase" ...` writes `assets/<name>.boxes.json` and prints where each phrase is. `EDGE:` lines = the crop cut through words -> crop again. Run it again after every re-crop.
 3. **No good screenshot:** ask the user once, right after the plan, with one numbered list ("tu khud hoke ss na le sake to mujhse manga kar"). For each screenshot give:
    - the exact URL, the part to capture, and the file name;
    - how to take it: desktop browser maximised, zoom 100 %, PNG, no bookmarks / personal info, dark mode if the site has it. A PDF is fine for a paper (`pdftoppm -png -r 200`).
    - Keep building with a Netlight-style card placeholder. Uploads land in `/root/.claude/uploads/...`; copy them into `assets/`.
-4. **Show it with effort:**
+4. **Show it with effort** - every highlight and cursor target is a PHRASE from the page, never pixel numbers you worked out (that is how boxes landed on the wrong row, on empty space, and the cursor missed the date):
    - `nlShot` in a browser window (the URL in the header = the credit);
-   - `nlCursor` + `CURSOR` + `CLICK`;
-   - `SHOT_FOCUS` on the words that mention it, plus `nlShotHL`.
+   - `nlShotHL(shot, 'hlN', 'the words', colour)` on the words the voice says. A table row: `'E2D2..64'` (from the first cell to the last on that row). Phrase twice on the page: `{ n: 2 }`. OCR misread it ("ncm" -> "nem" on dark pages): the error shows what OCR read; pass `{ fuzzy: true }` only if that is the same text.
+   - `nlCursor` + `CURSOR_TO(cur, shot, 'the words', t, d)` + `CLICK`. It knows the zoom/scroll at that moment; never `CURSOR(...)` with hand-computed pixels on a screenshot.
+   - Prefer a good crop over zooming. If you zoom (`SHOT_FOCUS(shot, t, ...nlShotXY(shot, 'words'), s)`), lcheck CUTTEXT must stay clean: no word may be cut by the window edge.
    - Paper: title, then the one sentence / figure the voice uses. Repo: header + stars, README, then the exact code lines.
    - Numbers that change get a date ("as of Oct 2026") or are left out. No recreated site logos or fake site UI.
 5. Images ship in `assets/` and are listed in the delivery setup. `nlShot` needs the real size: `python3 -c "from PIL import Image; print(Image.open('assets/x.png').size)"`.
@@ -130,7 +134,8 @@ When the script names a real paper, repo, site, post or doc, show the **real thi
   - vector: `nlVec(par,id,x,y,vals,c,horiz,cs)` then `POP('.idv',t,{st:.08})`
   - equation: `nlEq(par,id,x,y,w,html,head,c,fs)`
   - big counter: `nlCount(par,id,x,y,['0','8B','52B'],c,fs)` + `COUNT(id,t,step)`
-- **Real pages:** `nlShot(par,id,x,y,w,h,src,url,nw,nh)`, `SHOT_FOCUS(id,t,px,py,s,d)`, `nlShotHL(id,hid,px,py,w,h,c)`, `nlCursor(par,id,x,y)` (show it with `nlShow`), `CURSOR(id,t,x,y,d)`, `CLICK(id,t)`. Highlights and the cursor ring are hidden at 0 automatically.
+- **Real pages** (after `lfind.py`): `nlShot(par,id,x,y,w,h,src,url,nw,nh)`, `nlShotHL(id,hid,'phrase',c,{n,fuzzy,pad})`, `nlCursor(par,id,x,y)` (show it with `nlShow`), `CURSOR_TO(cur,shot,'phrase',t,d,{n,fuzzy})`, `CLICK(id,t)`, `SHOT_FOCUS(id,t,...nlShotXY(id,'phrase'),s,d)`. Highlights and the cursor ring are hidden at 0 automatically. Plain `CURSOR(id,t,x,y,d)` only for cursors over your own drawings.
+- **Text-like lines in drawings** (a page, a document, an essay): `nlWords(g, x0, x1, y, h, seed, wmin, wvar, gap)`. Every bar ends before x1; never write your own word-bar loop (lines ran past the card before: lcheck SVGOUT).
 - **Engine beats:** `go`, `W`, `B`, `IN`, `POP`, `FADE`, `OUT`, `PULSE`, `SHAKE`, `DRAW`, `TO`, `tl`, `findp(phrase, fromTime)`.
 - **Sound cues:** put `CUE(t, kind)` next to its beat.
   - `hit` on the 4-6 biggest reveals, `chime` when something is confirmed right, `err` on every X / failure, `tick` on list items and rows, `pop` when an object appears, `blip` on small digital events.
@@ -143,7 +148,8 @@ When the script names a real paper, repo, site, post or doc, show the **real thi
    if [ -f /home/user/hf-kit/light/light.js ]; then ln -sfn /home/user/hf-kit ~/lkit
    elif [ ! -f ~/lkit/light/light.js ]; then rm -rf ~/lkit; git clone -q --depth 1 https://github.com/scarwill/hf-kit ~/lkit
      [ -f ~/lkit/light/light.js ] || { rm -rf ~/lkit; git clone -q --depth 1 -b claude/wonderful-cannon-lnzyty https://github.com/scarwill/hf-kit ~/lkit; }; fi
-   export NODE_PATH=$(npm root -g); pip install -q scipy pocketsphinx pillow
+   export NODE_PATH=$(npm root -g); pip install -q scipy pocketsphinx pillow pytesseract
+   which tesseract >/dev/null || apt-get install -y -q tesseract-ocr >/dev/null 2>&1 || { apt-get update -q >/dev/null 2>&1; apt-get install -y -q tesseract-ocr >/dev/null 2>&1; }
    ```
    - If `light/` is still missing, tell the user the kit is not pushed; never rewrite the kit by hand.
    - Playwright + Chromium are preinstalled; never run `playwright install`.
@@ -162,11 +168,13 @@ When the script names a real paper, repo, site, post or doc, show the **real thi
    1. `cat ~/lkit/light/RULES.md` (every batch, even if you think you remember it).
    2. Add the batch's scenes to `video.js` (build parts + beats). The video stays buildable after every batch.
    3. `python3 ~/lkit/light/lbuild.py video.js <audio>`. Fix every ERROR (NOTFOUND / OUTSIDE / SCENE / BANNED / REDEFINE). Check AMBIGUOUS lines: if you meant the later occurrence, use a longer phrase.
-   4. `node ~/lkit/light/lcheck.js index.html --from <batch start> --to <batch end>`. Fix every warning and every `JS` line (EMPTY / TEXT / SMALL / OUT / OVERFLOW / OVERLAP / ORBCORNER / NOORB / NOVISUAL / GAP / LIGHT guards).
+   4. `node ~/lkit/light/lcheck.js index.html --from <batch start> --to <batch end>`. Fix every warning and every `JS` line (EMPTY / TEXT / SMALL / OUT / OVERFLOW / OVERLAP / ORBCORNER / NOORB / NOVISUAL / GAP / CUTTEXT / SMALLSHOT / SVGOUT / LIGHT guards incl. HLMISS).
    5. Read its 1-2 `out/sheet_NN.png`. Check: orb in the corner, wires on the right parts with arrowheads, nothing cut by a frame or the edge, no label on a part, no empty frame, text shown where the voice talks about text.
    6. For every moving thing (ball, packet, dot, cursor), take one motion sheet: `node ~/lkit/light/lsheet.js index.html range <a> <b> .25 --name motion`. It must move in every frame and land on its word.
-   7. Fix, then re-check only the fixed moments: `node ~/lkit/light/lsheet.js index.html at <t1> <t2> ... --name fix`.
-4. **Final check (whole video):** `lbuild` clean, then `node ~/lkit/light/lcheck.js index.html` → 0 warnings, 0 JS errors. Read every `out/sheet_NN.png` once (about one sheet per minute of video). Check the hook in the first 5 s and the intro/outro frames.
+   7. If the batch has a screenshot: `node ~/lkit/light/lshotcheck.js index.html --from <a> --to <b>` and read EVERY `out/pages_NN.png` (full-size crops of each highlight / cursor / zoom moment). Each box must surround exactly the words the voice says, the cursor tip must sit on its target, no line cut by an edge.
+   8. Fix, then re-check only the fixed moments: `node ~/lkit/light/lsheet.js index.html at <t1> <t2> ... --name fix`.
+4. **Final check (whole video):** `lbuild` clean, then `node ~/lkit/light/lcheck.js index.html` → 0 warnings, 0 JS errors. Read every `out/sheet_NN.png` once (about one sheet per minute of video). Check the hook in the first 5 s and the intro/outro frames. Then `node ~/lkit/light/lshotcheck.js index.html` and read every `out/pages_NN.png`.
+   - **0 warnings is NOT "done".** No tool checks these; look for them yourself in the sheets: a highlight that is on the right words but the wrong moment; a cursor body covering the text the voice reads; text you typed that differs from the source; a drawing that looks wrong but stays inside its box; anything the user complained about in an earlier video. Never send a video because the checker passed.
 5. **Audio:** `python3 ~/lkit/light/lmix.py index.html <audio> <mood>` (uses `cues.json` from lcheck) → `bgm.m4a` + cue onset check.
 
    | mood | use for |
@@ -192,8 +200,8 @@ When the script names a real paper, repo, site, post or doc, show the **real thi
    - If a new visual would help later videos, ASK before adding it to `light.js`.
 
 ## Context budget (do not skip)
-- Never Read single frames (`shot_*.png`, `nl_test` grabs). Only sheets: `out/sheet_NN.png`, `out/motion_NN.png`, `out/fix_NN.png`.
-- Rough total for a 5-min video: about 5 sheets per batch x 4-5 batches + 5 final sheets + real-source screenshots = 25-35 images. Never hundreds.
+- Never Read single frames (`nl_test` grabs). Only sheets: `out/sheet_NN.png`, `out/motion_NN.png`, `out/fix_NN.png`, and the full-size screenshot sheets `out/pages_NN.png` (these are worth their size: the small sheets hide a box on the wrong row).
+- Rough total for a 5-min video: about 5 sheets per batch x 4-5 batches + 5 final sheets + real-source screenshots + 6-12 pages sheets = 35-50 images. Never hundreds.
 - Don't paste large kit files into chat. Read `light-demo.js` once; for a specific part, grep `light.js` for its line.
 - Never paste house helpers or kit code into video.js; lbuild rejects it.
 
@@ -208,4 +216,5 @@ When the script names a real paper, repo, site, post or doc, show the **real thi
 - To fill a scene's first seconds, show the coming windows at `IN(..., { to: .3 })`, then `TO(..., { autoAlpha: 1 })` on the word.
 - Typed text (`nlType`) is mono and plain ASCII, so the caret lands right after the last char.
 - The local preview uses fallback fonts; the real render loads Space Grotesk, Inter and JetBrains Mono.
+- Screenshot highlights / cursors: never hand-type or compute pixel positions (lbuild SHOTPX refuses numbers in nlShotHL). Phrase -> OCR box -> kit.
 - The local shim only seeks forward cleanly. lsheet / lcheck sort their times; for your own grabs, seek in increasing order.
