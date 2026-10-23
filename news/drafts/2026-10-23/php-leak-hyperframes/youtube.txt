@@ -1,0 +1,23 @@
+TITLES (pick one)
+1. PHP's Secret Patch Date Leaked 3 Times
+2. Hackers Hit PHP 3 Days Before the Leak
+3. The PHP Embargo Fell Apart (and Nobody Knows How)
+
+DESCRIPTION
+The PHP2Shell fix had a secret release date. It leaked three ways: the bug IDs on forums, an exploit video posted by mistake, and Chainguard shipping the fix six hours early. But Amazon says its honeypot was hit on October 17, three days before any leak. No successful hack is confirmed yet. A third PHP bug (CVE-2026-115560) has no patch, but it only works with a rare setup.
+Update to PHP 8.5.12 / 8.4.27 / 8.3.36 / 8.2.35 and set session.upload_progress.enabled=0.
+
+Sources
+PHP Foundation, 21 Oct 2026: https://thephp.foundation/blog/2026/10/21/todays-php-security-release-and-how-were-strengthening-php-security/
+Hacker News post, 22 Oct 2026: https://news.ycombinator.com/item?id=50193416
+AWS Security Blog, 21 Oct 2026: https://aws.amazon.com/blogs/security/amazon-threat-intelligence-identifies-php2shell-exploitation-prior-to-public-disclosure-in-madpot/
+php.net mitigation notice, 23 Oct 2026: https://www.php.net/
+BleepingComputer, 23 Oct 2026: https://www.bleepingcomputer.com/news/security/php-shares-mitigation-for-new-and-unpatched-rce-vulnerability/
+
+Drawings (envelope, server, calendar, timeline, bug) are illustrative. Screenshots are real pages.
+
+HASHTAGS
+#shorts #php #cybersecurity #programming #webdev #technews
+
+TAGS
+php, php2shell, php security, php rce, cve-2026-109618, cve-2026-109619, cve-2026-115560, embargo leak, chainguard, aws honeypot, madpot, hacker news, web security, developer news, merge report

@@ -1,0 +1,11 @@
+This terminal is fake. Every letter on it is a guess.
+No shell. No files. No computer behind it.
+Just a tiny AI model with three hundred and sixty million parameters.
+You press a key. It predicts how the screen should change.
+It runs vim and tmux. It even plays snake.
+It learned from three hundred and thirty six thousand real terminal sessions.
+The whole thing is two hundred and eight megabytes and runs in your browser.
+But it is a dream of a computer.
+Add a line to a file. Read it back. It often forgets.
+For developers this is a peek at apps that are learned instead of coded.
+So next time your terminal acts weird. Ask yourself. Is it even real?

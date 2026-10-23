@@ -1,0 +1,13 @@
+The PHP patch had a secret release date. And that secret leaked three times.
+Two critical bugs let attackers run code on PHP servers.
+On October twentieth the bug IDs spread on forums.
+A developer who posted them on Hacker News later wrote. I am truly sorry.
+A security firm posted its exploit video by mistake.
+And Chainguard shipped the fix six hours early.
+But here is the twist.
+Amazon says attackers hit its traps on October seventeenth.
+Three days before any leak.
+Nobody knows how they knew.
+No successful hack is confirmed yet.
+But a third bug just dropped with no patch. It needs a rare setup.
+So update PHP today and turn off session upload progress.
