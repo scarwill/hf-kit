@@ -1,4 +1,5 @@
-// ===================== kurz/props.js — reusable shaded props (from the "Can humans hibernate?" long video) =====================
+// ===================== kurz/props.js — reusable shaded props (from the "Can humans hibernate?" and "Mind upload" long videos) =====================
+// Lab / tech / science props (kLabRoom, kNeuron2, kNuke, kCopy, kSubBtn, kCamPath ...): see the LAB section at the end of this file.
 // Load AFTER the other kurz files:  ... kurz/neon.js kurz/mascots.js kurz/props.js video.js
 // All original designs, shaded, no outlines (Kurz look). Every function draws into `par` and returns its group.
 // ROOMS:     kHomeRoom(par, defs, x0, y0, w, h, {id, wall:[top,bot], floor, wx, wy, ww, wh, px:false|x, plx, curtain, rug})  bedroom; ids id+'nS' night sky, id+'dS' day sky (opacity 0), id+'sun', id+'day' morning light (opacity 0)
@@ -398,3 +399,237 @@ function kBEAM(id, t0, dur = 1) { tl.fromTo('#' + id, { autoAlpha: 0, scaleX: .1
   [0, 1, 2].forEach(k => tl.fromTo('#' + id + 'r' + k, { scale: .3, transformOrigin: '50% 50%' }, { scale: 1.3, duration: .6, ease: 'power2.out' }, t0 + k * .08));
   for (let k = 0; k < 14; k++) tl.fromTo('#' + id + 's' + k, { y: 60 }, { y: -160 - (k % 4) * 40, duration: dur, ease: 'power1.out' }, t0);
   tl.to('#' + id, { autoAlpha: 0, scaleX: .1, duration: .3, ease: 'power2.in' }, t0 + dur - .3); }
+
+// ===================== LAB / TECH / SCIENCE PROPS (from the "Mind upload" long video) =====================
+// INDOOR:    kLabRoom(BG, defs, ox, oy, {fy, wall:[top,bot], cab:[x...], servers}) electrical lab / server room for one area (instead of kWorld) -> {R, fy}
+//            kFgLab(par, ox, oy, col) blurred dark desks at the bottom corners (foreground for indoor areas)
+//            kLabHouse(par, x, by, w, h, id) lab building (lit windows + door)  kChairS(par, cx, by, s, id) scan chair with helmet (rim id+'r')
+//            kBtn(par, cx, cy, s, id) red push button on a pedestal (top id+'t')  kSubBtn(par, cx, cy, id) SUBSCRIBE button (id+'r' red, id+'g' grey SUBSCRIBED, id+'b' bell)
+// TECH:      kCopy(par, defs, cx, cy, w, h, id, {bean}) digital copy = holo screen with the person as a bust (bean ids id+'p…')  kChipN(par, cx, cy, s, id) artificial neuron chip
+//            kRoads(par, cx, cy, w, h, id) road-grid map (cars id+'c'+k)  kDrive / kBolt / kOffice / kLaw / kLock (risk icons, draw inside nCard)  kBulbL(par, cx, cy, s, id) hanging bulb (glow id+'g')
+//            kPower(par, x, by, s, id) small power plant  kNuke(par, x, by, s, id) big nuclear plant (chimney, reactor dome, 2 cooling towers + steam; grow with scaleY from 50% 100%)
+// LIFE:      kNeuron2(par, cx, cy, s, col, id, {ax, axLen, n, hidAx}) neuron with branching dendrites + myelinated axon (axon group id+'a', g.__ax = axon path for kStream)
+//            kWorm(par, cx, cy, s, id, col, {glow}) C. elegans (body id+'b' -> kWIGGLE)  kFly(par, cx, cy, s, id) fruit fly (wings id+'w' -> kFLAP)  kLeaf(par, cx, cy, w, col)  kRice(par, cx, cy, s, id)
+// THINGS:    kShipT(par, defs, cx, cy, s, id) wooden ship, 10 planks (old id+'o'+k, new id+'n'+k hidden: FADE them in)  kCage(par, cx, cy, w, h, id) cage bars (drop it in)
+// MOTION:    kCamPath([[t, cx, cy, z, moveDur?, ease?], ...], endT) camera keys + slow push between them (never a static camera)
+//            kTITLE(sel, t) pop an nTitle  kBlinks(id, t0, t1) kBean blinks  kFLAP(id, t0, t1) fly wings  kWIGGLE(id, t0, t1, a) worm body
+// Rule from that video (user): technical things (servers, computers, scanners, screens) happen INSIDE kLabRoom, never outdoors in a landscape.
+// digital copy: holo screen with a person as a bust (clipped) + faint scanlines. o.bean = kBean opts (same look as the real person). bean ids id+'p…'
+function kCopy(par, defs, cx, cy, w, h, id, o = {}) {
+  const c = kScreen(par, cx, cy, w, h, NPAL.cyan, id), top = cy - h / 2 + h * .16 + 10;
+  const r = S('rect', { x: cx - w / 2 + 10, y: top, width: w - 20, height: cy + h / 2 - 16 - top, rx: 20 }, defs), cl = S('g', { 'clip-path': kClip(defs, r) }, c);
+  kGlow(cl, cx, cy, h * .7, '#38d6ff', .35);
+  const s = h / 330; kBean(cl, cx, cy + 436 * s + h * .04, s, id + 'p', Object.assign({}, o.bean || {}));
+  for (let k = 0; k < h / 16; k++) S('rect', { x: cx - w / 2, y: cy - h / 2 + k * 16, width: w, height: 5, fill: NPAL.cyan, opacity: .07 }, cl);
+  return c; }
+// C. elegans: thick shaded S-curve body with faint rings. g.__p = body path (for the wiring dots)
+function kWorm(par, cx, cy, s, id, col = '#f4c7b0', o = {}) {
+  const g = S('g', { id }, par), b = S('g', { id: id + 'b' }, g), P = (x, y) => `${cx + x * s} ${cy + y * s}`;
+  const d = `M${P(-230, 10)} C${P(-150, -70)} ${P(-60, 70)} ${P(20, 0)} S${P(170, -60)} ${P(230, -10)}`;
+  S('ellipse', { cx, cy: cy + 46 * s, rx: 240 * s, ry: 14 * s, fill: '#000', opacity: .22 }, b);
+  S('path', { d, stroke: kDark(col, .35), 'stroke-width': 46 * s, fill: 'none', 'stroke-linecap': 'round', transform: `translate(${4 * s} ${7 * s})` }, b);
+  const p = S('path', { d, stroke: col, 'stroke-width': 42 * s, fill: 'none', 'stroke-linecap': 'round' }, b);
+  if (o.glow) nBloom(p);
+  S('path', { d, stroke: kLite(col, .55), 'stroke-width': 9 * s, fill: 'none', 'stroke-linecap': 'round', opacity: .55, transform: `translate(${-3 * s} ${-10 * s})` }, b);
+  const L = p.getTotalLength(); for (let k = 1; k < 16; k++) { const q = p.getPointAtLength(L * k / 16); S('circle', { cx: q.x, cy: q.y, r: 15 * s, fill: kDark(col, .12), opacity: .35 }, b); }
+  kBall(b, cx + 222 * s, cy - 12 * s, 19 * s, kLite(col, .15));
+  g.__p = p; return g; }
+// fruit fly, front-top view: legs, see-through wings (id+'w'), striped abdomen, thorax, head with big red eyes
+function kFly(par, cx, cy, s, id) {
+  const g = S('g', { id }, par), d = kDefs(par);
+  [-1, 1].forEach(sd => [-34, 0, 34].forEach((dy, k) => S('path', { d: `M${cx + sd * 24 * s} ${cy + dy * s} Q${cx + sd * 100 * s} ${cy + (dy - 34) * s} ${cx + sd * 128 * s} ${cy + (dy + 44 + k * 12) * s}`, stroke: '#3a2418', 'stroke-width': 8 * s, fill: 'none', 'stroke-linecap': 'round' }, g)));
+  const w = S('g', { id: id + 'w' }, g); [-1, 1].forEach(sd => { const ex = cx + sd * 112 * s, ey = cy - 30 * s;
+    S('ellipse', { cx: ex, cy: ey, rx: 125 * s, ry: 50 * s, fill: '#cfeaff', opacity: .5, transform: `rotate(${sd * -24} ${ex} ${ey})` }, w);
+    S('path', { d: `M${cx + sd * 20 * s} ${cy - 20 * s} Q${ex} ${ey - 20 * s} ${cx + sd * 220 * s} ${cy - 70 * s}`, stroke: '#ffffff', 'stroke-width': 3 * s, fill: 'none', opacity: .45 }, w); });
+  const ab = S('ellipse', { cx, cy: cy + 92 * s, rx: 54 * s, ry: 84 * s, fill: '#d6963f' }, g), ac = S('g', { 'clip-path': kClip(d, ab) }, g);
+  [40, 80, 120].forEach(y => S('rect', { x: cx - 60 * s, y: cy + y * s, width: 120 * s, height: 16 * s, fill: '#5a3418', opacity: .8 }, ac));
+  S('ellipse', { cx: cx + 30 * s, cy: cy + 120 * s, rx: 50 * s, ry: 90 * s, fill: '#000', opacity: .25 }, ac);
+  kBall(g, cx, cy, 54 * s, '#b07030'); kBall(g, cx, cy - 76 * s, 44 * s, '#8a5426');
+  [-1, 1].forEach(sd => kBall(g, cx + sd * 36 * s, cy - 84 * s, 28 * s, '#e63946', '#8f1622', '#ffb3b3', null, '#ffd0d0'));
+  return g; }
+function kRice(par, cx, cy, s, id) { const g = S('g', { id }, par);
+  S('ellipse', { cx: cx + 8 * s, cy: cy + 64 * s, rx: 150 * s, ry: 14 * s, fill: '#000', opacity: .25 }, g);
+  kShade(g, S('ellipse', { cx, cy, rx: 150 * s, ry: 60 * s, fill: '#f3ead6', transform: `rotate(-10 ${cx} ${cy})` }, g), '#c2ad80', '#ffffff'); return g; }
+// hanging light bulb (glow id+'g')
+function kBulbL(par, cx, cy, s, id) { const g = S('g', { id }, par);
+  S('path', { d: `M${cx} ${cy - 900} L${cx} ${cy - 120 * s}`, stroke: '#2a1f3a', 'stroke-width': 8 * s }, g);
+  kGlow(g, cx, cy, 260 * s, '#ffd166', .6, id + 'g');
+  kShade(g, S('rect', { x: cx - 36 * s, y: cy - 150 * s, width: 72 * s, height: 66 * s, rx: 12 * s, fill: '#9aa3bd' }, g));
+  [0, 1, 2].forEach(k => S('rect', { x: cx - 38 * s, y: cy - 140 * s + k * 18 * s, width: 76 * s, height: 6 * s, rx: 3 * s, fill: '#6d7593' }, g));
+  kBall(g, cx, cy, 92 * s, '#ffe08a', '#e0a630', '#fffbe6', null, '#ffffff');
+  S('path', { d: `M${cx - 22 * s} ${cy - 84 * s} L${cx - 14 * s} ${cy} Q${cx} ${cy + 30 * s} ${cx + 14 * s} ${cy} L${cx + 22 * s} ${cy - 84 * s}`, stroke: '#c46a12', 'stroke-width': 6 * s, fill: 'none' }, g); return g; }
+// power plant: two cooling towers with steam clouds + turbine hall with a chimney
+function kPower(par, x, by, s, id) { const g = S('g', { id }, par);
+  S('ellipse', { cx: x + 80 * s, cy: by + 4, rx: 420 * s, ry: 22 * s, fill: '#000', opacity: .3 }, g);
+  const ctw = (tx, w, h, c) => kShade(g, S('path', { d: `M${tx - w / 2} ${by} Q${tx - w * .26} ${by - h * .55} ${tx - w * .36} ${by - h} L${tx + w * .36} ${by - h} Q${tx + w * .26} ${by - h * .55} ${tx + w / 2} ${by} Z`, fill: c }, g));
+  ctw(x - 120 * s, 230 * s, 320 * s, '#a3adc8'); ctw(x + 110 * s, 200 * s, 270 * s, '#8d99b5');
+  kCloud(g, x - 120 * s, by - 380 * s, 1.0 * s, null, '#f1f4ff', '#c3cde6'); kCloud(g, x + 110 * s, by - 320 * s, .8 * s, null, '#f1f4ff', '#c3cde6');
+  kShade(g, S('rect', { x: x + 200 * s, y: by - 170 * s, width: 220 * s, height: 170 * s, rx: 12 * s, fill: '#5b6888' }, g));
+  S('rect', { x: x + 360 * s, y: by - 330 * s, width: 34 * s, height: 170 * s, rx: 6 * s, fill: '#4a5675' }, g);
+  [0, 1, 2].forEach(k => S('rect', { x: x + 225 * s + k * 62 * s, y: by - 130 * s, width: 40 * s, height: 30 * s, rx: 6 * s, fill: '#ffd166', opacity: .9 }, g)); return g; }
+// wooden ship with 10 planks: old planks id+'o'+k, new planks id+'n'+k (hidden here, FADE them in one by one)
+function kShipT(par, defs, cx, cy, s, id) { const g = S('g', { id }, par), P = (x, y) => `${cx + x * s} ${cy + y * s}`;
+  S('rect', { x: cx - 10 * s, y: cy - 430 * s, width: 20 * s, height: 400 * s, rx: 8 * s, fill: '#6b4226' }, g);
+  kShade(g, S('path', { d: `M${P(22, -410)} Q${P(250, -260)} ${P(22, -80)} Z`, fill: '#f3ead6' }, g), '#bfae88', '#ffffff');
+  kShade(g, S('path', { d: `M${P(-22, -370)} Q${P(-200, -240)} ${P(-22, -90)} Z`, fill: '#e9dcc0' }, g), '#b8a47a', '#ffffff');
+  S('path', { d: `M${P(10, -430)} L${P(90, -405)} L${P(10, -380)} Z`, fill: '#ff5d6c' }, g);
+  const hull = S('path', { d: `M${P(-330, -40)} L${P(340, -40)} Q${P(300, 90)} ${P(200, 110)} L${P(-220, 110)} Q${P(-300, 60)} ${P(-330, -40)} Z`, fill: '#8a5a3c' }, g);
+  const cl = S('g', { 'clip-path': kClip(defs, hull) }, g), ph = 30;
+  for (let r = 0; r < 5; r++) for (let c = 0; c < 2; c++) { const x0 = -340 + c * 340, y0 = -40 + r * ph, k = r * 2 + c;
+    S('rect', { id: id + 'o' + k, x: cx + x0 * s, y: cy + y0 * s, width: 340 * s, height: ph * s, fill: (r + c) % 2 ? '#7a4e33' : '#8a5a3c' }, cl);
+    hid(S('rect', { id: id + 'n' + k, x: cx + x0 * s, y: cy + y0 * s, width: 340 * s, height: ph * s, fill: (r + c) % 2 ? '#d9a066' : '#e8b57a' }, cl));
+    S('path', { d: `M${P(x0, y0 + ph)} L${P(x0 + 340, y0 + ph)} M${P(x0 + 340, y0)} L${P(x0 + 340, y0 + ph)}`, stroke: '#3e2516', 'stroke-width': 3 * s, opacity: .5 }, cl); }
+  S('ellipse', { cx: cx + 220 * s, cy: cy + 120 * s, rx: 420 * s, ry: 110 * s, fill: '#1a0e08', opacity: .35 }, cl);
+  S('ellipse', { cx: cx - 120 * s, cy: cy - 26 * s, rx: 240 * s, ry: 18 * s, fill: '#ffffff', opacity: .15 }, cl);
+  S('rect', { x: cx - 336 * s, y: cy - 54 * s, width: 684 * s, height: 18 * s, rx: 9 * s, fill: '#5e3820' }, g); return g; }
+function kCage(par, cx, cy, w, h, id) { const g = S('g', { id }, par);
+  for (let k = 0; k <= 7; k++) kShade(g, S('rect', { x: cx - w / 2 + k * w / 7 - 9, y: cy - h / 2, width: 18, height: h, rx: 9, fill: '#8d99b5' }, g));
+  [-1, 1].forEach(sd => kShade(g, S('rect', { x: cx - w / 2 - 24, y: cy + sd * h / 2 - 18, width: w + 48, height: 36, rx: 18, fill: '#6d7aa6' }, g))); return g; }
+// scan chair: base, seat, tall back, helmet dome on an arm (glowing rim id+'r')
+function kChairS(par, cx, by, s, id) { const g = S('g', { id }, par);
+  S('ellipse', { cx, cy: by + 4, rx: 220 * s, ry: 20 * s, fill: '#000', opacity: .3 }, g);
+  kShade(g, S('rect', { x: cx - 130 * s, y: by - 620 * s, width: 260 * s, height: 420 * s, rx: 60 * s, fill: '#2f8a7e' }, g));
+  kShade(g, S('rect', { x: cx - 34 * s, y: by - 200 * s, width: 68 * s, height: 200 * s, rx: 14 * s, fill: '#5b6888' }, g));
+  kShade(g, S('rect', { x: cx - 170 * s, y: by - 250 * s, width: 340 * s, height: 70 * s, rx: 30 * s, fill: '#33a394' }, g));
+  S('path', { d: `M${cx + 140 * s} ${by - 240 * s} Q${cx + 230 * s} ${by - 640 * s} ${cx + 70 * s} ${by - 760 * s}`, stroke: '#7d89a8', 'stroke-width': 22 * s, fill: 'none', 'stroke-linecap': 'round' }, g);
+  kShade(g, S('path', { d: `M${cx - 150 * s} ${by - 650 * s} Q${cx - 150 * s} ${by - 830 * s} ${cx} ${by - 840 * s} Q${cx + 150 * s} ${by - 830 * s} ${cx + 150 * s} ${by - 650 * s} Z`, fill: '#cfd8ea' }, g), '#7d89a8', '#ffffff');
+  nBloom(S('path', { id: id + 'r', d: `M${cx - 150 * s} ${by - 650 * s} L${cx + 150 * s} ${by - 650 * s}`, stroke: NPAL.cyan, 'stroke-width': 12 * s, 'stroke-linecap': 'round' }, g)); return g; }
+// big red push button on a pedestal; top = id+'t' (press it with scaleY)
+function kBtn(par, cx, cy, s, id) { const g = S('g', { id }, par);
+  kShade(g, S('rect', { x: cx - 40 * s, y: cy + 30 * s, width: 80 * s, height: 230 * s, rx: 12 * s, fill: '#4a5675' }, g));
+  kShade(g, S('rect', { x: cx - 100 * s, y: cy - 10 * s, width: 200 * s, height: 50 * s, rx: 20 * s, fill: '#3b4466' }, g));
+  const t = S('g', { id: id + 't' }, g); kGlow(t, cx, cy - 20 * s, 130 * s, '#ff3b5c', .45);
+  kShade(t, S('path', { d: `M${cx - 70 * s} ${cy} Q${cx - 70 * s} ${cy - 70 * s} ${cx} ${cy - 72 * s} Q${cx + 70 * s} ${cy - 70 * s} ${cx + 70 * s} ${cy} Z`, fill: '#ff3b5c' }, t), '#a3122a', '#ffc0c8'); return g; }
+function kLeaf(par, cx, cy, w, col) { const g = S('g', {}, par);
+  kShade(g, S('path', { d: `M${cx - w / 2} ${cy} Q${cx - w * .1} ${cy - w * .3} ${cx + w / 2} ${cy - w * .04} Q${cx} ${cy + w * .2} ${cx - w / 2} ${cy} Z`, fill: col }, g));
+  S('path', { d: `M${cx - w / 2} ${cy} Q${cx} ${cy - w * .07} ${cx + w / 2} ${cy - w * .04}`, stroke: kLite(col, .3), 'stroke-width': 8, fill: 'none', opacity: .6 }, g);
+  [-.25, 0, .25].forEach(f => S('path', { d: `M${cx + f * w} ${cy - w * .04} L${cx + f * w + w * .1} ${cy - w * .13}`, stroke: kLite(col, .3), 'stroke-width': 5, fill: 'none', opacity: .45 }, g)); return g; }
+// city road grid (a "map"): blocks + roads + glowing junctions; cars id+'c'+k
+function kRoads(par, cx, cy, w, h, id) { const g = S('g', { id }, par), xs = [-.5, -.25, 0, .25, .5].map(f => cx + f * w), ys = [-.5, -.17, .17, .5].map(f => cy + f * h);
+  S('rect', { x: cx - w / 2 - 30, y: cy - h / 2 - 30, width: w + 60, height: h + 60, rx: 44, fill: '#160d4f' }, g);
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) kShade(g, S('rect', { x: xs[i] + 26, y: ys[j] + 26, width: xs[i + 1] - xs[i] - 52, height: ys[j + 1] - ys[j] - 52, rx: 18, fill: (i + j) % 2 ? '#2a2a8a' : '#3a2a90' }, g));
+  xs.forEach(x => S('path', { d: `M${x} ${ys[0]} L${x} ${ys[3]}`, stroke: '#4a4aa8', 'stroke-width': 30, 'stroke-linecap': 'round' }, g));
+  ys.forEach(y => S('path', { d: `M${xs[0]} ${y} L${xs[4]} ${y}`, stroke: '#4a4aa8', 'stroke-width': 30, 'stroke-linecap': 'round' }, g));
+  xs.forEach(x => ys.forEach(y => { kGlow(g, x, y, 34, NPAL.cyan, .6); S('circle', { cx: x, cy: y, r: 9, fill: '#bff6ff' }, g); }));
+  const cols = ['#ff5d6c', '#ffd23f', '#18d4a8', '#ff8a3d', '#ff2e88', '#22e3ff'];
+  cols.forEach((c, k) => { const hor = k % 2 === 0, x = hor ? xs[0] + 60 + k * 40 : xs[1 + (k % 3)], y = hor ? ys[k % 4 === 0 ? 1 : 2] : ys[0] + 70 + k * 18;
+    const car = S('g', { id: id + 'c' + k }, g); kShade(car, S('rect', { x: x - (hor ? 22 : 12), y: y - (hor ? 12 : 22), width: hor ? 44 : 24, height: hor ? 24 : 44, rx: 8, fill: c }, car)); });
+  return g; }
+// risk icons (drawn inside nCards)
+function kDrive(par, cx, cy, s) { const g = S('g', {}, par); kShade(g, S('rect', { x: cx - 90 * s, y: cy - 66 * s, width: 180 * s, height: 132 * s, rx: 16 * s, fill: '#7d89a8' }, g));
+  kBall(g, cx - 14 * s, cy, 52 * s, '#d5dcec', '#8a93ad', '#ffffff'); kBall(g, cx - 14 * s, cy, 12 * s, '#5b6888');
+  S('path', { d: `M${cx + 66 * s} ${cy - 46 * s} L${cx + 10 * s} ${cy + 10 * s}`, stroke: '#3b4466', 'stroke-width': 10 * s, 'stroke-linecap': 'round' }, g); return g; }
+function kBolt(par, cx, cy, s, col) { const g = S('g', {}, par); kGlow(g, cx, cy, 120 * s, col, .45);
+  kShade(g, S('path', { d: `M${cx + 20 * s} ${cy - 100 * s} L${cx - 50 * s} ${cy + 10 * s} L${cx - 5 * s} ${cy + 10 * s} L${cx - 25 * s} ${cy + 100 * s} L${cx + 55 * s} ${cy - 15 * s} L${cx + 8 * s} ${cy - 15 * s} Z`, fill: col }, g)); return g; }
+function kOffice(par, cx, cy, s) { const g = S('g', {}, par); kShade(g, S('rect', { x: cx - 60 * s, y: cy - 90 * s, width: 120 * s, height: 180 * s, rx: 10 * s, fill: '#5b6fb0' }, g));
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) S('rect', { x: cx - 44 * s + c * 32 * s, y: cy - 70 * s + r * 36 * s, width: 22 * s, height: 22 * s, rx: 4 * s, fill: (r * 3 + c) % 4 ? '#1d2550' : '#ffd166' }, g);
+  S('rect', { x: cx - 16 * s, y: cy + 60 * s, width: 32 * s, height: 30 * s, rx: 4 * s, fill: '#1d2550' }, g); return g; }
+function kLaw(par, cx, cy, s) { const g = S('g', {}, par), c = '#ffd166', cD = '#e0a630';
+  S('rect', { x: cx - 7 * s, y: cy - 70 * s, width: 14 * s, height: 140 * s, rx: 6 * s, fill: c }, g); S('rect', { x: cx - 50 * s, y: cy + 64 * s, width: 100 * s, height: 16 * s, rx: 8 * s, fill: cD }, g);
+  S('path', { d: `M${cx - 84 * s} ${cy - 52 * s} L${cx + 84 * s} ${cy - 52 * s}`, stroke: c, 'stroke-width': 10 * s, 'stroke-linecap': 'round' }, g);
+  [-1, 1].forEach(sd => { const px = cx + sd * 84 * s; S('path', { d: `M${px} ${cy - 52 * s} L${px - 30 * s} ${cy + 12 * s} M${px} ${cy - 52 * s} L${px + 30 * s} ${cy + 12 * s}`, stroke: cD, 'stroke-width': 4 * s }, g);
+    kShade(g, S('path', { d: `M${px - 38 * s} ${cy + 12 * s} Q${px} ${cy + 50 * s} ${px + 38 * s} ${cy + 12 * s} Z`, fill: c }, g)); });
+  kBall(g, cx, cy - 76 * s, 13 * s, c); return g; }
+function kLock(par, cx, cy, s, col) { const g = S('g', {}, par);
+  S('path', { d: `M${cx - 40 * s} ${cy - 10 * s} L${cx - 40 * s} ${cy - 60 * s} Q${cx - 40 * s} ${cy - 110 * s} ${cx + 6 * s} ${cy - 110 * s} Q${cx + 52 * s} ${cy - 110 * s} ${cx + 52 * s} ${cy - 70 * s}`, stroke: '#c9d2e6', 'stroke-width': 18 * s, fill: 'none', 'stroke-linecap': 'round' }, g);
+  kShade(g, S('rect', { x: cx - 70 * s, y: cy - 20 * s, width: 140 * s, height: 110 * s, rx: 20 * s, fill: col }, g));
+  kBall(g, cx, cy + 22 * s, 14 * s, '#2a0a1a'); S('rect', { x: cx - 6 * s, y: cy + 26 * s, width: 12 * s, height: 34 * s, rx: 5 * s, fill: '#2a0a1a' }, g); return g; }
+function kChipN(par, cx, cy, s, id) { const g = S('g', { id }, par);
+  for (let k = 0; k < 6; k++) { const a = k * 60 + 15, [x1, y1] = kPt(cx, cy, 70 * s, a), [x2, y2] = kPt(cx, cy, 108 * s, a + 18);
+    S('path', { d: `M${cx} ${cy} L${x1} ${y1} L${x2} ${y2}`, stroke: '#7cefff', 'stroke-width': 8 * s, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g); kBall(g, x2, y2, 9 * s, '#bff6ff'); }
+  kGlow(g, cx, cy, 80 * s, NPAL.cyan, .55);
+  kShade(g, S('rect', { x: cx - 34 * s, y: cy - 34 * s, width: 68 * s, height: 68 * s, rx: 14 * s, fill: '#22b8d6' }, g), '#0e6f8a', '#c9f7ff');
+  S('rect', { x: cx - 15 * s, y: cy - 15 * s, width: 30 * s, height: 30 * s, rx: 6 * s, fill: '#0b3a4a' }, g); return g; }
+function kLabHouse(par, x, by, w, h, id) { const g = S('g', { id }, par);
+  S('ellipse', { cx: x, cy: by + 4, rx: w * .6, ry: 18, fill: '#000', opacity: .3 }, g);
+  kShade(g, S('rect', { x: x - w / 2, y: by - h, width: w, height: h, rx: 18, fill: '#3c4f86' }, g));
+  S('rect', { x: x - w / 2 - 16, y: by - h - 26, width: w + 32, height: 36, rx: 16, fill: '#2a3766' }, g);
+  [-1, 1].forEach(sd => { kGlow(g, x + sd * w * .3, by - h * .78, 70, '#ffd166', .35); S('rect', { x: x + sd * w * .3 - 40, y: by - h * .86, width: 80, height: 70, rx: 10, fill: '#ffd98a' }, g); });
+  kGlow(g, x, by - h * .3, w * .5, '#bff6ff', .4); S('rect', { x: x - w * .17, y: by - h * .58, width: w * .34, height: h * .58, rx: 14, fill: '#d9fbff' }, g);
+  kBall(g, x + w * .32, by - h * .5, 16, NPAL.cyan); return g; }
+// indoor electrical lab / server room for one area (clipped): wall panels, pipes, cabinets with scope traces + meters (or server racks),
+// ceiling light bars + cable tray, perspective floor, baseboard light. Wall gear parallaxes (kP1). returns { R, fy }
+function kLabRoom(BG, defs, ox, oy, o = {}) {
+  const X0 = ox - 240, Y0 = oy - 160, W = 2400, H = 1400, fy = oy + (o.fy ?? 850), wt = o.wall || ['#17405a', '#0d2638'];
+  const cr = S('clipPath', { id: kUid('klab') }, defs); S('rect', { x: X0, y: Y0, width: W, height: H }, cr);
+  const R = S('g', { 'clip-path': `url(#${cr.id})` }, BG);
+  S('rect', { x: X0, y: Y0, width: W, height: fy - Y0, fill: kLG(defs, [[0, wt[0]], [1, wt[1]]]) }, R);
+  S('circle', { cx: ox + 960, cy: oy + 80, r: 1100, fill: kRG(defs, [[0, '#7fe9ff', .2], [.5, '#7fe9ff', .05], [1, '#7fe9ff', 0]]) }, R);
+  for (let k = 0; k <= 10; k++) S('rect', { x: X0 + k * 240 - 3, y: Y0, width: 6, height: fy - Y0, fill: '#000', opacity: .16 }, R);
+  S('rect', { x: X0, y: oy + 420, width: W, height: 8, fill: '#000', opacity: .14 }, R);
+  const P = S('g', { class: 'kP1', opacity: .92 }, R);
+  [[oy + 175, 16, '#24506e'], [oy + 205, 10, '#2c5d7e']].forEach(([yy, w, c]) => { S('path', { d: `M${X0} ${yy} L${X0 + W} ${yy}`, stroke: c, 'stroke-width': w }, P); S('path', { d: `M${X0} ${yy - w * .25} L${X0 + W} ${yy - w * .25}`, stroke: '#ffffff', 'stroke-width': 2, opacity: .12 }, P); });
+  for (let k = 0; k < 6; k++) kShade(P, S('rect', { x: X0 + 160 + k * 420, y: oy + 155, width: 56, height: 70, rx: 8, fill: '#2a5576' }, P));
+  if (o.servers) for (let k = 0; k < 14; k++) { const rx = X0 + 40 + k * 172;
+    kShade(P, S('rect', { x: rx, y: fy - 470, width: 150, height: 470, rx: 10, fill: '#15284a' }, P), '#070f1c', '#2a4468');
+    for (let j = 0; j < 9; j++) { S('rect', { x: rx + 14, y: fy - 452 + j * 50, width: 122, height: 36, rx: 6, fill: '#0b1628' }, P);
+      S('circle', { cx: rx + 30, cy: fy - 434 + j * 50, r: 4.5, fill: (j + k) % 3 ? '#4cc9f0' : '#7cf6c8' }, P); S('rect', { x: rx + 46, y: fy - 437 + j * 50, width: 40, height: 6, rx: 3, fill: '#4cc9f0', opacity: .35 }, P); } }
+  else (o.cab || [120, 1880]).forEach((dx, k) => { const c0 = ox + dx, cw = 190, ch = 360 + (k % 2) * 60, c = kMix(wt[0], '#4a6f8f', .45), tp = fy - ch;
+    kShade(P, S('rect', { x: c0 - cw / 2, y: tp, width: cw, height: ch, rx: 12, fill: c }, P));
+    S('rect', { x: c0 - cw / 2 + 16, y: tp + 18, width: cw - 32, height: 90, rx: 8, fill: '#0b1a28' }, P);
+    S('path', { d: `M${c0 - cw / 2 + 24} ${tp + 63} ` + Array.from({ length: 12 }, (_, j) => `L${(c0 - cw / 2 + 24 + j * 12.5).toFixed(1)} ${(tp + 63 + Math.sin(j * 1.3 + k) * 26).toFixed(1)}`).join(' '), stroke: k % 2 ? '#7cf6c8' : NPAL.cyan, 'stroke-width': 3, fill: 'none' }, P);
+    for (let j = 0; j < 8; j++) S('circle', { cx: c0 - cw / 2 + 32 + (j % 4) * 42, cy: tp + 140 + Math.floor(j / 4) * 34, r: 8, fill: ['#ffd166', '#4cc9f0', '#7cf6c8', '#ff5d6c'][(j + k) % 4] }, P);
+    kBall(P, c0, tp + 250, 34, '#dfe7f5', '#8a93ad', '#ffffff'); S('path', { d: `M${c0} ${tp + 250} L${c0 + 18} ${tp + 228}`, stroke: '#ff3b5c', 'stroke-width': 4, 'stroke-linecap': 'round' }, P);
+    for (let j = 0; j < 5; j++) S('rect', { x: c0 - cw / 2 + 12 + j * 36, y: fy - 28, width: 22, height: 14, fill: j % 2 ? '#ffd166' : '#14141c', opacity: .75 }, P); });
+  S('rect', { x: X0, y: Y0, width: W, height: 210, fill: '#071422' }, R);
+  [-700, -100, 500, 1100, 1700].forEach(dx => { kGlow(R, ox + dx + 130, oy + 70, 260, '#bff6ff', .35); S('rect', { x: ox + dx, y: oy + 40, width: 260, height: 16, rx: 8, fill: '#e6fdff' }, R); });
+  S('rect', { x: X0, y: oy + 84, width: W, height: 14, fill: '#22384f' }, R);
+  for (let k = 0; k < 9; k++) { const a = X0 + k * 280; S('path', { d: `M${a} ${oy + 98} Q${a + 140} ${oy + 140 + (k % 3) * 12} ${a + 280} ${oy + 98}`, stroke: ['#ff5d6c', '#ffd166', '#4cc9f0'][k % 3], 'stroke-width': 5, fill: 'none', opacity: .55 }, R); }
+  S('rect', { x: X0, y: fy, width: W, height: Y0 + H - fy, fill: kLG(defs, [[0, '#1d3a50'], [1, '#081420']]) }, R);
+  for (let k = -12; k <= 12; k++) S('path', { d: `M${ox + 960 + k * 110} ${fy} L${ox + 960 + k * 420} ${Y0 + H}`, stroke: '#000', 'stroke-width': 3, opacity: .25 }, R);
+  for (let k = 1; k < 7; k++) { const yy = fy + Math.pow(k / 7, 1.6) * (Y0 + H - fy); S('path', { d: `M${X0} ${yy} L${X0 + W} ${yy}`, stroke: '#000', 'stroke-width': 3, opacity: .22 }, R); }
+  S('ellipse', { cx: ox + 960, cy: fy + 110, rx: 900, ry: 40, fill: '#bff6ff', opacity: .05 }, R);
+  S('rect', { x: X0, y: fy - 10, width: W, height: 12, fill: '#0a1824' }, R); nBloom(S('rect', { x: X0, y: fy - 14, width: W, height: 4, fill: NPAL.cyan, opacity: .6 }, R));
+  return { R, fy }; }
+// blurred dark lab desks at the bottom corners (foreground depth for indoor areas)
+function kFgLab(par, ox, oy, col = '#03080f') { [[1, ox - 190], [-1, ox + 2110]].forEach(([sd, x0]) => { const g = fgG(par);
+  S('rect', { x: sd > 0 ? x0 : x0 - 380, y: oy + 960, width: 380, height: 300, rx: 26, fill: col }, g);
+  S('rect', { x: sd > 0 ? x0 + 60 : x0 - 320, y: oy + 890, width: 200, height: 90, rx: 16, fill: col }, g); }); }
+// neuron: glowing soma + nucleus, branching dendrites, myelinated axon toward o.ax (deg) of length o.axLen*s with terminal bulbs.
+// ids: id (whole), id+'a' axon group (hidden here if o.hidAx), g.__ax = axon path
+function kNeuron2(par, cx, cy, s, col, id, o = {}) {
+  const g = S('g', { id }, par), aa = o.ax ?? 0, AL = (o.axLen ?? 260) * s, dk = kDark(col, .22), lt = kLite(col, .4), n = o.n ?? 6;
+  kGlow(g, cx, cy, 120 * s, col, .4);
+  const A = S('g', { id: id + 'a' }, g), [ex, ey] = kPt(cx, cy, AL, aa), [m1x, m1y] = kPt(cx, cy, AL * .33, aa - 10), [m2x, m2y] = kPt(cx, cy, AL * .66, aa + 9);
+  const ax = S('path', { d: `M${cx} ${cy} C${m1x.toFixed(1)} ${m1y.toFixed(1)} ${m2x.toFixed(1)} ${m2y.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`, stroke: dk, 'stroke-width': 7 * s, fill: 'none', 'stroke-linecap': 'round' }, A);
+  const L = ax.getTotalLength(); for (let d = 52 * s; d < L - 34 * s; d += 40 * s) { const p = ax.getPointAtLength(d), q = ax.getPointAtLength(d + 1), an = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI;
+    S('ellipse', { cx: p.x, cy: p.y, rx: 15 * s, ry: 8.5 * s, fill: kLite(col, .62), transform: `rotate(${an.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})` }, A);
+    S('ellipse', { cx: p.x, cy: p.y + 3 * s, rx: 13 * s, ry: 4 * s, fill: dk, opacity: .25, transform: `rotate(${an.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})` }, A); }
+  [-38, 0, 38].forEach(da => { const [tx, ty] = kPt(ex, ey, 30 * s, aa + da); S('path', { d: `M${ex} ${ey} L${tx} ${ty}`, stroke: dk, 'stroke-width': 4 * s, 'stroke-linecap': 'round' }, A); kBall(A, tx, ty, 7 * s, '#ffd166', '#d99a2b', '#fff3c4'); });
+  const br = (x, y, a, Ln, w, dep) => { const [x2, y2] = kPt(x, y, Ln, a), [qx, qy] = kPt(x, y, Ln * .55, a + 12);
+    S('path', { d: `M${x.toFixed(1)} ${y.toFixed(1)} Q${qx.toFixed(1)} ${qy.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`, stroke: col, 'stroke-width': w, fill: 'none', 'stroke-linecap': 'round' }, g);
+    if (dep > 0) { br(x2, y2, a - 30, Ln * .62, w * .62, dep - 1); br(x2, y2, a + 26, Ln * .58, w * .6, dep - 1); } else kBall(g, x2, y2, w * .8, lt); };
+  for (let k = 0; k < n; k++) { const a = aa + 60 + k * (240 / (n - 1)) + (rnd(k * 7 + cx) - .5) * 18, [sx, sy] = kPt(cx, cy, 22 * s, a); br(sx, sy, a, (52 + rnd(k * 3 + cy) * 22) * s, 12 * s, 2); }
+  kBall(g, cx, cy, 30 * s, col, dk, lt, null, '#ffffff'); kBall(g, cx - 4 * s, cy - 3 * s, 11 * s, kDark(col, .4));
+  if (o.hidAx) hidId(id + 'a'); g.__ax = ax; return g; }
+// nuclear power plant (big): chimney, reactor dome with radiation badge, turbine hall, two huge cooling towers with steam
+function kNuke(par, x, by, s, id) { const g = S('g', { id }, par);
+  S('ellipse', { cx: x + 100 * s, cy: by + 6, rx: 900 * s, ry: 34 * s, fill: '#000', opacity: .3 }, g);
+  for (let k = 0; k < 6; k++) S('rect', { x: x - 620 * s, y: by - 560 * s + k * 93 * s, width: 40 * s, height: 93 * s, fill: k % 2 ? '#f1f4ff' : '#ff5d6c' }, g);
+  kShade(g, S('rect', { x: x - 480 * s, y: by - 230 * s, width: 260 * s, height: 230 * s, rx: 8 * s, fill: '#d5dcec' }, g), '#8a93ad', '#ffffff');
+  kShade(g, S('path', { d: `M${x - 480 * s} ${by - 228 * s} Q${x - 480 * s} ${by - 400 * s} ${x - 350 * s} ${by - 404 * s} Q${x - 220 * s} ${by - 400 * s} ${x - 220 * s} ${by - 228 * s} Z`, fill: '#e3e8f4' }, g), '#8a93ad', '#ffffff');
+  kBall(g, x - 350 * s, by - 150 * s, 42 * s, '#ffd166', '#d99a2b', '#fff3c4');
+  [90, 210, 330].forEach(a => S('path', { d: `M${x - 350 * s} ${by - 150 * s} L${kPt(x - 350 * s, by - 150 * s, 34 * s, a - 30).join(' ')} A${34 * s} ${34 * s} 0 0 1 ${kPt(x - 350 * s, by - 150 * s, 34 * s, a + 30).join(' ')} Z`, fill: '#1b1d2e' }, g));
+  kBall(g, x - 350 * s, by - 150 * s, 9 * s, '#1b1d2e');
+  kShade(g, S('rect', { x: x - 210 * s, y: by - 170 * s, width: 230 * s, height: 170 * s, rx: 8 * s, fill: '#5b6888' }, g));
+  for (let k = 0; k < 4; k++) S('rect', { x: x - 194 * s + k * 52 * s, y: by - 130 * s, width: 34 * s, height: 30 * s, rx: 5 * s, fill: '#ffd166' }, g);
+  const ctw = (tx, w, h, c) => { kShade(g, S('path', { d: `M${tx - w / 2} ${by} Q${tx - w * .24} ${by - h * .55} ${tx - w * .34} ${by - h} L${tx + w * .34} ${by - h} Q${tx + w * .24} ${by - h * .55} ${tx + w / 2} ${by} Z`, fill: c }, g));
+    S('ellipse', { cx: tx, cy: by - h, rx: w * .34, ry: 12 * s, fill: kDark(c, .3) }, g); kCloud(g, tx - 30 * s, by - h - 80 * s, 2.0 * s, null, '#f4f7ff', '#c3cde6'); kCloud(g, tx + 60 * s, by - h - 190 * s, 1.5 * s, null, '#f4f7ff', '#c3cde6'); };
+  ctw(x + 140 * s, 460 * s, 640 * s, '#b8c2da'); ctw(x + 560 * s, 400 * s, 560 * s, '#a3adc8');
+  return g; }
+// subscribe button (red -> grey "SUBSCRIBED") + bell. ids id+'r', id+'g', id+'b'
+function kSubBtn(par, cx, cy, id) { const g = S('g', { id }, par);
+  S('rect', { x: cx - 196, y: cy - 38, width: 400, height: 96, rx: 48, fill: '#000', opacity: .3 }, g);
+  const on = S('g', { id: id + 'r' }, g); kShade(on, S('rect', { x: cx - 200, y: cy - 48, width: 400, height: 96, rx: 48, fill: '#ff2a3d' }, on), '#a3122a', '#ffb3bb'); wtext(on, cx, cy + 15, 'SUBSCRIBE', 42, '#ffffff', 'middle', 800);
+  const off = S('g', { id: id + 'g', opacity: 0 }, g); kShade(off, S('rect', { x: cx - 200, y: cy - 48, width: 400, height: 96, rx: 48, fill: '#59627a' }, off)); wtext(off, cx, cy + 14, 'SUBSCRIBED', 38, '#e8eefc', 'middle', 800);
+  const b = S('g', { id: id + 'b' }, g), bx = cx + 280;
+  kShade(b, S('path', { d: `M${bx - 40} ${cy + 30} Q${bx - 38} ${cy - 46} ${bx} ${cy - 48} Q${bx + 38} ${cy - 46} ${bx + 40} ${cy + 30} L${bx + 52} ${cy + 42} L${bx - 52} ${cy + 42} Z`, fill: '#ffd166' }, b), '#c98a1a', '#fff4c4');
+  kBall(b, bx, cy + 52, 12, '#ffd166', '#c98a1a', '#fff4c4'); kBall(b, bx, cy - 54, 8, '#ffd166', '#c98a1a', '#fff4c4'); return g; }
+const kTITLE = (sel, t) => { tl.fromTo(sel, { autoAlpha: 0, scale: .6, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: .8, ease: 'back.out(1.6)' }, t); B(t); };
+// camera path for an area: keys [t, cx, cy, z, moveDur?, ease?]; after each move a slow push drifts until the next key (never a static camera)
+function kCamPath(keys, endT) { keys.forEach((k, i) => { const [t, x, y, z, d = 1.2, e = 'power2.inOut'] = k, nt = i + 1 < keys.length ? keys[i + 1][0] : endT;
+  const md = Math.min(d, Math.max(.3, nt - t - .05)); CAM(t, x, y, z, md, e); if (nt - (t + md) > .9) CAM(t + md + .02, x + 16, y - 6, z * 1.035, nt - t - md - .1, 'sine.inOut'); }); }
+const kBlinks = (id, t0, t1, every = 3.4) => { const ts = []; for (let t = t0 + 1.2; t < t1 - .3; t += every) ts.push(t); eyes('#' + id + 'E', ts); };
+const kFLAP = (id, t0, t1) => tl.to('#' + id + 'w', { scaleY: .6, transformOrigin: '50% 100%', duration: .08, yoyo: true, repeat: Math.max(1, Math.round((t1 - t0) / .08) | 1), ease: 'sine.inOut' }, t0);
+const kWIGGLE = (id, t0, t1, a = 6) => tl.to('#' + id + 'b', { skewX: a, transformOrigin: '50% 50%', duration: .7, yoyo: true, repeat: Math.max(1, Math.round((t1 - t0) / .7) | 1), ease: 'sine.inOut' }, t0);
+
