@@ -1,11 +1,11 @@
 ---
 name: "news"
-description: "Run the user's AI + Dev news YouTube channel end to end: find today's AI / developer / Hugging Face / GitHub / cloud-security news (verified, scored), propose daily Shorts, a weekly 'This Week in Tech' long video and Big Story videos, write TTS-ready English scripts with sources, then build the video in the channel's dark navy + blue look (real screenshots with highlights, press photos, typed code, stamps, arrows, counters, own music + sound cues) as HyperFrames index.html + bgm.m4a synced to the user's TTS audio, plus thumbnails and YouTube text. Use when the user says news / news skill, 'aaj ka kya hai', asks for today's or this week's tech / AI news, a news Short, a weekly or Big Story video, or a news thumbnail."
+description: "Run the user's AI + Dev news YouTube channel end to end: find today's AI / developer / Hugging Face / GitHub / cloud-security news (verified, scored), propose daily Shorts and Big Story long videos (only when the user picks a story), write TTS-ready English scripts with sources, then build the video in the channel's dark navy + blue look (real screenshots with highlights, press photos, typed code, stamps, arrows, counters, own custom music per video + sound cues) as HyperFrames index.html + bgm.m4a synced to the user's TTS audio, plus thumbnails and YouTube text. Use when the user says news / news skill, 'aaj ka kya hai', asks for today's tech / AI news, a news Short, a Big Story long video, or a news thumbnail."
 ---
 
 # NEWS: the AI + Dev news channel (research -> script -> video)
 
-The user runs **Merge Report**, a faceless AI + developer news channel for a US / UK audience. Voice = the user's English TTS (Clipchamp, one voice for the channel). Talk to the user in Hinglish, short and clear.
+The user runs **Merge Report**, a faceless AI + developer news channel for a US / UK audience (Indian viewers watch too and are loyal: note Indian angles). Voice = the user's English TTS (Clipchamp, one voice for the channel). Talk to the user in Hinglish, short and clear.
 Locked decisions live in `~/nkit/news/BRAND.md`: read it at the start of every session. If the user changes a decision, update BRAND.md (ask before pushing).
 
 **THIS SKILL ONLY.** Do not also follow `light`, `netlightml`, `net-script`, `net-thumb`, `kurzgesagt-explainer-video` or other video skills.
@@ -26,7 +26,7 @@ Never start the next stage on your own, never build a video "to save time". Ask 
 | "news", "aaj ka kya hai", "aaj ki news" | Step 1 research | the news table + your pick of 2-3 Shorts (+ 🔴 BIG STORY flag if any) |
 | "1 aur 3 bana", "pehla short de" | Step 2 scripts | `script_N.txt` + `sources_N.md` per Short, a 1-line visual plan per line |
 | uploads TTS audio | Step 3 build | `index.html` + `bgm.m4a` + `assets/*` + `youtube.txt` |
-| "is hafte ka long video", "weekly" | weekly plan from the week's stories + `log.md` | plan (deep dive / stories you missed / updates), then script, then 3 thumbnails, then video |
+| "weekly", "is hafte ka long video" | no weekly video (BRAND.md, 23 Oct 2026): say so, offer a Big Story long on one strong story instead | |
 | "big story bana" | Big Story long video plan | plan, script, 3 thumbnails, video (4-6 min) |
 | "thumbnail de" | `thumb.js` | 2-3 options + phone-size previews |
 | "dheema din hai" | 3 evergreen ideas | (explainer, free AI tool, week so far) |
@@ -49,10 +49,10 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 3. Open the 6-10 best leads (curl + text extraction) and verify each one: a primary source (company post, release notes, repo, model card, paper, official account, filing) + one independent reputable report, or two reputable reports. Note the exact numbers / names / quotes, and the publish date (inside the window).
 4. Score each story 0-2 on: big name · impact on developers / viewers · something to show (screenshot, repo, demo, photo, number) · freshness · wow. Total /10.
 5. **Big Story (9+/10):** major model launch, outage or hack that hits developers, huge deal, a viral open-source release everyone is talking about. Flag it at the top: `🔴 BIG STORY: Short now + its own long video today / tomorrow`, with why. At most 1-2 per week. The user decides.
-6. Reply with ONE table: #, story in one line, category, score, what we can show, source links. Then your pick: Short 1 / Short 2 (/ Short 3), and which stories go to the weekend video. Slow day: 3 evergreen ideas instead of weak stories. Upload time reminder (BRAND.md). **Stop.**
+6. Reply with ONE table: #, story in one line, category, score, what we can show, source links. Then your pick: Short 1 / Short 2 (/ Short 3), and a Big Story long candidate if one deserves it (the user decides). Slow day: 3 evergreen ideas instead of weak stories. Upload time reminder (BRAND.md). **Stop.**
 
 ## Step 2: scripts (TTS-ready, one per Short)
-- Shorts: 30-45 s = about 95-120 words (Clipchamp voice: 137 words = 51 s). One story. Big Story long: 4-6 min. Weekly long: 6-8 min (deep dive ~3 min, stories you missed ~3 min, updates ~1 min).
+- Shorts: 30-45 s = about 95-120 words (Clipchamp voice: 137 words = 51 s). One story. Big Story long: 4-6 min.
 - Structure: **hook in the first 2 s** (the claim or the villain, no "hey guys") -> the story as a story (who, what, when) -> 1-2 proofs (number, quote, screenshot line) -> **the "but"** (catch / twist / honest caveat) -> **what it means for developers / you** (one line) -> short ending line that can loop.
 - Plain spoken English, short sentences, one idea per line, numbers written as spoken ("three hundred and sixty two"), no emoji / URLs / markdown. One sentence per line in `script_N.txt`.
 - Lists of names: few commas ("Lloyds HSBC and Royal Mail"): the TTS pauses at every comma and the aligner then misplaces the words.
@@ -89,7 +89,7 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 - Build: `python3 ~/nkit/news/build.py video.js <audio>` (Shorts) or `... --long`. Fix every ERROR; check AMBIGUOUS.
 - Check: `node ~/nkit/news/check.js index.html` -> 0 warnings, 0 JS errors. Read its sheets (Shorts: 3-4 sheets; long: per batch with `--from --to`, then once whole). Fix -> `node ~/nkit/news/sheet.js index.html at t1 t2 ... --name fix`. Moving things: `sheet.js index.html range a b .1 --name motion`.
 - Look for: hook visible at 0.4 s, no empty first frames, nothing cut or overlapping, highlights on the right words, stamps inside the frame, arrows hitting their target, safe zone, end card.
-- Music: `python3 ~/nkit/news/nmix.py index.html <audio> upbeat` (`dark` for hacks / outages, `cinematic` for huge launches).
+- Music: a NEW custom track per video (BRAND.md Music, `~/nkit/news/music/README.md`). Never the plain nmix moods, never the same style as the last video (check `log.md` / README table). Steps: `nmix.py index.html <audio> <any mood>` (only for sfx.wav) -> a generator in `music/` (reuse one with a clearly different feel, or write a new one) writing `music.wav` -> `python3 ~/nkit/news/music/remix.py <audio>` -> `bgm.m4a` + `preview_mix.m4a`. Put a hit / stop / drop on the script's twist word and a resolve on the end card. Send the preview (we cannot listen) and add the new style to the README table.
 
 ### 3d Deliver
 - Copy `index.html`, `bgm.m4a`, `assets/*` to `~/<slug>-hyperframes/` and send with SendUserFile (`display: 'attach'`).
@@ -97,11 +97,12 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 - Hinglish message: length, scene list (what is shown), what is illustrative, render steps:
   `mkdir assets` · copy the voice as `assets\<audio name>` (the exact name in index.html) · `bgm.m4a` and every image into `assets\` · `dir assets` (watch for `.m4a.m4a`) · `npx hyperframes render --output <name>.mp4`.
 - Upload time (BRAND.md: ~8 pm IST, one hour later after 1 Nov).
-- Add a line to `~/nkit/news/log.md`; ask before pushing it.
+- Add a line to `~/nkit/news/log.md` (mention the music style); ask before pushing it.
 
-## Weekly long video ("This Week in Tech", weekend)
-- Plan from the week's scans + `log.md`: deep dive on the biggest story (~3 min: why it happened, what's next, a demo or the real page), "stories you missed" (4-5 that had no Short, ~3 min), updates on the week's Shorts (~1 min). 6-8 min.
-- Thumbnails: `node ~/nkit/news/thumb.js spec.json thumb_A.png` with layout `big3` (badge THIS WEEK IN TECH, the strongest story big, prefer stories that had no Short). Give 2-3 options + the `_feed.png` previews. Big Story videos: layout `single`, badge BIG STORY.
+## Big Story long video (only when the user picks the story)
+- No weekly / weekend video (decided 23 Oct 2026). Flag a candidate at most; the user decides which story gets a long video.
+- Plan with minutes per part (hook, how it works, the timeline, open questions, what it means for developers), 4-6 min. Short goes out first; pin the long video's link in the Short's comments.
+- Thumbnails: `node ~/nkit/news/thumb.js spec.json thumb_A.png` with layout `single`, badge BIG STORY. Give 2-3 options + the `_feed.png` previews.
 - Build in batches of ~6 scenes; `build.py ... --long`.
 
 ## Context budget
@@ -110,6 +111,10 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 - Never paste kit code into video.js; build.py rejects redefinitions.
 
 ## Pitfalls
+- A plain `D(scene, ...)` container is hidden until a beat shows it: `tl.set('#id', { autoAlpha: 1 }, t)` before animating its children, or they never appear.
+- Scene phrase in `NEXT` must be unique in the whole script, not only in the scene ("your browser" in sentence 1 broke scene 2): build.py reports OUTSIDE.
+- Running a WebGPU web demo ourselves: launch Chromium with `--enable-unsafe-webgpu --enable-features=Vulkan --use-vulkan=swiftshader --use-webgpu-adapter=swiftshader`, check `navigator.gpu` after `goto` (not on about:blank). It is CPU-slow (one keypress ~10 s+): run it with Bash `run_in_background`, screenshot after each command, and use whatever finished.
+- `pgrep -f <script>` also matches the shell running the check: use `ps aux | grep ... | grep -v grep`, and never start a second copy of a long browser job.
 - Less text, more drawing (BRAND.md): plan one drawn metaphor per scene before writing parts.
 - `fromTo` needs `autoAlpha` in both from and to, or the check sheets (gsap shim) never show the part.
 - s* parts are hidden until a beat shows them: show a scene's tag on its first frame with `FADE('#id', t - .02, { d: .05 })`.
