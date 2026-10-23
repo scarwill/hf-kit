@@ -1,0 +1,1197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080, height=1920">
+<title>Tech News</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@700;800;900&family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+:root{--acc:#34d399;--acc2:#22d3ee;--good:#34d399;--bad:#f87171;--c5:#fb923c;--c6:#60a5fa;--bg:#060a13;--ink:#e8eefc;--dim:#8b97b5;--red:#f87171;--gold:#fbbf24;--cyan:#22d3ee;--card:rgba(255,255,255,.045);--line:rgba(255,255,255,.14)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg)}
+#root{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:Poppins,'Segoe UI',sans-serif;color:var(--ink);
+  background:radial-gradient(1200px 800px at 15% 5%,#0f1d3a 0%,transparent 60%),radial-gradient(1000px 700px at 90% 95%,#0b2b25 0%,transparent 60%),var(--bg)}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:60px 60px}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.28}
+#stage{position:absolute;inset:0}
+.scene{position:absolute;inset:0}
+.a{position:absolute}
+.cx{position:absolute;left:0;right:0;margin:auto;width:fit-content;text-align:center;white-space:nowrap}
+.h1{font-size:88px;font-weight:800;letter-spacing:-1px;line-height:1.1}
+.h2{font-size:58px;font-weight:700;line-height:1.15}
+.h3{font-size:40px;font-weight:600;line-height:1.2}
+.tx{font-size:32px;line-height:1.3}
+.sm{font-size:26px;color:var(--dim);line-height:1.3}
+.mono{font-family:'JetBrains Mono',monospace}
+.card{position:absolute;background:var(--card);border:2px solid var(--line);border-radius:26px;padding:26px 32px}
+.chip{position:absolute;display:inline-flex;align-items:center;gap:12px;padding:12px 26px;border-radius:999px;font-size:28px;font-weight:600;background:rgba(14,20,34,.92);border:2px solid var(--line);white-space:nowrap}
+.badge{position:absolute;display:inline-flex;align-items:center;gap:12px;padding:12px 26px;border-radius:16px;border:3px solid;font-size:32px;font-weight:700;background:rgba(10,14,25,.94);white-space:nowrap}
+.tok{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:14px;font-size:30px;font-weight:600;background:rgba(255,255,255,.06);border:2px solid var(--line);white-space:nowrap}
+.sq{position:absolute;border-radius:10px}
+.ln{position:absolute;height:14px;border-radius:7px;background:rgba(255,255,255,.18)}
+svg.full{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:visible}
+.ic{display:inline-flex}
+.c-red{color:var(--red)}.c-gold{color:var(--gold)}.c-dim{color:var(--dim)}.c-cyan{color:var(--cyan)}
+.ib{display:inline-block}
+.acc{color:var(--acc)}.acc2{color:var(--acc2)}
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="41.58" data-width="1080" data-height="1920">
+  <div class="grid-bg"></div>
+  <div id="orb1" class="orb" style="left:-200px;top:-150px;width:700px;height:700px;background:#2563eb"></div>
+  <div id="orb2" class="orb" style="left:1300px;top:600px;width:800px;height:800px;background:#059669"></div>
+  <div id="orb3" class="orb" style="left:800px;top:200px;width:500px;height:500px;background:#7c3aed;opacity:.16"></div>
+  <div id="stage"></div>
+  <audio id="voiceover" data-start="0.2" data-duration="39.58" data-track-index="0" data-volume="1" src="assets/script2.m4a"></audio>
+  <audio id="bgm" data-start="0" data-duration="41.58" data-track-index="1" data-volume="1" src="assets/bgm.m4a"></audio>
+</div>
+<script>
+const VERT=true;
+const TW=[[0.4,"this"],[0.61,"terminal"],[0.95,"is"],[1.08,"fake"],[1.93,"every"],[2.19,"letter"],[2.48,"on"],[2.61,"it"],[2.75,"is"],[2.9,"a"],[2.99,"guess"],[3.7,"no"],[3.87,"shell"],[4.66,"no"],[4.92,"files"],[5.76,"no"],[5.93,"computer"],[6.37,"behind"],[6.71,"it"],[7.43,"just"],[7.68,"a"],[7.81,"tiny"],[8.06,"ai"],[8.22,"model"],[8.51,"with"],[8.76,"three"],[9.12,"hundred"],[9.5,"and"],[9.7,"sixty"],[10.01,"million"],[10.39,"parameters"],[11.37,"you"],[11.55,"press"],[11.77,"a"],[11.88,"key"],[12.5,"it"],[12.68,"predicts"],[13.09,"how"],[13.25,"the"],[13.42,"screen"],[13.69,"should"],[14.0,"change"],[14.74,"it"],[14.92,"runs"],[15.2,"vim"],[15.42,"and"],[15.65,"tmux"],[16.49,"it"],[16.64,"even"],[16.87,"plays"],[17.14,"snake"],[17.99,"it"],[18.14,"learned"],[18.49,"from"],[18.74,"three"],[19.01,"hundred"],[19.44,"and"],[19.63,"thirty"],[20.02,"six"],[20.21,"thousand"],[20.6,"real"],[20.85,"terminal"],[21.24,"sessions"],[22.09,"the"],[22.26,"whole"],[22.51,"thing"],[22.78,"is"],[22.9,"two"],[23.07,"hundred"],[23.37,"and"],[23.54,"eight"],[23.77,"megabytes"],[24.25,"and"],[24.41,"runs"],[24.61,"in"],[24.74,"your"],[24.94,"browser"],[25.69,"but"],[25.86,"it"],[25.99,"is"],[26.12,"a"],[26.21,"dream"],[26.45,"of"],[26.61,"a"],[26.7,"computer"],[27.53,"add"],[27.71,"a"],[27.81,"line"],[28.02,"to"],[28.22,"a"],[28.31,"file"],[29.02,"read"],[29.18,"it"],[29.34,"back"],[30.05,"it"],[30.21,"often"],[30.51,"forgets"],[31.49,"for"],[31.66,"developers"],[32.11,"this"],[32.35,"is"],[32.52,"a"],[32.61,"peek"],[32.82,"at"],[32.95,"apps"],[33.21,"that"],[33.41,"are"],[33.57,"learned"],[33.88,"instead"],[34.26,"of"],[34.38,"coded"],[35.13,"so"],[35.28,"next"],[35.54,"time"],[35.77,"your"],[36.02,"terminal"],[36.41,"acts"],[36.72,"weird"],[37.45,"ask"],[37.65,"yourself"],[38.64,"is"],[38.79,"it"],[38.94,"even"],[39.17,"real"]];
+const HEAD=0.2;
+const END=39.78;
+const TAIL=1.8;
+const TITLE=null;
+// ===================== PREMIUM LIBRARY (one continuous world + camera) =====================
+// Build: cat ~/hf-kit/premium.js ~/hf-kit/life.js video.js > all.js && python3 ~/hf-kit/build.py all.js <audio>
+// colour language (keep it fixed for the whole video and say it with the visuals, not with text)
+const P = { ctx: '#60a5fa', tgt: '#fbbf24', emb: '#34d399', pred: '#a78bfa', bad: '#f87171', ink: '#e8eefc', dim: '#64748b', skin: '#f2c29b', hair: '#5b3a29', ball: '#ef4444' };
+function grad(defs, id, stops, x2 = 0, y2 = 1) { const g = S('linearGradient', { id, x1: 0, y1: 0, x2, y2 }, defs); stops.forEach(([o, c, a]) => S('stop', { offset: o, 'stop-color': c, 'stop-opacity': a ?? 1 }, g)); }
+function rgrad(defs, id, c, a = .6) { const g = S('radialGradient', { id }, defs); S('stop', { offset: 0, 'stop-color': c, 'stop-opacity': a }, g); S('stop', { offset: 1, 'stop-color': c, 'stop-opacity': 0 }, g); }
+function wtext(g, x, y, txt, size, fill, anchor = 'middle', weight = 800, id) { const t = S('text', Object.assign({ x, y, 'text-anchor': anchor, 'font-size': size, 'font-weight': weight, fill, 'font-family': 'Poppins' }, id ? { id } : {}), g); t.textContent = txt; return t; }
+function pill(par, x, y, txt, bg, fg, id, fs = 30) { const g = S('g', { id }, par); const w = txt.length * fs * .6 + 50; S('rect', { x: x - w / 2, y: y - fs * .95, width: w, height: fs * 1.9, rx: fs * .95, fill: bg }, g); wtext(g, x, y + fs * .35, txt, fs, fg, 'middle', 700); return g; }
+function XM(par, cx, cy, r, id) { const g = S('g', { id }, par); S('path', { d: `M${cx - r} ${cy - r} L${cx + r} ${cy + r} M${cx + r} ${cy - r} L${cx - r} ${cy + r}`, stroke: P.bad, 'stroke-width': Math.max(8, r * .2), 'stroke-linecap': 'round' }, g); return g; }
+function QM(par, cx, cy, size, col, id) { const g = S('g', { id }, par); wtext(g, cx, cy + size * .36, '?', size, col, 'middle', 800); return g; }
+const rnd = i => { const v = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return v - Math.floor(v); };   // deterministic "random"
+// LONG = 1920x1080 frame, SHORT (VERT, build.py --short) = 1080x1920 frame. FW/FH = frame size.
+const FW = (typeof VERT !== 'undefined' && VERT) ? 1080 : 1920, FH = FW === 1080 ? 1920 : 1080;
+const AO = i => FW === 1080 ? [(i % 4) * 1500, Math.floor(i / 4) * 2400] : [(i % 4) * 2400, Math.floor(i / 4) * 1400];   // area i origin; each area is a FWxFH "room" of the world
+// ---- phrase timing relative to the current area: go('first words of area') sets ST; W('later words') looks from ST on
+let ST = 0;
+const go = p => { const t = findp(p, ST - .06); if (t !== null) ST = t; return ST; };
+const W = p => { const t = findp(p, ST - .06); return t === null ? ST : t; };
+// ---- camera on #world (transformOrigin 0 0): centre (cx,cy) at zoom z. Visible half-size = 960/z x 540/z.
+// clampV: keep the camera inside the painted room around (cx,cy) so the next room never shows at the frame edge (LONG and SHORT)
+function clampV(cx, cy, z) { const L = FW !== 1080, px = L ? 2400 : 1500, py = L ? 1400 : 2400, mx0 = L ? 240 : 210, mx1 = L ? 2160 : 1290, my0 = L ? 160 : 240, my1 = L ? 1240 : 2160;
+  const ax = Math.round((cx - FW / 2) / px) * px, ay = Math.round((cy - FH / 2) / py) * py, hw = FW / 2 / z + 40, hh = FH / 2 / z + 30;
+  const cl = (v, a, b) => a > b ? (a + b) / 2 : Math.min(Math.max(v, a), b); return [cl(cx, ax - mx0 + hw, ax + mx1 - hw), cl(cy, ay - my0 + hh, ay + my1 - hh)]; }
+const CAM = (t, cx, cy, z, d = 1.3, e = 'power3.inOut') => { [cx, cy] = clampV(cx, cy, z); tl.to('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z, duration: d, ease: e }, t); if (typeof FGP === 'function') FGP(t, cx, cy, d, e); B(t); };
+const CUT = (t, cx, cy, z) => { [cx, cy] = clampV(cx, cy, z); tl.set('#world', { x: FW / 2 - cx * z, y: FH / 2 - cy * z, scale: z }, t); if (typeof FGP === 'function') FGP(t, cx, cy); };   // area change = CUT zoomed-in, then CAM out ("cut + push")
+// ---- hidden-until-cue elements: hid(el) at build, tl.set(HID,{autoAlpha:0},0) first thing in beats; DR = draw-on that also un-hides
+const HID = []; const hid = e => { HID.push(e); return e; };
+const hidId = id => hid(document.getElementById(id));
+const DR = (sel, t, o) => { tl.set(sel, { autoAlpha: 1 }, t); return DRAW(sel, t, o); };
+const ARW = (par, x1, y1, x2, y2, col, id, w = 6) => S('path', { id, class: 'draw', d: arrowD(x1, y1, x2, y2, 20), stroke: col, 'stroke-width': w, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, par);
+const CRV = (par, d, col, id, w = 6) => S('path', { id, class: 'draw', d, stroke: col, 'stroke-width': w, fill: 'none', 'stroke-linecap': 'round' }, par);
+// ---- world setup: call first inside the custom build. cols x rows areas. BG group is BELOW content group G.
+function makeWorld(s, cols = 4, rows = 2) {
+  const world = H('div', 'a', `left:0;top:0;width:${FW}px;height:${FH}px`, null, s, 'world');
+  const sv = S('svg', { width: cols * 2400, height: rows * 1400, viewBox: `0 0 ${cols * 2400} ${rows * 1400}`, style: 'position:absolute;left:0;top:0;overflow:visible' }, world);
+  const defs = S('defs', {}, sv);
+  grad(defs, 'gTech', [[0, '#0b1226'], [1, '#111a33']]); grad(defs, 'gWall', [[0, '#25305a'], [1, '#161d38']]); grad(defs, 'gFloor', [[0, '#4a3426'], [1, '#2a1d15']]);
+  grad(defs, 'gSky', [[0, '#7dd3fc'], [1, '#e0f2fe']]); grad(defs, 'gGrass', [[0, '#16a34a'], [1, '#14532d']]); grad(defs, 'gBlue', [[0, '#1e3a8a'], [1, '#0b1226']]); grad(defs, 'gCone', [[0, '#fde68a', .4], [1, '#fde68a', 0]]);
+  rgrad(defs, 'gNet', P.ctx, .45); rgrad(defs, 'gBulb', '#fde68a', .55); rgrad(defs, 'gEmb', P.emb, .5); rgrad(defs, 'gLamp', '#fcd34d', .35);
+  const sh = S('filter', { id: 'fSh', x: '-20%', y: '-20%', width: '140%', height: '140%' }, defs); S('feDropShadow', { dx: 0, dy: 12, stdDeviation: 12, 'flood-color': '#000', 'flood-opacity': .45 }, sh);
+  const pat = S('pattern', { id: 'pGrid', width: 64, height: 64, patternUnits: 'userSpaceOnUse' }, defs); S('path', { d: 'M64 0 L0 0 0 64', stroke: 'rgba(148,163,184,.07)', 'stroke-width': 2, fill: 'none' }, pat);
+  const hat = S('pattern', { id: 'pHatch', width: 18, height: 18, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, defs); S('rect', { width: 18, height: 18, fill: '#78350f' }, hat); S('rect', { width: 8, height: 18, fill: P.tgt, opacity: .55 }, hat);
+  const BG = S('g', {}, sv); const G = S('g', {}, sv);
+  // dark technical floor for an area, with 240/160 px margins so a zoomed camera never shows void
+  const techBg = (ox, oy, h = 1080) => { S('rect', { x: ox - 240, y: oy - 160, width: 2400, height: h + 320, fill: 'url(#gTech)' }, BG); S('rect', { x: ox - 240, y: oy - 160, width: 2400, height: h + 320, fill: 'url(#pGrid)' }, BG); };
+  return { world, sv, defs, BG, G, techBg };
+}
+// ---- technical pieces
+function nnet(par, cx, cy, w, h, layers, col, id) {   // nodes get glow circles with class id+'g'+layer -> fire()
+  const g = S('g', { id }, par); const pts = layers.map((n, li) => Array.from({ length: n }, (_, k) => [cx - w / 2 + li * w / (layers.length - 1), cy - h / 2 + (k + .5) * h / n]));
+  for (let li = 0; li < pts.length - 1; li++) pts[li].forEach(a => pts[li + 1].forEach(b => S('path', { d: `M${a[0]} ${a[1]} L${b[0]} ${b[1]}`, stroke: col, 'stroke-opacity': .22, 'stroke-width': 2 }, g)));
+  const r = Math.min(18, h / Math.max(...layers) * .26);
+  pts.forEach((L, li) => L.forEach(p => { S('circle', { cx: p[0], cy: p[1], r, fill: '#0b1020', stroke: col, 'stroke-width': 4 }, g); S('circle', { class: id + 'g' + li, cx: p[0], cy: p[1], r: r * .62, fill: col }, g); }));
+  return g;
+}
+const fire = (id, nL, t, gap = .18, rep = 1) => { for (let li = 0; li < nL; li++) tl.fromTo('.' + id + 'g' + li, { autoAlpha: .15 }, { autoAlpha: 1, duration: .2, yoyo: true, repeat: rep, ease: 'sine.inOut' }, t + li * gap); };   // signal wave through layers (use odd rep so it ends dim)
+function encT(par, x, y, w, h, col, label, id) { const g = S('g', { id }, par); S('path', { d: `M${x} ${y} L${x + w} ${y + h * .28} L${x + w} ${y + h * .72} L${x} ${y + h} Z`, fill: col, 'fill-opacity': .16, stroke: col, 'stroke-width': 5, 'stroke-linejoin': 'round' }, g);
+  for (let k = 0; k < 3; k++) { const xx = x + w * (.22 + k * .26), hh = h * (1 - .56 * (xx - x) / w) * .7; S('rect', { x: xx - 7, y: y + h / 2 - hh / 2, width: 14, height: hh, rx: 7, fill: col, opacity: .55 }, g); }
+  if (label) wtext(g, x + w / 2, y + h + 42, label, 28, col, 'middle', 700); return g; }   // encoder = trapezoid (wide in -> narrow out)
+function vecG(par, x, y, vals, col, id, c = 56) { const g = S('g', { id }, par); vals.forEach((v, k) => S('rect', { x: x + k * (c + 6), y, width: c, height: c, rx: 10, fill: col, 'fill-opacity': .18 + .45 * Math.min(1, Math.abs(v) / 2), stroke: col, 'stroke-width': 3 }, g));
+  const nt = S('g', { id: id + 'N' }, g); vals.forEach((v, k) => wtext(nt, x + k * (c + 6) + c / 2, y + c / 2 + 7, (v > 0 ? '' : '-') + Math.abs(v).toFixed(1), c * .34, '#f8fafc', 'middle', 700)); return g; }   // embedding vector; numbers in id+'N'
+function pixImg(par, x, y, cols, rows, cell, id, colFn) { const g = S('g', { id }, par); const cells = [];   // picture as pixels: colFn(u,v) with u,v in 0..1
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { const col = colFn((c + .5) / cols, (r + .5) / rows); cells.push({ c, r, col, el: S('rect', { x: x + c * cell, y: y + r * cell, width: cell - 2, height: cell - 2, rx: 2, fill: col }, g) }); }
+  return { g, cells }; }
+function card(par, x, y, w, h, id, bg = '#f8fafc') { const g = S('g', { id, filter: 'url(#fSh)' }, par); S('rect', { x, y, width: w, height: h, rx: 18, fill: bg }, g); return g; }
+function bulb(par, cx, cy, s, id) { const g = S('g', { id }, par); S('circle', { cx, cy, r: 110 * s, fill: 'url(#gBulb)' }, g); S('circle', { cx, cy, r: 46 * s, fill: '#fde68a' }, g); S('rect', { x: cx - 20 * s, y: cy + 40 * s, width: 40 * s, height: 30 * s, rx: 6 * s, fill: '#94a3b8' }, g); for (let k = 0; k < 6; k++) { const a = -Math.PI / 2 + (k - 2.5) * .5; S('path', { d: `M${cx + Math.cos(a) * 64 * s} ${cy + Math.sin(a) * 64 * s} L${cx + Math.cos(a) * 92 * s} ${cy + Math.sin(a) * 92 * s}`, stroke: '#fde68a', 'stroke-width': 7 * s, 'stroke-linecap': 'round' }, g); } return g; }
+function person(par, x, y, s, col, id) { const g = S('g', { id }, par); S('circle', { cx: x, cy: y - 230 * s, r: 70 * s, fill: col }, g); S('path', { d: `M${x - 150 * s} ${y} Q${x - 150 * s} ${y - 140 * s} ${x} ${y - 145 * s} Q${x + 150 * s} ${y - 140 * s} ${x + 150 * s} ${y} Z`, fill: col }, g); return g; }   // generic silhouette (use for real people — never draw a likeness)
+function ballG(par, cx, cy, r, id, idR) { const g = S('g', id ? { id } : {}, par); const R = S('g', idR ? { id: idR } : {}, g); S('circle', { cx, cy, r, fill: P.ball }, R); S('path', { d: `M${cx - r} ${cy} Q${cx} ${cy - r * .5} ${cx + r} ${cy}`, stroke: '#fff', 'stroke-width': r * .16, fill: 'none' }, R); S('circle', { cx: cx - r * .35, cy: cy - r * .4, r: r * .18, fill: '#fff', opacity: .5 }, R); return g; }   // move id with x, spin idR with rotation+transformOrigin 50% 50%
+function wordC(par, cx, cy, size, word, cols, id) { const g = S('g', { id }, par); word.split('').forEach((ch, i) => { const L = S('g', { id: id + i }, g); wtext(L, cx + (i - (word.length - 1) / 2) * size * .72, cy, ch, size, cols[i % cols.length], 'middle', 800); }); return g; }   // coloured title letters id+i
+
+// ===================== LIFE (premium add-on) =====================
+// camera breathing, transition flash/streak, small effects. Backgrounds stay the dark techBg (no per-area colours). NO vignette, NO floating particles/bubbles (user hates all three).
+// call once after makeWorld (before anything else is added to s): wraps #world in #drift and adds screen overlays
+function addLife(s) { const w = document.getElementById('world'); const d = H('div', 'a', `left:0;top:0;width:${FW}px;height:${FH}px`, null, s, 'drift'); d.appendChild(w);
+  H('div', 'a', `left:0;top:0;width:${FW}px;height:${FH}px;pointer-events:none;background:radial-gradient(circle at center,rgba(253,230,138,.5),rgba(255,255,255,0) 70%)`, '', s, 'flash');
+  H('div', 'a', `left:-700px;top:-200px;width:500px;height:${FH + 700}px;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(253,230,138,.32),rgba(255,255,255,0))`, '', s, 'streak');
+  H('div', 'a', `left:0;top:0;width:${FW}px;height:${FH}px;background:#000;pointer-events:none`, '', s, 'fadeEnd');
+  H('div', 'a', `left:0;top:0;width:${FW}px;height:${FH}px;background:#000;pointer-events:none`, '', s, 'fadeIn'); }
+// call inside beats: area-start times get a flash + light streak; camera breathes the whole video
+function lifeBeats(times) { tl.set(['#flash', '#streak'], { autoAlpha: 0 }, 0); tl.set('#streak', { rotation: 18 }, 0);
+  tl.to('#drift', { scale: 1.035, x: -18, y: 10, transformOrigin: '50% 50%', duration: 8, yoyo: true, repeat: Math.max(0, Math.floor(END / 8) - 1), ease: 'sine.inOut' }, 0);
+  times.forEach(t => { tl.fromTo('#flash', { autoAlpha: .7 }, { autoAlpha: 0, duration: .6, ease: 'power2.out' }, t - .05); tl.fromTo('#streak', { autoAlpha: 1, x: 0 }, { autoAlpha: 1, x: 2900, duration: .7, ease: 'power2.inOut' }, t - .25); tl.set('#streak', { autoAlpha: 0 }, t + .5); }); }
+// small effects
+function spark(par, cx, cy, s, col, id) { const g = S('g', { id }, par); for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; S('path', { d: `M${cx + Math.cos(a) * 20 * s} ${cy + Math.sin(a) * 20 * s} L${cx + Math.cos(a) * 60 * s} ${cy + Math.sin(a) * 60 * s}`, stroke: col, 'stroke-width': 7 * s, 'stroke-linecap': 'round' }, g); } S('circle', { cx, cy, r: 12 * s, fill: col }, g); return g; }   // POP then fade + scale up
+function gauge(par, cx, cy, r, col, id) { const g = S('g', { id }, par); S('path', { d: `M${cx - r} ${cy} A${r} ${r} 0 0 1 ${cx + r} ${cy}`, stroke: '#334155', 'stroke-width': 22, fill: 'none', 'stroke-linecap': 'round' }, g); S('path', { d: `M${cx + r * Math.cos(-.9)} ${cy + r * Math.sin(-.9)} A${r} ${r} 0 0 1 ${cx + r} ${cy}`, stroke: col, 'stroke-width': 22, fill: 'none', 'stroke-linecap': 'round' }, g); const n = S('g', { id: id + 'N' }, g); S('path', { d: `M${cx} ${cy} L${cx} ${cy - r + 20}`, stroke: '#f8fafc', 'stroke-width': 9, 'stroke-linecap': 'round' }, n); S('circle', { cx, cy, r: 14, fill: '#f8fafc' }, g); return g; }   // needle id+'N': rotation with transformOrigin '50% 100%'
+function glowRing(par, cx, cy, r, col, id, w = 8) { return S('circle', { id, cx, cy, r, fill: 'none', stroke: col, 'stroke-width': w, opacity: .9 }, par); }
+// ENDING (every video): call last inside beats. Camera eases back to (cx,cy,z) as the last words finish, focus (selector of the final
+// visual) gets a pulse, then the screen fades to black. build.py makes the video TAIL s longer than the audio.
+function outro(cx, cy, z = .9, focus) { if (typeof flushTalks === 'function') flushTalks(); const T2 = END + (typeof TAIL === 'number' ? TAIL : 3.1); tl.set('#fadeEnd', { autoAlpha: 0 }, 0);
+  CAM(END - .4, cx, cy, z, 2.8, 'sine.inOut');
+  if (focus) tl.to(focus, { scale: 1.12, transformOrigin: '50% 50%', duration: .6, yoyo: true, repeat: 3, ease: 'sine.inOut' }, END + .1);
+  tl.fromTo('#fadeEnd', { autoAlpha: 0 }, { autoAlpha: 1, duration: 1.3, ease: 'power1.in' }, T2 - 1.4); tl.set({}, {}, T2); }
+// OPENING (every video): call FIRST inside beats. 0..HEAD (no voice yet): fade from black, light streak, the hero object assembles
+// (each child of `hero` scales in, staggered), a glow ring pulses. If the script has a spoken title (TITLE from align.py), its words pop
+// on the spoken words in a screen-space row and leave at `outAt` (phrase where the hook starts). Then the first area takes the camera.
+// hero: selector of a group built at build time (NOT hid()), cx/cy: its centre, s: the scene element.
+function intro(s, hero, cx, cy, o = {}) {
+  const h0 = typeof HEAD === 'number' ? HEAD : 1.5, kids = [...document.querySelector(hero).children];
+  tl.fromTo('#fadeIn', { autoAlpha: 1 }, { autoAlpha: 0, duration: .8, ease: 'power1.out' }, 0);
+  tl.set('#streak', { autoAlpha: 0, rotation: 18 }, 0); tl.fromTo('#streak', { autoAlpha: 1, x: 0 }, { autoAlpha: 1, x: 2900, duration: .9, ease: 'power2.inOut' }, .2); tl.set('#streak', { autoAlpha: 0 }, 1.2);
+  CUT(0, cx, cy, o.z0 ?? 2.0); CAM(.05, cx, cy + 40, o.z1 ?? 1.45, h0 + .6, 'power2.out');
+  tl.fromTo(hero, { autoAlpha: 0 }, { autoAlpha: 1, duration: .2 }, .1);
+  tl.fromTo(kids, { scale: 0, transformOrigin: '50% 50%' }, { scale: 1, duration: .35, stagger: Math.min(.12, (h0 - .6) / Math.max(1, kids.length)), ease: 'back.out(1.8)' }, .15); B(.15);
+  const ring = document.getElementById('introRing') || glowRing(document.querySelector(hero).parentNode, cx, cy, o.r ?? 250, o.col ?? '#a78bfa', 'introRing', 6);
+  tl.set(ring, { autoAlpha: 0 }, 0); tl.fromTo(ring, { autoAlpha: .9, scale: .9, transformOrigin: '50% 50%' }, { autoAlpha: 0, scale: 1.8, duration: .9, ease: 'power2.out' }, h0 - .3);
+  if (TITLE && o.title !== false) {
+    const words = TITLE.split(/\s+/), cols = o.titleCols || [], wrap = H('div', 'cx', 'top:828px;width:fit-content', null, s, 'tWrap');
+    const row = H('div', '', 'display:flex;gap:28px;font-size:96px;font-weight:800;letter-spacing:-1px;line-height:1.1', null, wrap);
+    words.forEach((w, k) => H('span', 'ib', `color:${cols[k] || '#e8eefc'}`, w, row, 'tw' + k));
+    H('div', '', `height:9px;border-radius:5px;margin-top:10px;background:${o.ulCol || '#fbbf24'}`, '', wrap, 'tUl');
+    const ids = words.map((_, k) => '#tw' + k); tl.set([...ids, '#tUl'], { autoAlpha: 0 }, 0);
+    let last = h0; words.forEach((w, k) => { const t = findp(w, 0) ?? (h0 + .25 * k); last = t; tl.fromTo(ids[k], { autoAlpha: 0, y: 40, scale: .85, transformOrigin: '50% 50%' }, { autoAlpha: 1, y: 0, scale: 1, duration: .45, ease: 'back.out(1.8)' }, t - .08); B(t); });
+    tl.fromTo('#tUl', { autoAlpha: 1, scaleX: 0, transformOrigin: '0% 50%' }, { autoAlpha: 1, scaleX: 1, duration: .5, ease: 'power2.out' }, last + .1);
+    CAM(h0 + .1, cx, cy + 170, 1.12, 1.6, 'sine.inOut');
+    const tOut = o.outAt ? findp(o.outAt, last) ?? last + 1.2 : last + 1.2; OUT([...ids, '#tUl'], tOut - .25, { d: .3 });
+  }
+}
+
+// ===================== ENGINE for the news look (loaded by build.py BEFORE look.js) =====================
+// For the AI + Dev news channel only these engine pieces are used: D, nlScene, nlStart/nlNext (overridden in look.js), NEXT, CUE, nlBox, nlSvg,
+// nlType + TYPE + CARET, COUNT, arw, nlDraw, nlShow. The rest of this file is the retired neon look (nl* windows, nw* cards, orb-free intro):
+// build.py BANS those parts, use the s* parts of look.js instead.
+// ===================== NEWS  (neon-tech look for the daily tech news channel, `news` skill) =====================
+// Build:  python3 ~/hf-kit/news/nbuild.py video.js audio.m4a      (lint + phrase check + build; cats premium.js + life.js + this + video.js, HEAD 2.6 / TAIL 3.6)
+// Look:   navy-black bg + navy glow on top, NO grid, glowing windows/chips, mono labels. Titles = Space Grotesk, body = Inter, code/labels = JetBrains Mono.
+// Colour = meaning (never decoration):  NEW / GOOD green · COMPANY / PRODUCT blue · KEY NUMBER / FACT yellow · PROBLEM / RISK pink · purple = ONLY the <b> word in a title.
+// NO mascot, NO header, NO footer, NO progress bar: everything lives inside a scene (nbuild bans drawing on `stage`).
+// RULE #1: SHOW, DON'T WRITE. Every scene has a moving visual. Text = 1-4 word labels, plus the exact text a story is about (headline, post, command).
+const NL = { bg: '#05070d', data: '#34e0b0', model: '#6cc8ff', out: '#ffcc4d', err: '#ff6b81', acc: '#b48cff', ink: '#eef2f6', dim: '#8e9aae', line: 'rgba(255,255,255,.09)' };
+const NLMONO = "'JetBrains Mono','DejaVu Sans Mono',monospace", NLHEAD = "'Space Grotesk',Inter,sans-serif", NLBODY = "Inter,'Space Grotesk',sans-serif";
+const NLX = (c, sz = 26) => `<svg width="${sz}" height="${sz}" viewBox="0 0 26 26"><path d="M6 6L20 20M20 6L6 20" stroke="${c}" stroke-width="4" stroke-linecap="round"/></svg>`;
+const NLOK = (c, sz = 26) => `<svg width="${sz}" height="${sz}" viewBox="0 0 26 26"><path d="M5 14L11 19L21 7" stroke="${c}" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const NLUSR = (c, sz = 38) => `<svg width="${sz}" height="${sz}" viewBox="0 0 38 38"><circle cx="19" cy="14" r="7" stroke="${c}" stroke-width="3" fill="none"/><path d="M6 33c2-8 8-11 13-11s11 3 13 11" stroke="${c}" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
+
+// ---------- css + layers (call FIRST in build) ----------
+function nlInit(s) {
+  const css = document.createElement('style'); css.textContent = `
+  #root{background:radial-gradient(1100px 650px at 50% -10%,#0f1a33 0%,transparent 65%),${NL.bg}!important;font-family:${NLBODY}}
+  .orb{display:none!important} .grid-bg{display:none!important}
+  .nsc{position:absolute;inset:0}
+  .nttl{position:absolute;top:52px;left:0;right:0;text-align:center;font:700 60px ${NLHEAD};color:#fff;letter-spacing:-1px;white-space:nowrap}
+  .nttl b{color:${NL.acc};font-weight:700;text-shadow:0 0 30px ${NL.acc}66}
+  .nwin{position:absolute;background:#0a0f1a;border:2px solid var(--c);border-radius:18px;box-shadow:0 0 44px -10px var(--c),inset 0 0 30px -18px var(--c);overflow:hidden}
+  .nhd{height:50px;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid ${NL.line};font:500 24px ${NLMONO};color:${NL.dim};white-space:nowrap}
+  .ndt{width:12px;height:12px;border-radius:50%;background:#262d3a}
+  .nchp{position:absolute;display:flex;align-items:center;gap:14px;padding:12px 24px;border-radius:14px;border:2px solid var(--c);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 24%,#05070d),color-mix(in srgb,var(--c) 7%,#05070d));color:#fff;font:700 32px ${NLMONO};box-shadow:0 0 30px -6px var(--c);white-space:nowrap}
+  .nico{min-width:40px;height:40px;padding:0 6px;border-radius:10px;background:var(--c);color:#05070d;display:flex;align-items:center;justify-content:center;font:800 24px ${NLMONO}}
+  .nlb{position:absolute;font:700 24px ${NLMONO};letter-spacing:3px;color:var(--c);text-transform:uppercase;white-space:nowrap}
+  .ntx{font:500 32px/1.4 ${NLBODY};color:${NL.ink}}
+  .nrow{position:relative;display:flex;align-items:center;gap:18px;font:500 28px ${NLMONO};color:#c9d2de;padding:12px 26px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.06)}
+  .ndoc{position:absolute;border-radius:8px;border:1.5px solid color-mix(in srgb,var(--c) 70%,#000);background:color-mix(in srgb,var(--c) 10%,#05070d)}
+  .ndoc i{position:absolute;left:18%;right:18%;height:3px;border-radius:2px;background:color-mix(in srgb,var(--c) 55%,#000)}
+  .nmk{position:absolute;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--c);background:color-mix(in srgb,var(--c) 18%,#05070d);box-shadow:0 0 24px -4px var(--c)}
+  .nav{position:absolute;width:80px;height:80px;border-radius:50%;border:2px solid var(--c);background:#0a0f1a;display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px -6px var(--c)}
+  .nbig{position:absolute;left:0;right:0;text-align:center;font:800 120px ${NLMONO};color:var(--c);text-shadow:0 0 40px color-mix(in srgb,var(--c) 60%,transparent);white-space:nowrap}
+  .nbox{position:absolute}
+  .ncell{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:8px;font:600 26px ${NLMONO};color:#fff}
+  .nchar{display:inline-block;white-space:pre}
+  .ncar{display:inline-block;margin-left:6px;border-radius:4px;background:${NL.data};box-shadow:0 0 18px ${NL.data}}
+  .nhero{position:absolute;z-index:5}`;
+  document.head.appendChild(css);
+  nlInit.top = D(stage, '', 'position:absolute;inset:0;pointer-events:none;z-index:20', 'nlTop');   // hero objects live here, above every scene
+  return s;
+}
+const D = (par, html, css2, id, cls = '') => { const e = document.createElement('div'); if (id) e.id = id; if (cls) e.className = cls; e.style.cssText = css2 || ''; e.innerHTML = html || ''; par.appendChild(e); return e; };
+const NLWIRES = [];
+
+// ---------- scene + basic parts ----------
+const nlScene = (s, id, title) => { const e = D(s, '', '', id, 'nsc'); D(e, title, '', id + 'T', 'nttl'); return e; };           // title: 'Plain words <b>key word</b>'
+const nlWin = (par, id, x, y, w, h, c, head) => D(par, `<div class="nhd"><span class="ndt" style="background:${c}"></span><span class="ndt"></span><span class="ndt"></span><span style="margin-left:10px">${head}</span></div>`, `left:${x}px;top:${y}px;width:${w}px;height:${h}px;--c:${c}`, id, 'nwin');
+const nlChip = (par, id, x, y, txt, c, ico, fs) => D(par, (ico ? `<span class="nico">${ico}</span>` : '') + `<span>${txt}</span>`, `left:${x}px;top:${y}px;--c:${c}${fs ? ';font-size:' + fs + 'px' : ''}`, id, 'nchp');
+const nlLab = (par, id, x, y, txt, c, center) => center ? D(par, `<span>${txt}</span>`, `left:${x}px;top:${y}px;width:0;display:flex;justify-content:center;--c:${c}`, id, 'nlb') : D(par, txt, `left:${x}px;top:${y}px;--c:${c}`, id, 'nlb');   // center=true: x is the label's centre
+const nlMark = (par, id, x, y, c, ok) => D(par, ok ? NLOK(c) : NLX(c), `left:${x}px;top:${y}px;--c:${c}`, id, 'nmk');
+const nlUser = (par, id, x, y, c) => D(par, NLUSR(c), `left:${x}px;top:${y}px;--c:${c}`, id, 'nav');
+const nlBig = (par, id, y, txt, c, fs) => D(par, txt, `top:${y}px;--c:${c}${fs ? ';font-size:' + fs + 'px' : ''}`, id, 'nbig');
+const nlText = (par, id, x, y, html, css = '') => D(par, html, `position:absolute;left:${x}px;top:${y}px;${css}`, id, 'ntx');
+const nlRow = (par, id, left, right, rc) => D(par, `<span style="flex:1">${left}</span><span style="color:${rc || NL.data}">${right ?? ''}</span>`, '', id, 'nrow');
+// glow frame around one row (lives inside the row, so it always lines up). POP('#'+id, t) to show it.
+const nlRowHL = (row, id, c = NL.out) => D(row, '', `position:absolute;inset:2px 6px;border:3px solid ${c};border-radius:10px;box-shadow:0 0 20px ${c}`, id);
+const nlSvg = par => { const v = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); v.style.cssText = 'position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:visible;pointer-events:none'; par.appendChild(v); return v; };
+const nlWire = (v, id, d, c, dash, w = 3.5) => { const g = S('g', { id }, v); S('path', { d, stroke: c, 'stroke-width': w * 3, fill: 'none', opacity: .16, 'stroke-linecap': 'round' }, g); S('path', { class: 'draw', d, stroke: c, 'stroke-width': w, fill: 'none', 'stroke-linecap': 'round', 'stroke-dasharray': dash || null }, g); NLWIRES.push(g); return g; };
+const nlDocs = (par, id, x, y, cols, rows, w, h, gap, c) => { const g = D(par, '', '', id); for (let r = 0; r < rows; r++) for (let k = 0; k < cols; k++) D(g, '<i style="top:28%"></i><i style="top:48%"></i><i style="top:68%;right:40%"></i>', `left:${x + k * (w + gap)}px;top:${y + r * (h + gap)}px;width:${w}px;height:${h}px;--c:${c}`, null, 'ndoc ' + id + 'd'); return g; };
+// a box holding its own svg (local coords 0..w, 0..h) -> [div, svg]
+const nlBox = (par, id, x, y, w, h) => { const e = D(par, '', `left:${x}px;top:${y}px;width:${w}px;height:${h}px`, id, 'nbox'); const v = S('svg', { width: w, height: h, viewBox: `0 0 ${w} ${h}` }, e); v.style.overflow = 'visible'; return [e, v]; };
+
+// ---------- HERO object: one card that lives across scenes (answer / dataset / model output). Move it, never rebuild it. ----------
+// nlHero(id, x, y, w, html, c, head) builds it in the top layer;  HERO(id, t, x, y, s) glides it to (x,y) at scale s;  show with IN/POP, hide with OUT.
+function nlHero(id, x, y, w, html, c = NL.out, head = 'answer') { const e = nlWin(nlInit.top, id, x, y, w, 0, c, head); e.style.height = 'auto'; e.classList.add('nhero'); D(e, html, 'padding:22px 28px 26px;font-size:38px', null, 'ntx'); e.dataset.x = x; e.dataset.y = y; return e; }
+function HERO(id, t, x, y, s = 1, d = .9) { const e = document.getElementById(id); B(t); return tl.to(e, { x: x - +e.dataset.x, y: y - +e.dataset.y, scale: s, transformOrigin: '0% 0%', duration: d, ease: 'power3.inOut' }, t); }
+
+// ---------- CARET: typed mono text with the green block cursor. nlType(par,id,x,y,txt,fs,col) ; TYPE(id,t,dt) types it (returns end time) ; CARET(id,t,n) blinks n times ----------
+function nlType(par, id, x, y, txt, fs = 34, col = NL.ink) { const n = [...txt].length, cw = fs * .6;   // mono: every char is .6 em wide, so the caret can sit right after the last typed char
+  const e = D(par, [...txt].map(ch => `<span class="nchar ${id}c">${ch}</span>`).join('') + `<span id="${id}k" class="ncar" style="position:absolute;left:${n * cw + 6}px;top:${fs * .05}px;width:${fs * .5}px;height:${fs * 1.05}px"></span>`, `position:absolute;left:${x}px;top:${y}px;font:700 ${fs}px ${NLMONO};line-height:${fs * 1.15}px;height:${fs * 1.15}px;color:${col};white-space:nowrap`, id, 'ncode'); e.dataset.cw = cw; return e; }
+function TYPE(id, t, dt = .055) { B(t); const e = document.getElementById(id), cw = +e.dataset.cw, cs = e.querySelectorAll('.' + id + 'c'), n = cs.length; tl.set(e, { autoAlpha: 1 }, t); tl.set('#' + id + 'k', { x: -n * cw }, 0);
+  cs.forEach((c, i) => { tl.set(c, { autoAlpha: 0 }, 0); tl.set(c, { autoAlpha: 1 }, t + i * dt); tl.set('#' + id + 'k', { x: -(n - i - 1) * cw }, t + i * dt); }); return t + n * dt; }
+function CARET(id, t, n = 2) { for (let i = 0; i < n; i++) { tl.set('#' + id + 'k', { autoAlpha: 0 }, t + i * .5); tl.set('#' + id + 'k', { autoAlpha: 1 }, t + i * .5 + .25); } B(t); return t + n * .5; }
+
+// ---------- scene flow ----------
+// nlStart(['#s1','#s2',...]) FIRST in beats: hides all scenes but #s1, every top-level part of every scene, and every wire. (Children of a window show with it.)
+// nlNext('#s2', 'first words of scene 2') switches scene (+ slow camera drift) and returns its start time.  nlDraw(id, t) shows + draws a wire.
+let NLCUR = null; const NLSC = [];
+function nlStart(scs) { NLSC.push(...scs); NLCUR = scs[0]; tl.set(scs.slice(1), { autoAlpha: 0 }, 0);
+  scs.forEach(sc => document.querySelectorAll(sc + ' > [id]:not(.nttl)').forEach(e => tl.set(e, { autoAlpha: 0 }, 0)));
+  NLWIRES.forEach(g => tl.set(g, { autoAlpha: 0 }, 0)); document.querySelectorAll('#nlTop > [id]').forEach(e => tl.set(e, { autoAlpha: 0 }, 0)); tl.set(scs[0] + 'T', { autoAlpha: 0 }, 0);
+  IN(scs[0] + 'T', HEAD - .3, { y: -20, d: .5 }); nlDrift(scs[0], HEAD - .3); }
+function nlDrift(sel, t, d = 9) { tl.fromTo(sel, { scale: 1, transformOrigin: '50% 45%' }, { scale: 1.03, duration: d, ease: 'none' }, t); }
+function nlNext(sel, phrase) { const t = go(phrase); OUT(NLCUR, t - .3, { d: .3 }); tl.set(sel, { autoAlpha: 1 }, t); IN(sel + 'T', t, { y: -20, d: .5 }); nlDrift(sel, t); NLCUR = sel; return t; }
+const nlDraw = (id, t, d = .6) => { tl.set('#' + id, { autoAlpha: 1 }, t); return DRAW('#' + id + ' .draw', t, { d }); };
+const nlShow = (sels, t) => tl.set(sels, { autoAlpha: 1 }, t);
+
+// =====================================================================================================
+// ML / DS VISUALS. Each one is a top-level part (hidden by nlStart). Show it with IN/POP/FADE, then run its beat.
+// =====================================================================================================
+
+// ---- training loop: Data -> Model -> Loss -> Update around a ring, a light dot orbits, epoch counter in the middle.  LOOP_RUN(id, t, laps, lap=1.4)
+function nlLoop(par, id, cx, cy, R = 185, epochs = ['epoch 1', 'epoch 12', 'epoch 30', 'epoch 50']) {
+  const g = D(par, '', 'position:absolute;inset:0', id), v = nlSvg(g), lp = a => [cx + Math.cos(a) * R, cy + Math.sin(a) * R];
+  S('circle', { cx, cy, r: R, fill: 'none', stroke: NL.model, 'stroke-width': 12, opacity: .12 }, v); S('circle', { cx, cy, r: R, fill: 'none', stroke: NL.model, 'stroke-width': 3, 'stroke-dasharray': '10 12' }, v);
+  [-1, 1, 3, -3].forEach(q => { const a = q * Math.PI / 4, [x, y] = lp(a); S('path', { d: 'M-10 -9 L10 0 L-10 9 Z', fill: NL.model, transform: `translate(${x} ${y}) rotate(${a * 180 / Math.PI + 90})` }, v); });
+  D(g, '', `position:absolute;left:${cx - 11}px;top:${cy - R - 11}px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 0 18px ${NL.model},0 0 6px #fff`, id + 'dot');
+  [['Data', NL.data, '▤', Math.PI], ['Model', NL.model, 'M', -Math.PI / 2], ['Loss', NL.err, 'L', 0], ['Update', NL.out, '∇', Math.PI / 2]].forEach(([t, c, i, a], k) => { const [x, y] = lp(a); const e = nlChip(g, id + 'n' + k, x - 90, y - 30, t, c, i, 28); e.style.width = '180px'; e.style.justifyContent = 'center'; e.style.padding = '8px 12px'; });
+  const ep = D(g, '', `position:absolute;left:${cx - 110}px;top:${cy - 18}px;width:220px;text-align:center`, id + 'ep'); epochs.forEach((t, k) => D(ep, t, `position:absolute;left:0;right:0;font:700 26px ${NLMONO};color:${NL.model}`, id + 'ev' + k, id + 'ev'));
+  g.dataset.r = R; return g;
+}
+function LOOP_RUN(id, t, laps = 3, lap = 1.4) { B(t); const R = +document.getElementById(id).dataset.r, n = laps * 8, dt = lap / 8, ev = document.querySelectorAll('.' + id + 'ev');
+  ev.forEach(e => tl.set(e, { autoAlpha: 0 }, 0)); for (let k = 1; k <= n; k++) { const a = -Math.PI / 2 + k * Math.PI / 4; tl.to('#' + id + 'dot', { x: Math.cos(a) * R, y: Math.sin(a) * R + R, duration: dt, ease: 'none' }, t + (k - 1) * dt); }
+  const per = laps * lap / ev.length; ev.forEach((e, k) => { tl.set(e, { autoAlpha: 1 }, t + k * per); if (k < ev.length - 1) tl.set(e, { autoAlpha: 0 }, t + (k + 1) * per); });
+  for (let k = 0; k < laps; k++) PULSE('#' + id + 'n2', t + k * lap + lap * .25, { s: 1.08 }); return t + laps * lap; }
+
+// ---- neural network: layers of nodes + edges.  NET_FWD(id, t, d=1.6) = signal flows left->right (edges draw, nodes light up layer by layer)
+function nlNet(par, id, x, y, w, h, layers = [3, 5, 5, 2], cIn = NL.data, cOut = NL.out) {
+  const [e, v] = nlBox(par, id, x, y, w, h), L = layers.length, pos = layers.map((n, l) => Array.from({ length: n }, (_, k) => [40 + l * (w - 80) / (L - 1), h / 2 + (k - (n - 1) / 2) * Math.min(110, (h - 60) / Math.max(...layers))]));
+  const col = l => l === 0 ? cIn : l === L - 1 ? cOut : NL.model;
+  for (let l = 0; l < L - 1; l++) { const g = S('g', { id: id + 'e' + l }, v); pos[l].forEach(p => pos[l + 1].forEach(q => S('path', { class: 'draw', d: `M${p[0]} ${p[1]} L${q[0]} ${q[1]}`, stroke: NL.model, 'stroke-width': 2, opacity: .45 }, g))); }
+  pos.forEach((ps, l) => { const g = S('g', { id: id + 'l' + l }, v); ps.forEach(p => { S('circle', { cx: p[0], cy: p[1], r: 30, fill: col(l), opacity: .12 }, g); S('circle', { cx: p[0], cy: p[1], r: 17, fill: '#0a0f1a', stroke: col(l), 'stroke-width': 3 }, g); S('circle', { class: id + 'h' + l, cx: p[0], cy: p[1], r: 11, fill: col(l), opacity: 0 }, g); }); });
+  e.dataset.L = L; return e;
+}
+function NET_FWD(id, t, d = 1.6) { B(t); const L = +document.getElementById(id).dataset.L, st = d / L;
+  for (let l = 0; l < L; l++) { tl.fromTo('.' + id + 'h' + l, { opacity: 0 }, { opacity: 1, duration: .2, stagger: .04 }, t + l * st); if (l < L - 1) DRAW('#' + id + 'e' + l + ' path', t + l * st + .1, { d: st }); } return t + d; }
+
+// ---- plot window with axes + a curve (loss going down by default). pts = [[x0..1, y0..1], ...] (y up). CURVE(id, t, d) draws it, a dot rides the end.
+function nlCurve(par, id, x, y, w, h, o = {}) {
+  const c = o.c || NL.err, e = nlWin(par, id, x, y, w, h, c, o.head || 'loss.png'), pw = w - 140, ph = h - 160, ox = 90, oy = h - 70;
+  const v = S('svg', { width: w, height: h }, e); v.style.cssText = 'position:absolute;left:0;top:0;overflow:visible';
+  S('path', { d: `M${ox} ${oy - ph} L${ox} ${oy} L${ox + pw} ${oy}`, stroke: '#3a4458', 'stroke-width': 2.5, fill: 'none' }, v);
+  for (let k = 1; k < 4; k++) S('path', { d: `M${ox} ${oy - ph * k / 4} L${ox + pw} ${oy - ph * k / 4}`, stroke: '#1c2333', 'stroke-width': 1.5 }, v);
+  const pts = o.pts || Array.from({ length: 30 }, (_, k) => { const u = k / 29; return [u, .08 + .85 * Math.exp(-u * 4.2) + .03 * Math.sin(k * 1.7)]; });
+  const P = pts.map(([a, b]) => [ox + a * pw, oy - b * ph]); const dd = 'M' + P.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
+  S('path', { d: dd, stroke: c, 'stroke-width': 12, fill: 'none', opacity: .15, 'stroke-linecap': 'round', id: id + 'pg' }, v); S('path', { id: id + 'p', class: 'draw', d: dd, stroke: c, 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, v);
+  S('circle', { id: id + 'd', cx: P[0][0], cy: P[0][1], r: 10, fill: '#fff', opacity: 0 }, v);
+  if (o.xl) D(e, o.xl, `position:absolute;right:40px;top:${h - 52}px;font:600 24px ${NLMONO};color:${NL.dim}`); if (o.yl) D(e, o.yl, `position:absolute;left:24px;top:62px;font:600 24px ${NLMONO};color:${NL.dim}`);
+  e.__P = P; return e;
+}
+function CURVE(id, t, d = 1.6) { B(t); const P = document.getElementById(id).__P; tl.fromTo('#' + id + 'pg', { opacity: 0 }, { opacity: .15, duration: .3 }, t); DRAW('#' + id + 'p', t, { d, e: 'none' }); tl.set('#' + id + 'd', { opacity: 1 }, t);
+  const n = Math.min(P.length - 1, 12); for (let k = 1; k <= n; k++) { const p = P[Math.round(k * (P.length - 1) / n)]; tl.to('#' + id + 'd', { attr: { cx: p[0], cy: p[1] }, duration: d / n, ease: 'none' }, t + (k - 1) * d / n); } return t + d; }
+
+// ---- gradient descent: loss bowl + ball stepping down.  GD(id, t, steps=6, dt=.45)
+function nlBowl(par, id, x, y, w, h, c = NL.err) {
+  const [e, v] = nlBox(par, id, x, y, w, h);
+  const yb = u => 40 + (h - 90) * (1 - Math.pow(2 * u - 1, 2)); const dd = 'M' + Array.from({ length: 41 }, (_, k) => `${(k / 40 * w).toFixed(1)} ${yb(k / 40).toFixed(1)}`).join(' L');
+  S('path', { d: dd, stroke: c, 'stroke-width': 14, fill: 'none', opacity: .14 }, v); S('path', { d: dd, stroke: c, 'stroke-width': 4, fill: 'none' }, v);
+  S('circle', { cx: w / 2, cy: yb(.5) + 4, r: 8, fill: NL.data }, v);
+  const us = [.04, .17, .28, .37, .44, .48, .5]; e.__B = us.map(u => [u * w, yb(u) - 22]);
+  S('circle', { id: id + 'b', cx: e.__B[0][0], cy: e.__B[0][1], r: 20, fill: NL.out, filter: null }, v); S('circle', { id: id + 'bg', cx: e.__B[0][0], cy: e.__B[0][1], r: 34, fill: NL.out, opacity: .2 }, v); return e;
+}
+function GD(id, t, steps = 6, dt = .45) { B(t); const P = document.getElementById(id).__B; for (let k = 1; k <= Math.min(steps, P.length - 1); k++) tl.to(['#' + id + 'b', '#' + id + 'bg'], { attr: { cx: P[k][0], cy: P[k][1] }, duration: dt * .8, ease: 'power2.inOut' }, t + (k - 1) * dt); return t + steps * dt; }
+
+// ---- embedding space: window with grey background points. Returns el; el.pt(pid, fx, fy, c, label) adds a point (fx,fy = 0..1 inside the plot), el.link(wid, p1, p2, c) a curved wire.
+function nlEmbed(par, id, x, y, w, h, head = 'embedding_space (2-D)', n = 70) {
+  const e = nlWin(par, id, x, y, w, h, NL.model, head), v = S('svg', { width: w, height: h }, e); v.style.cssText = 'position:absolute;left:0;top:0;overflow:visible';
+  const X = fx => 60 + fx * (w - 120), Y = fy => 90 + fy * (h - 150), bg = S('g', { id: id + 'bg' }, v);
+  for (let k = 0; k < n; k++) S('circle', { cx: X(rnd(k * 3 + 1)), cy: Y(rnd(k * 7 + 2)), r: 5, fill: '#5d6678', opacity: .55 }, bg);
+  const P = {}; e.pt = (pid, fx, fy, c, label, dx = 20, dy = -16) => { P[pid] = [X(fx), Y(fy)]; const g = S('g', { id: pid }, v); S('circle', { cx: X(fx), cy: Y(fy), r: 24, fill: c, opacity: .18 }, g); S('circle', { cx: X(fx), cy: Y(fy), r: 10, fill: c }, g);
+    if (label) D(e, label, `position:absolute;left:${X(fx) + dx}px;top:${Y(fy) + dy - 16}px;font:600 26px ${NLMONO};color:${c};white-space:nowrap;text-shadow:0 0 12px #000`, pid + 'L'); return g; };
+  e.link = (wid, a, b, c = NL.model, bend = -60) => { const [x1, y1] = P[a], [x2, y2] = P[b]; return nlWire(v, wid, `M${x1} ${y1} Q ${(x1 + x2) / 2} ${(y1 + y2) / 2 + bend} ${x2} ${y2}`, c); };
+  e.ring = (rid, fx, fy, rx, ry, c = NL.data) => { const g = S('g', { id: rid }, v); S('ellipse', { cx: X(fx), cy: Y(fy), rx, ry, fill: 'none', stroke: c, 'stroke-width': 3, 'stroke-dasharray': '10 10' }, g); return g; };
+  return e;
+}
+
+// ---- attention heatmap: tokens x tokens, cell alpha = weight. ATTN(id, t) fades cells in; ATTN_ROW(id, t, r) spotlights one query row.
+function nlAttn(par, id, x, y, toks, M, cs = 86, c = NL.model) {
+  const n = toks.length, e = D(par, '', `left:${x}px;top:${y}px;width:${150 + n * cs}px;height:${70 + n * cs}px`, id, 'nbox');
+  toks.forEach((tk, k) => { D(e, tk, `position:absolute;left:${150 + k * cs}px;top:0;width:${cs}px;text-align:center;font:600 24px ${NLMONO};color:${NL.dim}`); D(e, tk, `position:absolute;left:0;top:${70 + k * cs + cs / 2 - 16}px;width:136px;text-align:right;font:600 24px ${NLMONO};color:${NL.dim}`, id + 'q' + k); });
+  M.forEach((row, r) => row.forEach((a, k) => D(e, a >= .3 ? a.toFixed(1) : '', `left:${150 + k * cs + 3}px;top:${70 + r * cs + 3}px;width:${cs - 6}px;height:${cs - 6}px;background:color-mix(in srgb,${c} ${Math.round(8 + a * 80)}%,#0a0f1a);font-size:24px;color:${a > .5 ? '#05070d' : '#fff'}`, id + 'c' + r + '_' + k, 'ncell ' + id + 'c ' + id + 'r' + r)));
+  D(e, '', `position:absolute;left:146px;top:66px;width:${n * cs + 8}px;height:${cs + 8}px;border:3px solid ${NL.out};border-radius:12px;box-shadow:0 0 22px ${NL.out}`, id + 'hl'); e.dataset.cs = cs; return e;
+}
+function ATTN(id, t) { B(t); tl.set('#' + id + 'hl', { autoAlpha: 0 }, 0); return tl.fromTo('.' + id + 'c', { autoAlpha: 0, scale: .6 }, { autoAlpha: 1, scale: 1, duration: .25, stagger: .02 }, t); }
+function ATTN_ROW(id, t, r) { B(t); const cs = +document.getElementById(id).dataset.cs; tl.set('#' + id + 'hl', { autoAlpha: 1 }, t); tl.to('#' + id + 'hl', { y: r * cs, duration: .35, ease: 'power2.inOut' }, t); return PULSE('.' + id + 'r' + r, t + .3, { s: 1.06 }); }
+
+// ---- decision boundary: two classes of points + a separating line that DRAWs.  BOUND(id, t) (points pop, line draws)
+function nlBound(par, id, x, y, w, h, c1 = NL.data, c2 = NL.err, seed = 3) {
+  const e = nlWin(par, id, x, y, w, h, NL.model, 'classifier'), v = S('svg', { width: w, height: h }, e); v.style.cssText = 'position:absolute;left:0;top:0;overflow:visible';
+  for (let k = 0; k < 60; k++) { const a = rnd(seed * 31 + k * 3), b = rnd(seed * 17 + k * 5), m = a - .9 * b - .05; if (Math.abs(m) < .07) continue; const cl = m > 0; const px = 60 + a * (w - 120), py = 90 + (1 - b) * (h - 150); S('circle', { class: id + 'p', cx: px, cy: py, r: 11, fill: cl ? c2 : c1, opacity: .9 }, v); }
+  S('path', { id: id + 'b', class: 'draw', d: `M${60 + (w - 120) * .95} ${90} L${60 + (w - 120) * .05} ${h - 60}`, stroke: NL.out, 'stroke-width': 5, 'stroke-dasharray': null, fill: 'none', 'stroke-linecap': 'round' }, v); return e;
+}
+function BOUND(id, t) { B(t); tl.fromTo('.' + id + 'p', { scale: 0, transformOrigin: '50% 50%' }, { scale: 1, duration: .2, stagger: .02 }, t); return DRAW('#' + id + 'b', t + 1, { d: .8 }); }
+
+// ---- confusion matrix 2x2. m = [[TP, FN], [FP, TN]]. Cells POP with nlShow/POP('.'+id+'c').
+function nlConf(par, id, x, y, m, cs = 190, labs = ['spam', 'ham']) {
+  const e = D(par, '', `left:${x}px;top:${y}px;width:${150 + 2 * cs}px;height:${100 + 2 * cs}px`, id, 'nbox');
+  labs.forEach((l, k) => { D(e, l, `position:absolute;left:${150 + k * cs}px;top:40px;width:${cs}px;text-align:center;font:600 24px ${NLMONO};color:${NL.dim}`); D(e, l, `position:absolute;left:0;top:${100 + k * cs + cs / 2 - 16}px;width:136px;text-align:right;font:600 24px ${NLMONO};color:${NL.dim}`); });
+  D(e, 'predicted →', `position:absolute;left:150px;top:0;width:${2 * cs}px;text-align:center;font:600 24px ${NLMONO};color:${NL.dim}`);
+  m.forEach((row, r) => row.forEach((v, k) => { const ok = r === k, c = ok ? NL.data : NL.err; D(e, String(v), `left:${150 + k * cs + 4}px;top:${100 + r * cs + 4}px;width:${cs - 8}px;height:${cs - 8}px;border:2px solid ${c};background:color-mix(in srgb,${c} ${ok ? 22 : 12}%,#0a0f1a);font-size:54px;box-shadow:0 0 26px -8px ${c}`, id + 'c' + r + k, 'ncell ' + id + 'c'); })); return e;
+}
+
+// ---- matrix x vector = result. MATMUL(id, t, dt=.7): each row of A lights with the vector, then its result cell pops.
+function nlMatmul(par, id, x, y, A, v, cs = 84) {
+  const R = A.length, Cn = A[0].length, out = A.map(r => r.reduce((s, a, k) => s + a * v[k], 0)), e = D(par, '', `left:${x}px;top:${y}px;width:${(Cn + 3) * cs + 160}px;height:${R * cs}px`, id, 'nbox');
+  const cell = (cx, cy, val, c, cid, cls) => D(e, String(val), `left:${cx}px;top:${cy}px;width:${cs - 8}px;height:${cs - 8}px;border:2px solid color-mix(in srgb,${c} 60%,#000);background:color-mix(in srgb,${c} 12%,#0a0f1a)`, cid, 'ncell ' + (cls || ''));
+  A.forEach((row, r) => row.forEach((a, k) => cell(k * cs, r * cs, a, NL.model, id + 'a' + r + k, id + 'r' + r)));
+  D(e, '×', `position:absolute;left:${Cn * cs + 6}px;top:${R * cs / 2 - 34}px;font:700 52px ${NLMONO};color:${NL.dim}`);
+  const vy = (R - Cn) * cs / 2; v.forEach((b, k) => cell(Cn * cs + 70, vy + k * cs, b, NL.data, id + 'v' + k, id + 'v'));
+  D(e, '=', `position:absolute;left:${Cn * cs + 70 + cs + 12}px;top:${R * cs / 2 - 34}px;font:700 52px ${NLMONO};color:${NL.dim}`);
+  out.forEach((o, r) => cell(Cn * cs + 70 + cs + 80, r * cs, o, NL.out, id + 'o' + r, id + 'o'));
+  D(e, '', `position:absolute;left:-6px;top:-6px;width:${Cn * cs + 4}px;height:${cs + 4}px;border:3px solid ${NL.out};border-radius:12px;box-shadow:0 0 20px ${NL.out}`, id + 'hl'); e.dataset.R = R; e.dataset.cs = cs; return e;
+}
+function MATMUL(id, t, dt = .7) { B(t); const e = document.getElementById(id), R = +e.dataset.R, cs = +e.dataset.cs; tl.set('.' + id + 'o', { autoAlpha: 0 }, 0); tl.set('#' + id + 'hl', { autoAlpha: 0 }, 0); tl.set('#' + id + 'hl', { autoAlpha: 1 }, t);
+  for (let r = 0; r < R; r++) { if (r) tl.to('#' + id + 'hl', { y: r * cs, duration: .2 }, t + r * dt); PULSE('.' + id + 'v', t + r * dt + .1, { s: 1.06 }); POP('#' + id + 'o' + r, t + r * dt + .35); } tl.to('#' + id + 'hl', { autoAlpha: 0, duration: .2 }, t + R * dt); return t + R * dt; }
+
+// ---- code window (simple highlight). lines = array of strings. CODE(id, t, dt=.35) reveals line by line.
+function nlCode(par, id, x, y, w, lines, head = 'train.py', fs = 28) {
+  const e = nlWin(par, id, x, y, w, 70 + lines.length * fs * 1.6 + 30, NL.model, head), KW = /\b(def|for|in|return|import|from|class|if|else|while|with|as|lambda|None|True|False)\b/g;
+  const hl = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/(#.*)$/, `<span style="color:${NL.dim}">$1</span>`).replace(/('[^']*'|"[^"]*")/g, `<span style="color:${NL.out}">$1</span>`).replace(KW, `<span style="color:${NL.model}">$1</span>`).replace(/\b(\d+\.?\d*)\b/g, `<span style="color:${NL.data}">$1</span>`);
+  lines.forEach((l, k) => D(e, `<span style="color:#47506a;display:inline-block;width:${fs * 1.6}px">${k + 1}</span>${hl(l)}`, `padding:${k ? 0 : 18}px 26px 0;font:500 ${fs}px/1.6 ${NLMONO};color:${NL.ink};white-space:pre`, id + 'L' + k, id + 'L ncode')); return e;
+}
+function CODE(id, t, dt = .35) { B(t); return tl.fromTo('.' + id + 'L', { autoAlpha: 0, x: -10 }, { autoAlpha: 1, x: 0, duration: .2, stagger: dt }, t); }
+
+// ---- probability / score bars inside a window. items = [[label, 0..1, colour?], ...]. BARS(id, t) grows them.
+function nlBars(par, id, x, y, w, items, head = 'next_token_probs', c = NL.out) {
+  const e = nlWin(par, id, x, y, w, 80 + items.length * 70, c, head);
+  items.forEach(([l, p, cc], k) => { const col = cc || c; D(e, `<span style="width:${Math.min(260, w * .32)}px;overflow:hidden">${l}</span><span style="flex:1;height:22px;position:relative"><span class="${id}b" style="position:absolute;left:0;top:0;bottom:0;width:${p * 100}%;border-radius:6px;background:${col};box-shadow:0 0 14px ${col};transform-origin:0 50%"></span></span><span style="width:90px;text-align:right;color:${col}">${Math.round(p * 100)}%</span>`, '', id + 'r' + k, 'nrow'); }); return e;
+}
+function BARS(id, t, st = .25) { B(t); return tl.fromTo('.' + id + 'b', { scaleX: 0 }, { scaleX: 1, duration: .7, ease: 'power2.out', stagger: st }, t); }
+
+// ---- tokens: a row of chips (text split into tokens), fixed mono widths so el.xs = [[left, width], ...] (local x) is known at build. POP('.'+id+'t', t, {st:.12}) shows them one by one.
+function nlTokens(par, id, x, y, toks, c = NL.data, fs = 30, gap = 12) { const e = D(par, '', `left:${x}px;top:${y}px;height:${fs * 1.2 + 24}px`, id, 'nbox'); let cx = 0; e.xs = [];
+  toks.forEach((tk, k) => { const w = Math.round(tk.length * fs * .6 + 40); e.xs.push([cx, w]); D(e, tk, `position:absolute;left:${cx}px;top:0;width:${w}px;padding:10px 0;text-align:center;border-radius:12px;border:2px solid ${c};background:color-mix(in srgb,${c} 14%,#0a0f1a);font:600 ${fs}px ${NLMONO};color:#fff;white-space:pre;box-shadow:0 0 20px -8px ${c}`, id + 't' + k, id + 't'); cx += w + gap; });
+  e.style.width = (cx - gap) + 'px'; e.cx = k => x + e.xs[k][0] + e.xs[k][1] / 2; return e; }
+// ---- tag: a small glowing pill CENTRED on cx (safe to tween with IN/POP).
+const nlTag = (par, id, cx, y, txt, c = NL.model, fs = 32) => D(par, `<span style="padding:8px 18px;border-radius:12px;border:2px solid ${c};background:color-mix(in srgb,${c} 16%,#0a0f1a);font:700 ${fs}px ${NLMONO};color:#fff;white-space:nowrap;box-shadow:0 0 22px -6px ${c}">${txt}</span>`, `position:absolute;left:${cx}px;top:${y}px;width:0;display:flex;justify-content:center`, id);
+
+// ---- vector: a column/row of numbers with a colour bar per cell (an embedding). horiz=true for a row.
+function nlVec(par, id, x, y, vals, c = NL.model, horiz = false, cs = 70) { const e = D(par, '', `left:${x}px;top:${y}px`, id, 'nbox');
+  vals.forEach((v, k) => D(e, (v >= 0 ? ' ' : '') + v.toFixed(2), `left:${horiz ? k * (cs + 30) : 0}px;top:${horiz ? 0 : k * (cs * .62)}px;width:${cs + 24}px;height:${cs * .55}px;border:1.5px solid color-mix(in srgb,${v < 0 ? NL.err : c} 60%,#000);background:color-mix(in srgb,${v < 0 ? NL.err : c} ${Math.round(10 + Math.abs(v) * 40)}%,#0a0f1a)`, id + 'v' + k, 'ncell ' + id + 'v')); return e; }
+
+// ---- equation window. html may use <sup>.
+const nlEq = (par, id, x, y, w, html, head = 'math', c = NL.model, fs = 56) => { const e = nlWin(par, id, x, y, w, 90 + fs * 2, c, head); D(e, html, `padding:${fs * .55}px 44px;font:700 ${fs}px ${NLMONO};color:#fff;white-space:nowrap`); return e; };
+
+// ---- counter that steps through values (no number tweening): nlCount(par,id,x,y,['0','8B','52B'],c,fs) ; COUNT(id, t, step=.22)
+function nlCount(par, id, x, y, vals, c = NL.out, fs = 120) { const e = D(par, '', `left:${x}px;top:${y}px;width:${Math.ceil(Math.max(...vals.map(v => v.length)) * fs * .62)}px;height:${fs * 1.3}px`, id, 'nbox'); vals.forEach((n, k) => D(e, n, `position:absolute;left:0;font:800 ${fs}px ${NLMONO};color:${c};text-shadow:0 0 36px ${c}88;white-space:nowrap`, id + 'n' + k, id + 'n')); return e; }
+function COUNT(id, t, step = .22) { B(t); const ns = document.querySelectorAll('.' + id + 'n'); tl.set('#' + id, { autoAlpha: 1 }, t); ns.forEach((n, k) => { tl.set(n, { autoAlpha: 0 }, 0); tl.set(n, { autoAlpha: 1 }, t + k * step); if (k < ns.length - 1) tl.set(n, { autoAlpha: 0 }, t + (k + 1) * step); }); return t + ns.length * step; }
+
+// =====================================================================================================
+// NEWS PARTS. Each one is a top-level part (hidden by nwBegin). Show it with IN/POP/FADE, then run its beat.
+// Facts on screen come from the story's real sources: source + date are required arguments (NEWS: guard when empty).
+// =====================================================================================================
+const NWSTORY = [];
+const nwErr = m => console.error('NEWS: ' + m);
+const nwArc = (cx, cy, R, a0, a1) => { const p = a => [(cx + R * Math.cos(a)).toFixed(1), (cy + R * Math.sin(a)).toFixed(1)], [x0, y0] = p(a0), [x1, y1] = p(a1); return `M${x0} ${y0} A${R} ${R} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1} ${y1}`; };
+
+// ---- story opener: dial with one arc per story (this story's arc draws), big "02", tag, source + date.  STORY(id, t)
+// nwStory(par, id, x, y, k, n, tag, source, date): k = this story (1..n), n = stories in the video. Box is 520 x 520.
+function nwStory(par, id, x, y, k, n, tag, source, date) {
+  if (!source || !date) nwErr(`nwStory('${id}') needs its source and date`);
+  NWSTORY.push([id, k, n, par.id]);
+  const [e, v] = nlBox(par, id, x, y, 520, 520), cx = 260, cy = 190, R = 170, gap = n > 1 ? .12 : 0;
+  S('circle', { cx, cy, r: R, fill: 'none', stroke: NL.model, 'stroke-width': 30, opacity: .06 }, v);
+  for (let i = 0; i < n; i++) { const a0 = -Math.PI / 2 + i * 2 * Math.PI / n + gap / 2, a1 = a0 + 2 * Math.PI / n - gap;
+    if (i === k - 1) { S('path', { d: nwArc(cx, cy, R, a0, a1), stroke: NL.out, 'stroke-width': 26, fill: 'none', opacity: .18, class: id + 'a' }, v); S('path', { id: id + 'k', class: 'draw', d: nwArc(cx, cy, R, a0, a1), stroke: NL.out, 'stroke-width': 10, fill: 'none', 'stroke-linecap': 'round' }, v); }
+    else S('path', { class: id + 'a', d: nwArc(cx, cy, R, a0, a1), stroke: i < k - 1 ? NL.model : '#263044', 'stroke-width': 10, fill: 'none', 'stroke-linecap': 'round', opacity: i < k - 1 ? .55 : 1 }, v); }
+  D(e, String(k).padStart(2, '0'), `position:absolute;left:0;width:520px;top:${cy - 92}px;text-align:center;font:800 150px ${NLMONO};color:${NL.out};text-shadow:0 0 40px ${NL.out}88`, id + 'n');
+  D(e, 'of ' + String(n).padStart(2, '0'), `position:absolute;left:0;width:520px;top:${cy + 64}px;text-align:center;font:600 26px ${NLMONO};color:${NL.dim}`, id + 'o');
+  nlTag(e, id + 'g', 260, 396, tag, NL.model, 30);
+  D(e, `${source} &middot; ${date}`, `position:absolute;left:-40px;width:600px;top:470px;text-align:center;font:600 26px ${NLMONO};color:${NL.dim};white-space:nowrap`, id + 's');
+  return e;
+}
+function STORY(id, t) { B(t); tl.set('#' + id, { autoAlpha: 1 }, t); tl.fromTo('.' + id + 'a', { opacity: 0 }, { opacity: (i, el) => +el.getAttribute('opacity') || 1, duration: .3, stagger: .05 }, t); DRAW('#' + id + 'k', t + .25, { d: .7 }); POP(['#' + id + 'n', '#' + id + 'o'], t + .1); FADE(['#' + id + 'g', '#' + id + 's'], t + .6, { st: .2 }); return t + 1; }
+
+// ---- article card: the REAL headline, word for word, in a window whose header is "source · date". <b>words</b> in the headline get a marker that MARK(id, t) sweeps in
+//      (a marked part never wraps: keep each <b> to 1-4 words).
+// nwHead(par, id, x, y, w, source, date, headline, c). Height grows with the text.
+function nwHead(par, id, x, y, w, source, date, html, c = NL.model) {
+  if (!source || !date) nwErr(`nwHead('${id}') needs its source and date`);
+  if (html.replace(/<[^>]+>/g, '').length > 140) nwErr(`nwHead('${id}') headline is longer than 140 characters - show the first part and say the rest`);
+  const e = nlWin(par, id, x, y, w, 0, c, `${source} &middot; ${date}`); e.style.height = 'auto';
+  D(e, html.replace(/<b>(.*?)<\/b>/g, `<span class="nwmk"><span class="nwmb ${id}mb"></span><span style="position:relative">$1</span></span>`), `padding:26px 34px 32px;font:700 46px/1.25 ${NLHEAD};color:#fff`, id + 'h', 'nwq');
+  return e;
+}
+function MARK(id, t) { B(t); return tl.fromTo('.' + id + 'mb', { scaleX: 0 }, { scaleX: 1, duration: .5, ease: 'power2.out', stagger: .25 }, t); }
+
+// ---- post card: a real post / statement, word for word (generic card, no platform logo or UI). POST(id, t, dt) reveals it word by word (returns the end time).
+// nwPost(par, id, x, y, w, name, handle, date, text, c)
+function nwPost(par, id, x, y, w, name, handle, date, text, c = NL.model) {
+  if (!handle || !date) nwErr(`nwPost('${id}') needs the real handle and date`);
+  const e = nlWin(par, id, x, y, w, 0, c, `post &middot; ${date}`); e.style.height = 'auto';
+  const ini = name.split(/\s+/).map(s => s[0] || '').join('').slice(0, 2).toUpperCase();
+  D(e, `<span style="width:64px;height:64px;border-radius:50%;border:2px solid ${c};display:flex;align-items:center;justify-content:center;font:800 26px ${NLMONO};color:${c};flex:none">${ini}</span><span style="display:flex;flex-direction:column;gap:2px"><span style="font:700 32px ${NLBODY};color:#fff">${name}</span><span style="font:500 26px ${NLMONO};color:${NL.dim}">${handle}</span></span>`, 'display:flex;align-items:center;gap:18px;padding:22px 30px 0');
+  D(e, text.split(/\s+/).map(wd => `<span class="${id}w">${wd}</span>`).join(' '), `padding:18px 30px 30px;font:500 36px/1.38 ${NLBODY};color:${NL.ink}`, id + 'x', 'nwq');
+  e.dataset.n = text.split(/\s+/).length; return e;
+}
+function POST(id, t, dt = .07) { B(t); const n = +document.getElementById(id).dataset.n; tl.fromTo('.' + id + 'w', { autoAlpha: 0 }, { autoAlpha: 1, duration: .05, stagger: dt }, t); return t + n * dt; }
+
+// ---- spec / A vs B table. cols = ['', 'Model A', 'Model B'] ; rows = [['context', '128k', '1M', 2], ...] (optional 4th+ item = the winning column, 1-based).
+// nwSpec(par, id, x, y, w, cols, rows, head, colours). SPEC(id, t, dt) shows the rows one by one, the winner cell lights up.
+function nwSpec(par, id, x, y, w, cols, rows, head = 'spec sheet', cc = [NL.model, NL.data, NL.out]) {
+  const nc = cols.length, w0 = Math.round((w - 40) * .36), wc = Math.floor((w - 40 - w0) / (nc - 1)), e = nlWin(par, id, x, y, w, 50 + 76 + rows.length * 76 + 20, NL.model, head);
+  const row = (cells, rid, cls, fn) => { const r = D(e, '', `position:relative;display:flex;align-items:center;height:76px;margin:0 20px;border-bottom:1px solid rgba(255,255,255,.06)`, rid, cls); cells.forEach((c, i) => D(r, c, `width:${i ? wc : w0}px;${i ? 'text-align:center;' : 'padding-left:10px;'}font:${fn(i)};white-space:nowrap;overflow:hidden;position:relative`)); return r; };
+  row(cols, null, '', i => `700 30px ${NLMONO};color:${i ? cc[(i - 1) % cc.length] : NL.dim}`);
+  rows.forEach((rw, k) => { const r = row(rw.slice(0, nc), id + 'r' + k, id + 'r', i => `${i ? 600 : 500} 30px ${NLMONO};color:${i ? '#fff' : '#c9d2de'}`), win = rw[nc];
+    if (win) D(r, '', `position:absolute;left:${w0 + (win - 1) * wc + 6}px;top:8px;width:${wc - 12}px;height:60px;border:3px solid ${NL.out};border-radius:10px;box-shadow:0 0 18px ${NL.out}`, id + 'w' + k, id + 'w'); });
+  e.dataset.n = rows.length; return e;
+}
+function SPEC(id, t, dt = .5) { B(t); const n = +document.getElementById(id).dataset.n; tl.fromTo('.' + id + 'r', { autoAlpha: 0, x: -14 }, { autoAlpha: 1, x: 0, duration: .25, stagger: dt }, t);
+  document.querySelectorAll('.' + id + 'w').forEach(w => { const k = +w.id.slice(id.length + 1); tl.fromTo(w, { autoAlpha: 0 }, { autoAlpha: 1, duration: .25 }, t + k * dt + .3); }); return t + n * dt; }
+
+// ---- timeline: dates above, events below, a glowing marker that travels from event to event.  events = [['2023', 'v1 ships'], ...] (2-6 events)
+// nwTime(par, id, x, y, w, events, c). TIMELINE(id, t, dt) draws the line and runs the marker through every event; TIME_GO(id, t, k, d) moves it to event k on a word.
+function nwTime(par, id, x, y, w, ev, c = NL.model) {
+  const [e, v] = nlBox(par, id, x, y, w, 260), px = k => 70 + k * (w - 140) / Math.max(1, ev.length - 1);
+  S('path', { d: `M20 130 L${w - 20} 130`, stroke: c, 'stroke-width': 14, opacity: .1 }, v); S('path', { id: id + 'ln', class: 'draw', d: `M20 130 L${w - 20} 130`, stroke: c, 'stroke-width': 4 }, v);
+  ev.forEach(([dt, tx], k) => { const g = D(e, '', `position:absolute;left:${px(k)}px;top:0;width:0`, id + 'e' + k, id + 'e');
+    D(g, dt, `position:absolute;left:-150px;width:300px;top:52px;text-align:center;font:700 30px ${NLMONO};color:${NL.out};white-space:nowrap`);
+    D(g, '', `position:absolute;left:-12px;top:118px;width:24px;height:24px;border-radius:50%;background:#0a0f1a;border:3px solid ${c}`);
+    D(g, tx, `position:absolute;left:-160px;width:320px;top:166px;text-align:center;font:600 28px ${NLBODY};color:${NL.ink};white-space:nowrap`); });
+  D(e, '', `position:absolute;left:${px(0) - 17}px;top:113px;width:34px;height:34px;border-radius:50%;background:#fff;box-shadow:0 0 22px ${NL.out},0 0 8px #fff`, id + 'm');
+  e.px = px; e.dataset.n = ev.length; return e;
+}
+function TIME_GO(id, t, k, d = .7) { const e = document.getElementById(id); TO('#' + id + 'm', t, { x: e.px(k) - e.px(0), duration: d, ease: 'power1.inOut' }); POP('#' + id + 'e' + k, t + d - .15, { d: .35 }); return t + d; }
+function TIMELINE(id, t, dt = .8) { B(t); const n = +document.getElementById(id).dataset.n; DRAW('#' + id + 'ln', t, { d: .6 }); FADE('#' + id + 'm', t, { d: .2 }); POP('#' + id + 'e0', t + .1, { d: .35 });
+  for (let k = 1; k < n; k++) TIME_GO(id, t + .45 + (k - 1) * dt, k, dt); return t + .45 + (n - 1) * dt; }
+
+// ---- company / project badge: initials in a glowing ring + the name (NOT a logo - never redraw a real logo). Centred on cx.
+// nwCo(par, id, cx, y, name, c, sz)
+function nwCo(par, id, cx, y, name, c = NL.model, sz = 130) {
+  const ini = name.split(/\s+/).map(s => s[0] || '').join('').slice(0, 2).toUpperCase(), e = D(par, '', `position:absolute;left:${cx}px;top:${y}px;width:0;display:flex;flex-direction:column;align-items:center`, id);
+  D(e, ini, `flex:none;width:${sz}px;height:${sz}px;border-radius:50%;border:3px solid ${c};background:color-mix(in srgb,${c} 14%,#0a0f1a);box-shadow:0 0 34px -6px ${c};display:flex;align-items:center;justify-content:center;font:800 ${Math.round(sz * .36)}px ${NLMONO};color:#fff`);
+  D(e, name, `margin-top:14px;font:700 30px ${NLMONO};color:${c};white-space:nowrap`); return e;
+}
+
+// ---- recap: today's stories as numbered rows, each gets a check.  nwRecap(par, id, x, y, w, items, head) ; RECAP(id, t, dt)
+function nwRecap(par, id, x, y, w, items, head = 'today') {
+  const e = nlWin(par, id, x, y, w, 50 + items.length * 78 + 24, NL.model, head);
+  items.forEach((it, k) => { const r = D(e, `<span style="color:${NL.out};font-weight:800">${String(k + 1).padStart(2, '0')}</span><span style="flex:1;font-family:${NLBODY};font-weight:600;color:#fff">${it}</span>`, 'height:78px;padding:0 26px;font-size:32px', id + 'r' + k, 'nrow ' + id + 'r');
+    D(r, NLOK(NL.data, 32), 'display:flex', id + 'c' + k, id + 'c'); }); e.dataset.n = items.length; return e;
+}
+function RECAP(id, t, dt = .6) { B(t); tl.fromTo('.' + id + 'r', { autoAlpha: 0, x: -14 }, { autoAlpha: 1, x: 0, duration: .25, stagger: dt }, t); tl.fromTo('.' + id + 'c', { autoAlpha: 0, scale: .4 }, { autoAlpha: 1, scale: 1, duration: .3, ease: 'back.out(2)', stagger: dt }, t + .3);
+  return t + +document.getElementById(id).dataset.n * dt; }
+
+// =====================================================================================================
+// INTRO "Signal" (0..HEAD = 2.6 s, before the voice) and OUTRO "Sign-off" (END .. END+TAIL). Channel + date come from nwSetup. Never change their text.
+// =====================================================================================================
+const NWB = { channel: '', date: '' };
+// broadcast emblem: a dot with 3 arcs on each side (class 'draw', DRAW them)
+function nwSignal(par, id, cx, cy, r = 90, c = NL.data) {
+  const [e, v] = nlBox(par, id, cx - r * 2.2, cy - r * 1.4, r * 4.4, r * 2.8), ox = r * 2.2, oy = r * 1.4;
+  S('circle', { cx: ox, cy: oy, r: r * .7, fill: c, opacity: .12 }, v); S('circle', { id: id + 'd', cx: ox, cy: oy, r: r * .24, fill: c }, v);
+  for (let k = 1; k <= 3; k++) [-1, 1].forEach(sd => { const R = r * (.32 + k * .5), a = .62, A = sd > 0 ? 0 : Math.PI;
+    S('path', { class: 'draw ' + id + 'a', d: nwArc(ox, oy, R, A - a, A + a), stroke: c, 'stroke-width': Math.max(4, r * .09), fill: 'none', 'stroke-linecap': 'round', opacity: 1 - k * .2 }, v); });
+  return e;
+}
+function nwIntro(s) { const e = D(stage, '', `position:absolute;inset:0;z-index:30;background:radial-gradient(1100px 650px at 50% -10%,#0f1a33 0%,transparent 65%),${NL.bg}`, 'nwI');
+  nwSignal(e, 'nwIs', 960, 330, 90); const tx = '> ' + NWB.channel; nlType(e, 'nwIt', Math.round(960 - tx.length * 72 * .6 / 2), 470, tx, 72);
+  nlTag(e, 'nwId', 960, 610, `${NWB.date} &middot; <span id="nwIn">0</span> stories`, NL.out, 34); return e; }
+function nwIntroBeats() { tl.set('#nwIt', { autoAlpha: 1 }, 0); CARET('nwIt', 0, 1); DRAW('.nwIsa', .15, { d: .5, st: .06 }); TYPE('nwIt', .45, .045); POP('#nwId', 1.6); PULSE('#nwIsd', 1.6, { s: 1.4 });
+  tl.to('#nwI', { autoAlpha: 0, duration: .35 }, HEAD - .4); }
+function nwOutro(s) { const e = D(stage, '', `position:absolute;inset:0;z-index:30;background:radial-gradient(1100px 650px at 50% -10%,#0f1a33 0%,transparent 65%),${NL.bg}`, 'nwO');
+  nwSignal(e, 'nwOs', 960, 380, 100); const txt = '> subscribe --daily'; nlType(e, 'nwOt', Math.round(960 - txt.length * 60 * .6 / 2), 640, txt, 60); return e; }
+function nwOutroBeats() { const t = END + .2; tl.set('#nwO', { autoAlpha: 0 }, 0); tl.set('#nwOt', { autoAlpha: 0 }, 0); FADE('#nwO', t, { d: .4 }); DRAW('.nwOsa', t + .3, { d: .5, st: .06 });
+  const te = TYPE('nwOt', t + .6, .045); CARET('nwOt', te + .1, 2); PULSE('#nwOsd', t + 2.4, { s: 1.4 }); tl.to('#nwO', { opacity: 0, duration: .5 }, END + TAIL - .6); tl.set({}, {}, END + TAIL); }
+
+// =====================================================================================================
+// NEWS HOUSE LAYER
+//   build:  nwSetup(s, { channel, date })  ->  nlScene(...) per idea  ->  nwStory(...) in the first scene of every story
+//   beats:  nwBegin(['#s1', ...])  FIRST   ->  NEXT('#sN', 'first words of sN') per scene  ->  nwFinish()  LAST
+// Guards (console.error 'NEWS: ...' = ncheck fails): missing channel/date, a scene missing from nwBegin, stories not numbered 1..n,
+// a story opener without source/date, a scene start phrase not found, scenes out of order, NEXT with the scene already showing.
+// =====================================================================================================
+// arrowhead at (x,y) on a wire group g: dir 'r' right, 'l' left, 'd' down, 'u' up
+const arw = (g, x, y, c, dir = 'r') => { const P = { r: [[-16, -11], [-16, 11]], l: [[16, -11], [16, 11]], d: [[-11, -16], [11, -16]], u: [[-11, 16], [11, 16]] }[dir];
+  return S('path', { class: 'draw', d: `M${x + P[0][0]} ${y + P[0][1]} L${x} ${y} L${x + P[1][0]} ${y + P[1][1]}`, stroke: c, 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g); };
+// sound cues -> window.__CUES -> ncheck writes cues.json -> nmix.py. kinds: whoosh hit chime blip tick err pop down type(n chars, dt)
+const CUES = []; window.__CUES = CUES;
+const CUE = (t, k, n = 1, dt = 0) => { if (t != null) CUES.push([+(+t).toFixed(3), k, n, dt]); return t; };
+const NLT = []; window.__NLT = NLT;          // [scene, start time] for ncheck / phrase report
+function NEXT(sel, ph) {
+  if (sel === NLCUR) nwErr(`NEXT('${sel}') but ${sel} is already showing`);
+  if (NLSC.indexOf(sel) < 0) nwErr(`NEXT('${sel}') - scene not listed in nwBegin([...])`);
+  const prev = NLT.length ? NLT[NLT.length - 1][1] : HEAD, t = nlNext(sel, ph);
+  if (t <= prev + .05) nwErr(`scene ${sel} start phrase '${ph}' not found or not after the previous scene (t=${t.toFixed(2)})`);
+  NLT.push([sel, t]); return CUE(t, 'whoosh');
+}
+function nwSetup(s, o = {}) {
+  NWB.channel = o.channel || ''; NWB.date = o.date || '';
+  if (!NWB.channel) nwErr("nwSetup(s, { channel: '...', date: '...' }) - channel name missing");
+  if (NWB.channel.length > 24 || /[^\x20-\x7e]/.test(NWB.channel)) nwErr('channel name: plain ASCII, at most 24 characters (it is typed in the intro)');
+  if (!NWB.date) nwErr("nwSetup: the episode date is missing (e.g. date: '16 Oct 2026')");
+  nlInit(s);
+  const css = document.createElement('style'); css.textContent = `
+  .nwmk{position:relative;display:inline-block}
+  .nwmb{position:absolute;left:-6px;right:-6px;bottom:4px;height:42%;background:${NL.out};opacity:.38;border-radius:5px;transform-origin:0 50%}`;
+  document.head.appendChild(css); nwIntro(s); nwOutro(s); return s;
+}
+function nwBegin(scs) {
+  nwIntroBeats(); nlStart(scs); NLT.push([scs[0], HEAD]);
+  const all = [...document.querySelectorAll('.nsc')].map(e => '#' + e.id);
+  all.forEach(sc => { if (scs.indexOf(sc) < 0) nwErr(`scene ${sc} exists but is missing from nwBegin([...])`); });
+  const n = NWSTORY.length; if (!n) nwErr('no nwStory(...) - every story starts with a story opener');
+  NWSTORY.forEach(([id, k, nn, sc], i) => { if (k !== i + 1 || nn !== n) nwErr(`nwStory('${id}') is story ${k} of ${nn}, expected ${i + 1} of ${n} (number them 1..n in order)`);
+    if (i && scs.indexOf('#' + sc) <= scs.indexOf('#' + NWSTORY[i - 1][3])) nwErr(`nwStory('${id}') is not in a later scene than story ${i}`); });
+  const cn = document.getElementById('nwIn'); if (cn) cn.textContent = n;
+  NLHL.forEach(h => tl.set('#' + h, { autoAlpha: 0 }, 0));
+  CUE(.15, 'whoosh'); CUE(.45, 'type', NWB.channel.length + 2, .045); CUE(1.6, 'chime');
+}
+function nwFinish() {
+  if (NLCUR !== NLSC[NLSC.length - 1]) nwErr(`video ends on ${NLCUR}, not on the last scene ${NLSC[NLSC.length - 1]} (a NEXT is missing)`);
+  OUT(NLCUR, END + .1, { d: .3 }); nwOutroBeats(); CUE(END + .2, 'whoosh'); CUE(END + .6, 'type', 19, .045); CUE(END + 2.4, 'chime');
+}
+
+// ---- real pages: screenshot inside a browser window + scroll/zoom focus, highlight box, cursor + click ----
+// nlShot(par,id,x,y,w,h,src,url,nw,nh): src = 'assets/<file>.png', nw/nh = the image's real pixel size (python3 -c "from PIL import Image; print(Image.open('assets/x.png').size)").
+function nlShot(par, id, x, y, w, h, src, url, nw, nh) {
+  const e = nlWin(par, id, x, y, w, h, NL.model, url), vh = h - 50, ih = Math.round(w * nh / nw);
+  const vp = D(e, '', `position:absolute;left:0;top:50px;width:${w}px;height:${vh}px;overflow:hidden;background:#0d1117`, id + 'vp');
+  D(vp, `<img src="${src}" style="width:${w}px;height:${ih}px;display:block">`, `position:absolute;left:0;top:0;width:${w}px;height:${ih}px;transform-origin:0 0`, id + 'im');
+  e.dataset.vw = w; e.dataset.vh = vh; e.dataset.ih = ih; return e;
+}
+// SHOT_FOCUS(id,t,px,py,s,d): bring image point (px,py) (px of the image as shown at scale 1) to the centre of the window at zoom s. s=1 = plain scroll.
+function SHOT_FOCUS(id, t, px, py, s = 1, d = 1.1) {
+  const e = document.getElementById(id), vw = +e.dataset.vw, vh = +e.dataset.vh, ih = +e.dataset.ih;
+  const x = Math.min(0, Math.max(vw - vw * s, vw / 2 - px * s)), y = Math.min(0, Math.max(vh - ih * s, vh / 2 - py * s));
+  return TO('#' + id + 'im', t, { x, y, scale: s, duration: d, ease: 'power2.inOut' });
+}
+// highlight box on the image (moves with scroll/zoom). Hidden at 0 automatically; POP('#hid', t) to show.
+const NLHL = [];
+const nlShotHL = (id, hid, px, py, w, h, c = NL.out) => { NLHL.push(hid); return D(document.getElementById(id + 'im'), '', `position:absolute;left:${px}px;top:${py}px;width:${w}px;height:${h}px;border:4px solid ${c};border-radius:10px;box-shadow:0 0 22px ${c},inset 0 0 18px ${c}55`, hid); };
+// mouse cursor: nlCursor(par,id,x,y) ; CURSOR(id,t,x,y,d) moves its tip to (x,y) ; CLICK(id,t) ring + press. Show it with nlShow('#id', t).
+function nlCursor(par, id, x, y) {
+  const e = D(par, `<svg width="44" height="54" viewBox="0 0 22 27"><path d="M2 2 L2 22 L7.5 17 L11 25 L14.5 23.5 L11 15.5 L18 15.5 Z" fill="#fff" stroke="#05070d" stroke-width="1.6" stroke-linejoin="round"/></svg>`, `position:absolute;left:${x - 4}px;top:${y - 4}px;width:44px;height:54px;z-index:6;filter:drop-shadow(0 4px 6px #000)`, id);
+  D(par, '', `position:absolute;left:${x - 22}px;top:${y - 22}px;width:44px;height:44px;border-radius:50%;border:3px solid ${NL.out};z-index:5`, id + 'r');
+  NLHL.push(id + 'r'); e.dataset.x = x; e.dataset.y = y; return e;
+}
+function CURSOR(id, t, x, y, d = .8) { const e = document.getElementById(id), dx = x - +e.dataset.x, dy = y - +e.dataset.y; TO(['#' + id, '#' + id + 'r'], t, { x: dx, y: dy, duration: d, ease: 'power2.inOut' }); return t + d; }
+function CLICK(id, t) { B(t); CUE(t, 'blip'); tl.fromTo('#' + id + 'r', { autoAlpha: 1, scale: .3 }, { autoAlpha: 0, scale: 1.6, duration: .45, ease: 'power2.out' }, t); tl.to('#' + id, { scale: .85, duration: .08, yoyo: true, repeat: 1, transformOrigin: '10% 10%' }, t); return t + .45; }
+
+// ===================== LOOK: AI + Dev news channel, dark "Night Blue" (navy-black + blue, decided 23 Oct 2026). Shorts 1080x1920 and long 1920x1080. =====================
+// Loads AFTER news.js (build.py): news.js is only the ENGINE here (D, nlScene, nlStart, NEXT, CUE, nlBox, nlType/TYPE, COUNT...). Its old neon parts are banned by build.py.
+// This file sets the look, the scene cut (hard cut + punch-in) and the end card. No intro: the hook is on screen from frame 0. FW/FH = frame size (premium.js).
+// build:  sSetup(s)  ->  nlScene(s, 'sN', '') per idea      beats: sBegin(['#s1', ...]) FIRST -> NEXT('#sN', 'first words') -> sFinish() LAST
+// Shorts safe zones: text above y 1590, and left of x 940 below y 900 (Shorts buttons / title). Text parts carry class 'stxt' so check.js can see them.
+// Long videos: keep 60 px from every edge.
+// acc = lighter blue for accent TEXT on the dark bg (headline <b>, tags, pills); blue = fills, highlights, buttons. dark = ink colour for text drawn on white (real screenshots, white labels).
+const SB = { bg: '#070B14', ink: '#F1F5F9', soft: '#94A3B8', card: '#111A2B', line: '#24324A', blue: '#3B82F6', acc: '#60A5FA', tint: '#1B2B4D', red: '#E11D48', hl: 'rgba(59,130,246,.35)', dark: '#0F172A' };
+const SHEAD = "'Inter Tight',Inter,sans-serif", SBODY = "Inter,'Helvetica Neue',sans-serif", SMONO = "'JetBrains Mono','DejaVu Sans Mono',monospace";
+const SBG = `radial-gradient(900px 700px at 100% 0%,#13244A 0%,transparent 60%),radial-gradient(900px 800px at 0% 100%,#0E1626 0%,transparent 60%),${SB.bg}`;
+
+function sSetup(s) {
+  nlInit(s);
+  const css = document.createElement('style'); css.textContent = `
+  #root{background:${SBG}!important;font-family:${SBODY}}
+  .nttl{display:none!important}
+  .spill{position:absolute;display:flex;gap:14px;align-items:center;font:800 32px ${SBODY};letter-spacing:2px;color:#93B4FF;background:#13244A;border-radius:999px;padding:14px 28px;white-space:nowrap}
+  .spill i{width:14px;height:14px;border-radius:50%;background:${SB.blue}}
+  .shead{position:absolute;font:800 100px/1.0 ${SHEAD};letter-spacing:-3px;color:${SB.ink}}
+  .shead b{color:${SB.acc};font-weight:800}
+  .stag{position:absolute;font:800 32px ${SBODY};letter-spacing:4px;color:${SB.acc};white-space:nowrap}
+  .ssub{position:absolute;font:600 40px/1.25 ${SBODY};color:${SB.soft}}
+  .schip{position:absolute;display:flex;gap:16px;align-items:center;background:${SB.card};border:2px solid ${SB.line};border-radius:22px;padding:18px 28px;font:700 40px ${SBODY};color:${SB.ink};box-shadow:0 12px 28px -16px rgba(0,0,0,.8);white-space:nowrap}
+  .schip b{color:${SB.acc}}
+  .scard{position:absolute;background:${SB.card};border:2px solid ${SB.line};border-radius:36px;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)}
+  .sshot{position:absolute;background:${SB.card};border-radius:30px;overflow:hidden;box-shadow:0 34px 70px -24px rgba(0,0,0,.7),0 0 0 6px #1B2740}
+  .sshot .bar{height:58px;display:flex;align-items:center;gap:10px;padding:0 22px;border-bottom:2px solid ${SB.line};font:600 24px ${SBODY};color:${SB.soft};white-space:nowrap;background:#0F1828}
+  .sshot .bar i{width:13px;height:13px;border-radius:50%;background:#334155}
+  .sshot .vp{position:relative;overflow:hidden}
+  .sshot .im{position:absolute;left:0;top:0;transform-origin:50% 0%}
+  .sshot .im img{display:block;width:100%}
+  .shl{position:absolute;border-radius:6px;background:${SB.hl};border-bottom:5px solid ${SB.blue};transform-origin:0 50%}
+  .sstamp{position:absolute;display:flex;justify-content:center;width:0}
+  .sstamp span{display:inline-block;white-space:nowrap;font:900 88px ${SHEAD};letter-spacing:-1px;padding:10px 30px;border:9px solid currentColor;border-radius:18px;background:rgba(7,11,20,.88)}
+  .sbig{position:absolute;font:900 240px/1 ${SHEAD};letter-spacing:-8px;color:${SB.ink};white-space:nowrap}
+  .scode{position:absolute;background:#0B1222;border:2px solid ${SB.line};border-radius:28px;padding:34px 40px;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)}
+  .scode .scl{font:600 40px/1.5 ${SMONO};color:#E2E8F0;white-space:pre;height:60px}
+  .scode .sch{visibility:hidden}
+  .scode .scl.hl{color:#93B4FF}
+  .sphoto{position:absolute;border-radius:30px;overflow:hidden;background:#1B2740;box-shadow:0 34px 70px -24px rgba(0,0,0,.7),0 0 0 6px #1B2740}
+  .sphoto img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;display:block}
+  .scr{position:absolute;right:16px;bottom:14px;font:600 30px ${SBODY};color:#fff;background:rgba(0,0,0,.55);padding:4px 14px;border-radius:10px}
+  .stable{position:absolute;background:${SB.card};border:2px solid ${SB.line};border-radius:32px;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)}
+  .srow{display:flex;justify-content:space-between;align-items:center;gap:30px;padding:26px 40px;border-bottom:2px solid ${SB.line};font:600 40px ${SBODY};color:${SB.soft};white-space:nowrap}
+  .srow:last-child{border-bottom:0}
+  .srow b{font:800 44px ${SBODY};color:${SB.ink}}
+  .squote{position:absolute;background:${SB.card};border:2px solid ${SB.line};border-radius:32px;padding:40px 46px;box-shadow:0 30px 70px -30px rgba(0,0,0,.8)}
+  .squote .q{font:800 60px/1.12 ${SHEAD};letter-spacing:-1px;color:${SB.ink}}
+  .squote .w{font:600 30px ${SBODY};color:${SB.soft};margin-top:20px}
+  .smk{position:relative;display:inline-block}
+  .smk .smb{position:absolute;left:-6px;right:-6px;bottom:6px;height:38%;background:#1E40AF;border-radius:6px;transform-origin:0 50%}
+  .smk .smt{position:relative}`;
+  document.head.appendChild(css); sEnd(); return s;
+}
+
+// ---------- parts ----------
+const sPill = (par, id, x, y, txt) => D(par, `<i></i>${txt}`, `left:${x}px;top:${y}px`, id, 'spill stxt');
+const sHead = (par, id, x, y, w, html, fs) => D(par, html, `left:${x}px;top:${y}px;width:${w}px${fs ? ';font-size:' + fs + 'px' : ''}`, id, 'shead stxt');
+const sTag = (par, id, x, y, txt) => D(par, txt, `left:${x}px;top:${y}px`, id, 'stag stxt');
+const sSub = (par, id, x, y, w, txt) => D(par, txt, `left:${x}px;top:${y}px;width:${w}px`, id, 'ssub stxt');
+const sChip = (par, id, x, y, html) => D(par, html, `left:${x}px;top:${y}px`, id, 'schip stxt');
+const sCard = (par, id, x, y, w, h) => D(par, '', `left:${x}px;top:${y}px;width:${w}px${h ? ';height:' + h + 'px' : ''}`, id, 'scard');
+const sBig = (par, id, x, y, html, c = SB.ink) => D(par, html, `left:${x}px;top:${y}px;color:${c}`, id, 'sbig stxt');
+// stamp centred on cx: STAMP(id, t) slams it in. rot in degrees, c = SB.red for problems, SB.blue / SB.ink otherwise.
+const sStamp = (par, id, cx, y, txt, c = SB.red, rot = -7, fs) => D(par, `<span style="color:${c};transform:rotate(${rot}deg)${fs ? ';font-size:' + fs + 'px' : ''}">${txt}</span>`, `left:${cx}px;top:${y}px`, id, 'sstamp stxt');
+function STAMP(id, t) { B(t); tl.fromTo('#' + id, { autoAlpha: 0, scale: 2.4 }, { autoAlpha: 1, scale: 1, duration: .22, ease: 'power4.in' }, t); tl.to('#' + id, { x: 8, duration: .05, yoyo: true, repeat: 3 }, t + .22); return t + .45; }
+// real page screenshot in a light browser card: sShot(par, id, x, y, w, src, url, nw, nh) (nw/nh = image pixels). Card height = 58 + nh * w / nw.
+// el.hl(hid, px, py, pw, ph): highlight on image pixels (hidden at 0, SHL(hid, t) sweeps it in). KB-style slow zoom: SZOOM(id, t, d, s0, s1).
+function sShot(par, id, x, y, w, src, url, nw, nh, vh) {
+  const k = w / nw, ih = Math.round(nh * k), h = vh || ih;
+  const e = D(par, `<div class="bar"><i></i><i></i><i></i><span style="margin-left:10px">${url}</span></div>`, `left:${x}px;top:${y}px;width:${w}px;height:${58 + h}px`, id, 'sshot');
+  const vp = D(e, '', `width:${w}px;height:${h}px`, id + 'vp', 'vp'); const im = D(vp, `<img src="${src}">`, `width:${w}px;height:${ih}px`, id + 'im', 'im');
+  e.hl = (hid, px, py, pw, ph) => { SHLS.push(hid); return D(im, '', `left:${px * k - 6}px;top:${py * k - 4}px;width:${pw * k + 12}px;height:${ph * k + 8}px`, hid, 'shl'); };
+  e.k = k; e.h = h; return e;
+}
+const SHLS = [];
+function SHL(hid, t) { B(t); return tl.fromTo('#' + hid, { autoAlpha: 1, scaleX: 0 }, { autoAlpha: 1, scaleX: 1, duration: .45, ease: 'power2.out' }, t); }
+function SZOOM(id, t, d, s0 = 1, s1 = 1.06, y0 = 0, y1 = 0) { B(t); return tl.fromTo('#' + id + 'im', { scale: s0, y: y0 }, { scale: s1, y: y1, duration: d, ease: 'none' }, t); }
+
+// official / press photo with credit (always moving: KB). sPhoto(par, id, x, y, w, h, src, credit, pos) ; KB(id, t, d, {s,x,y}, {s,x,y})
+const sPhoto = (par, id, x, y, w, h, src, credit = '', pos = '50% 50%') => D(par, `<img src="${src}" style="object-position:${pos}">` + (credit ? `<span class="scr">${credit}</span>` : ''), `left:${x}px;top:${y}px;width:${w}px;height:${h}px`, id, 'sphoto nbox');
+function KB(id, t, d, a, b) { B(t); return tl.fromTo('#' + id + ' img', { scale: a.s ?? 1, x: a.x ?? 0, y: a.y ?? 0 }, { scale: b.s ?? 1, x: b.x ?? 0, y: b.y ?? 0, duration: d, ease: 'none' }, t); }
+// info table: rows = [[label, value, colour?], ...]; rows are id+'r'+k (hidden at 0 by sBegin), TABLE(id, t, dt) reveals them one by one
+function sTable(par, id, x, y, w, rows) { const e = D(par, '', `left:${x}px;top:${y}px;width:${w}px`, id, 'stable stxt nwq');
+  rows.forEach(([l, v, c], k) => D(e, `<span>${l}</span><b style="color:${c || SB.ink}">${v}</b>`, '', id + 'r' + k, 'srow ' + id + 'r')); STABLES.push(id); return e; }
+const STABLES = [];
+function TABLE(id, t, dt = .35) { B(t); return tl.fromTo('.' + id + 'r', { autoAlpha: 0, x: -14 }, { autoAlpha: 1, x: 0, duration: .25, stagger: dt }, t); }
+// quote card: html may hold <mk>words</mk> (highlighter, SMARK(id, t) sweeps it in); who = the real speaker + where it was said
+function sQuote(par, id, x, y, w, html, who) { return D(par, `<div class="q">${html.replace(/<mk>(.*?)<\/mk>/g, `<span class="smk"><span class="smb ${id}mb"></span><span class="smt">$1</span></span>`)}</div><div class="w">${who}</div>`, `left:${x}px;top:${y}px;width:${w}px`, id, 'squote stxt nwq'); }
+function SMARK(id, t) { B(t); return tl.fromTo('.' + id + 'mb', { scaleX: 0 }, { scaleX: 1, duration: .5, ease: 'power2.out' }, t); }
+// big counter that steps through values: sCount(par, id, x, y, ['0', '46', '362'], c, fs) ; COUNT(id, t, step) (engine). The first value shows with the part.
+function sCount(par, id, x, y, vals, c = SB.blue, fs = 220) { const e = D(par, '', `position:absolute;left:${x}px;top:${y}px;width:${Math.ceil(Math.max(...vals.map(v => v.length)) * fs * .62)}px;height:${Math.round(fs * 1.15)}px`, id);
+  vals.forEach((v, k) => D(e, v, `position:absolute;left:0;top:0;font:900 ${fs}px/1.1 ${SHEAD};letter-spacing:-6px;color:${c};white-space:nowrap`, id + 'n' + k, id + 'n stxt')); return e; }
+// svg layer the size of the frame
+const sSvg = par => { const v = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); v.style.cssText = `position:absolute;left:0;top:0;width:${FW}px;height:${FH}px;overflow:visible;pointer-events:none`; par.appendChild(v); return v; };
+// hand-drawn arrow from (x1,y1) to (x2,y2) with a bend; DRAW('#'+id+' path', t) or sDraw(id, t)
+function sArrow(v, id, x1, y1, x2, y2, c = SB.red, bend = 60) {
+  const g = S('g', { id }, v), mx = (x1 + x2) / 2 + bend, my = (y1 + y2) / 2 - bend * .4, a = Math.atan2(y2 - my, x2 - mx), L = 30;
+  S('path', { class: 'draw', d: `M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}`, stroke: c, 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' }, g);
+  S('path', { class: 'draw', d: `M${x2 - L * Math.cos(a - .5)} ${y2 - L * Math.sin(a - .5)} L${x2} ${y2} L${x2 - L * Math.cos(a + .5)} ${y2 - L * Math.sin(a + .5)}`, stroke: c, 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+  SWIRES.push(id); return g;
+}
+// hand-drawn loop around (cx, cy)
+function sCircle(v, id, cx, cy, rx, ry, c = SB.red) { const g = S('g', { id }, v);
+  S('path', { class: 'draw', d: `M${cx - rx * .2} ${cy - ry} C${cx + rx * 1.1} ${cy - ry * 1.15}, ${cx + rx * 1.1} ${cy + ry * 1.05}, ${cx} ${cy + ry} S${cx - rx * 1.1} ${cy + ry * .1}, ${cx - rx * .55} ${cy - ry * .95}`, stroke: c, 'stroke-width': 8, fill: 'none', 'stroke-linecap': 'round' }, g); SWIRES.push(id); return g; }
+const SWIRES = [];
+const sDraw = (id, t, d = .45) => { tl.set('#' + id, { autoAlpha: 1 }, t); return DRAW('#' + id + ' .draw', t, { d, st: .12 }); };
+// dark code / reasoning card with typed lines: sCode(par, id, x, y, w, lines, head) ; TYPEL(id, t, k, dt) types line k (returns end time)
+function sCode(par, id, x, y, w, lines, head) {
+  const e = D(par, (head ? `<div style="font:700 30px ${SBODY};letter-spacing:3px;color:#93B4FF;margin-bottom:14px">${head}</div>` : ''), `left:${x}px;top:${y}px;width:${w}px`, id, 'scode');
+  lines.forEach((l, k) => D(e, [...l].map(ch => `<span class="sch ${id}c${k}">${ch}</span>`).join(''), '', id + 'l' + k, 'scl')); return e; }
+function TYPEL(id, t, k, dt = .035) { B(t); const cs = document.querySelectorAll('.' + id + 'c' + k); cs.forEach((c, i) => { tl.set(c, { visibility: 'hidden' }, 0); tl.set(c, { visibility: 'visible' }, t + i * dt); }); return t + cs.length * dt; }
+
+// ---------- scene cut: hard cut + punch-in (replaces the slow fade + drift of the long-video kit) ----------
+function nlDrift(sel, t, d = 6) { tl.fromTo(sel, { scale: 1.035, transformOrigin: '50% 40%' }, { scale: 1, duration: .35, ease: 'power3.out' }, t); }
+function nlNext(sel, phrase) { const t = go(phrase); tl.set(NLCUR, { autoAlpha: 0 }, t - .02); tl.set(sel, { autoAlpha: 1 }, t - .02); nlDrift(sel, t - .02); NLCUR = sel; return t; }
+
+// ---------- end card (END .. END+TAIL) ----------
+function sEnd() { const e = D(stage, '', `position:absolute;inset:0;z-index:30;background:${SBG}`, 'sE');
+  const V = FH > FW, top = V ? 620 : 300;
+  D(e, 'MERGE REPORT', `position:absolute;left:0;right:0;top:${top - 90}px;text-align:center;font:800 40px ${SBODY};letter-spacing:8px;color:${SB.acc}`, 'sEn');
+  D(e, V ? 'New AI &amp; dev news<br>every day' : 'New AI &amp; dev news every day', `position:absolute;left:70px;right:70px;top:${top}px;text-align:center;font:800 104px/1.02 ${SHEAD};letter-spacing:-3px;color:${SB.ink}`, 'sEt');
+  D(e, `<span style="display:inline-block;background:${SB.blue};color:#fff;font:800 48px ${SBODY};padding:24px 60px;border-radius:999px;box-shadow:0 18px 34px -14px ${SB.blue}">${V ? 'Follow' : 'Subscribe'}</span>`, `position:absolute;left:0;right:0;top:${top + (V ? 280 : 170)}px;text-align:center`, 'sEb'); return e; }
+function sEndBeats() { const t = END + .05; tl.set('#sE', { autoAlpha: 0 }, 0); tl.set('#sE', { autoAlpha: 1 }, t); tl.fromTo(['#sEn', '#sEt'], { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .4, ease: 'power3.out', stagger: .08 }, t); POP('#sEb', t + .35); PULSE('#sEb', t + 1.1, { s: 1.06 }); tl.set({}, {}, END + TAIL); }
+
+// ---------- word-by-word captions (Shorts, BRAND.md Captions): band y 1380-1540, keep scene parts out of it ----------
+// sCaptions(text): text = the script, one token per spoken word in words.json. '1.107{5}' shows one token for 5 spoken words.
+// Chunks of up to 3 words (new chunk after . ? ! , or a pause); the spoken word turns blue. Beats are added by sFinish.
+const SCAPS = [];
+function sCaptions(text, y = 1390) {
+  const css = document.createElement('style'); css.textContent = `
+  .scapk{position:absolute;left:0;right:0;top:0;text-align:center}
+  .scapc{display:inline-block;max-width:870px;background:${SB.card};border:2px solid ${SB.line};border-radius:28px;padding:14px 34px 18px;box-shadow:0 18px 40px -18px rgba(0,0,0,.8);font:800 68px/1.15 ${SHEAD};letter-spacing:-1px;color:${SB.ink};white-space:nowrap}
+  .scapw{position:relative;display:inline-block;margin:0 .13em}
+  .scapb{position:absolute;left:0;top:0;color:${SB.acc}}`; document.head.appendChild(css);
+  const toks = text.split(/\s+/).filter(Boolean).map(t => { const m = t.match(/^(.*?)\{(\d+)\}(.*)$/); return m ? [m[1] + m[3], +m[2]] : [t, 1]; });
+  const n = toks.reduce((a, [, k]) => a + k, 0);
+  if (n !== TW.length) console.error(`LOOK: sCaptions has ${n} spoken words, words.json has ${TW.length}`);
+  const L = D(stage, '', `position:absolute;left:70px;width:870px;top:${y}px;height:150px;z-index:25;pointer-events:none`, 'sCap');
+  let i = 0, ck = null, prevT = -9, prevTxt = '.';
+  toks.forEach(([txt, k]) => { const t0 = TW[Math.min(i, TW.length - 1)][0];
+    if (!ck || ck.w.length >= 3 || /[.?!,]$/.test(prevTxt) || t0 - prevT > .75) { const id = 'sCap' + SCAPS.length; ck = { id, w: [], el: D(L, '<span class="scapc"></span>', '', id, 'scapk') }; SCAPS.push(ck); }
+    const wid = ck.id + 'w' + ck.w.length, safe = txt.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    ck.el.firstChild.insertAdjacentHTML('beforeend', `<span class="scapw">${safe}<span class="scapb" id="${wid}">${safe}</span></span>`);
+    ck.w.push([wid, t0]); i += k; prevT = TW[Math.min(i - 1, TW.length - 1)][0]; prevTxt = txt; });
+}
+function sCapBeats() {
+  SCAPS.forEach((c, j) => { const t0 = c.w[0][1] - .06, nx = j + 1 < SCAPS.length ? SCAPS[j + 1].w[0][1] - .06 : END + .05, last = c.w[c.w.length - 1][1];
+    tl.set('#' + c.id, { autoAlpha: 0 }, 0); tl.fromTo('#' + c.id, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .1, ease: 'power2.out' }, t0);
+    tl.set('#' + c.id, { autoAlpha: 0 }, Math.min(nx, last + 1.2));
+    c.w.forEach(([wid, t], k) => { tl.set('#' + wid, { autoAlpha: 0 }, 0); tl.set('#' + wid, { autoAlpha: 1 }, t); if (k + 1 < c.w.length) tl.set('#' + wid, { autoAlpha: 0 }, c.w[k + 1][1]); }); });
+}
+
+function sBegin(scs) {
+  nlStart(scs); NLT.push([scs[0], HEAD]);
+  [...document.querySelectorAll('.nsc')].map(e => '#' + e.id).forEach(sc => { if (scs.indexOf(sc) < 0) console.error(`LOOK: scene ${sc} exists but is missing from sBegin([...])`); });
+  SHLS.forEach(h => tl.set('#' + h, { autoAlpha: 0 }, 0)); SWIRES.forEach(h => tl.set('#' + h, { autoAlpha: 0 }, 0)); STABLES.forEach(h => tl.set('.' + h + 'r', { autoAlpha: 0 }, 0));
+}
+function sFinish() {
+  if (NLCUR !== NLSC[NLSC.length - 1]) console.error(`LOOK: video ends on ${NLCUR}, not on the last scene ${NLSC[NLSC.length - 1]}`);
+  tl.set(NLCUR, { autoAlpha: 0 }, END + .05); if (SCAPS.length) sCapBeats(); sEndBeats(); CUE(END + .05, 'whoosh'); CUE(END + .4, 'pop');
+}
+
+// SHORT: WorldTUI, a terminal imagined by a 360M model (simedw, 21 Oct 2026). Build: python3 ~/nkit/news/build.py video.js script2.m4a
+// Assets: our own run of the browser demo (demo_*.png, simedw.com/projects/worldtui) + crops of the author's post (b_*.png).
+const VIDEO = { theme: 'blue', scenes: [{ type: 'custom', build: (s) => {
+  sSetup(s);
+  const ink = SB.ink, red = SB.red, blue = SB.blue;
+  const X = (v, id, cx, cy, r) => { const g = S('g', { id }, v); SWIRES.push(id);
+    S('path', { class: 'draw', d: `M${cx - r} ${cy - r} L${cx + r} ${cy + r}`, stroke: red, 'stroke-width': 18, 'stroke-linecap': 'round' }, g);
+    S('path', { class: 'draw', d: `M${cx + r} ${cy - r} L${cx - r} ${cy + r}`, stroke: red, 'stroke-width': 18, 'stroke-linecap': 'round' }, g); };
+
+  // S1 hook: our run of the demo, FAKE stamp, every letter a guess
+  const s1 = nlScene(s, 's1', '');
+  sPill(s1, 'p1', 70, 150, 'WORLDTUI &middot; OCT 21');
+  sHead(s1, 'h1', 70, 235, 940, 'Every letter here is <b>an AI guess</b>', 100);
+  sShot(s1, 'sh1', 70, 520, 940, 'assets/demo_a.png', 'simedw.com/projects/worldtui', 800, 216);
+  sStamp(s1, 'st1', 540, 1130, 'FAKE TERMINAL', red, -6, 96);
+  [[180, 700], [420, 760], [700, 690], [300, 900], [820, 880]].forEach(([x, y], k) => D(s1, '?', `position:absolute;left:${x}px;top:${y}px;width:70px;height:70px;border-radius:18px;background:${blue};color:#fff;font:900 50px/70px ${SHEAD};text-align:center`, 'q1' + k, 'q1'));
+
+  // S2 no shell, no files, no computer: three drawings crossed out
+  const s2 = nlScene(s, 's2', '');
+  sTag(s2, 'tg2', 70, 150, "WHAT'S BEHIND IT");
+  const [e2, v2] = nlBox(s2, 'nb2', 70, 230, 940, 1100);
+  // shell prompt window
+  S('rect', { x: 250, y: 20, width: 440, height: 260, rx: 28, fill: '#0B1222', stroke: ink, 'stroke-width': 8 }, v2);
+  S('path', { d: 'M310 110 L370 150 L310 190 M400 195 L480 195', fill: 'none', stroke: SB.acc, 'stroke-width': 14, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, v2);
+  // folder
+  S('path', { d: 'M260 420 L400 420 L440 460 L680 460 L680 680 L260 680 Z', fill: SB.tint, stroke: ink, 'stroke-width': 8, 'stroke-linejoin': 'round' }, v2);
+  // computer
+  S('rect', { x: 260, y: 780, width: 420, height: 250, rx: 22, fill: SB.card, stroke: ink, 'stroke-width': 8 }, v2);
+  S('path', { d: 'M420 1030 L400 1080 M520 1030 L540 1080 M360 1085 L580 1085', stroke: ink, 'stroke-width': 8, 'stroke-linecap': 'round' }, v2);
+  D(e2, 'shell', `position:absolute;left:730px;top:120px;font:800 48px ${SHEAD};color:${ink}`, 'nb2a', 'stxt');
+  D(e2, 'files', `position:absolute;left:730px;top:540px;font:800 48px ${SHEAD};color:${ink}`, 'nb2b', 'stxt');
+  D(e2, 'computer', `position:absolute;left:20px;top:880px;font:800 44px ${SHEAD};color:${ink}`, 'nb2c', 'stxt');
+  const xv = sSvg(e2); X(xv, 'x2a', 470, 150, 120); X(xv, 'x2b', 470, 560, 120); X(xv, 'x2c', 470, 905, 120);
+
+  // S3 tiny model: counter to 360M + the post's own line
+  const s3 = nlScene(s, 's3', '');
+  sTag(s3, 'tg3', 70, 150, 'JUST A TINY MODEL');
+  sCount(s3, 'n3', 70, 210, ['0', '90', '180', '270', '360'], blue, 260);
+  sSub(s3, 'l3', 70, 480, 870, 'million parameters');
+  const w3 = sShot(s3, 'sh3', 70, 580, 870, 'assets/b_tldr.png', 'simedw.com', 820, 372);
+  w3.hl('hl3a', 170, 20, 518, 42); w3.hl('hl3b', 36, 80, 590, 42);
+  sChip(s3, 'c3', 70, 1090, 'base model: <b>Qwen2.5-Coder 0.5B</b>');
+
+  // S4 you press a key -> model -> screen change (drawn pipeline)
+  const s4 = nlScene(s, 's4', '');
+  sTag(s4, 'tg4', 70, 150, 'HOW IT WORKS');
+  const [e4, v4] = nlBox(s4, 'pp4', 70, 230, 940, 1100);
+  D(e4, 'L', `position:absolute;left:330px;top:20px;width:260px;height:240px;border-radius:40px;background:${SB.card};border:8px solid ${ink};box-shadow:0 22px 0 ${SB.line};font:900 150px/240px ${SMONO};color:${ink};text-align:center`, 'ky4');
+  D(e4, 'AI MODEL', `position:absolute;left:250px;top:420px;width:420px;height:180px;border-radius:36px;background:${blue};border:8px solid ${ink};font:900 66px/165px ${SHEAD};color:#fff;text-align:center`, 'md4');
+  const pv = sSvg(e4); sArrow(pv, 'ar4a', 460, 300, 460, 410, SB.acc, 0); sArrow(pv, 'ar4b', 460, 610, 460, 720, SB.acc, 0);
+  const gr = D(e4, '', `position:absolute;left:120px;top:740px;width:680px;height:330px;border-radius:28px;background:#0B1222;border:6px solid ${ink};overflow:hidden`, 'gr4');
+  for (let k = 0; k < 48; k++) D(gr, '', `position:absolute;left:${24 + (k % 12) * 53}px;top:${24 + Math.floor(k / 12) * 72}px;width:44px;height:58px;border-radius:8px;background:${SB.line}`, 'gc4' + k);
+  for (let k = 0; k < 48; k++) D(gr, '', `position:absolute;left:${24 + (k % 12) * 53}px;top:${24 + Math.floor(k / 12) * 72}px;width:44px;height:58px;border-radius:8px;background:${SB.acc}`, 'go4' + k, 'go4');
+
+  // S5 vim, tmux, snake: the post's line + a drawn snake moving on a grid
+  const s5 = nlScene(s, 's5', '');
+  sTag(s5, 'tg5', 70, 150, 'IT CAN EVEN');
+  const w5 = sShot(s5, 'sh5', 70, 220, 940, 'assets/b_tldr.png', 'simedw.com', 820, 372);
+  w5.hl('hl5', 240, 320, 486, 42);
+  const sn = D(s5, '', `position:absolute;left:70px;top:740px;width:870px;height:540px;border-radius:30px;background:#0B1222;border:4px solid ${SB.line};overflow:hidden`, 'sn5');
+  D(sn, '', `position:absolute;left:640px;top:300px;width:40px;height:40px;border-radius:50%;background:${red}`, 'fd5');
+  D(sn, ['', '', '', '', '', ''].map((_, k) => `<i style="position:absolute;left:${k * 46}px;top:0;width:42px;height:42px;border-radius:10px;background:${k === 5 ? SB.acc : '#22C55E'}"></i>`).join(''), 'position:absolute;left:60px;top:300px;width:280px;height:42px', 'bd5');
+  D(sn, 'snake &middot; 96&times;32', `position:absolute;left:30px;top:24px;font:600 32px ${SMONO};color:${SB.soft}`, 'sn5t', 'stxt');
+
+  // S6 336k real sessions: counter + grid of tiny terminals + the post's line
+  const s6 = nlScene(s, 's6', '');
+  sTag(s6, 'tg6', 70, 150, 'TRAINING DATA');
+  sCount(s6, 'n6', 70, 200, ['0', '84', '168', '252', '336'], blue, 240);
+  sSub(s6, 'l6', 70, 450, 870, 'thousand real terminal sessions');
+  const tg = D(s6, '', 'position:absolute;left:70px;top:540px;width:870px;height:420px', 'tg6g');
+  for (let k = 0; k < 40; k++) { const x = (k % 10) * 87, y = Math.floor(k / 10) * 105;
+    D(tg, `<i style="position:absolute;left:10px;top:30px;width:28px;height:6px;border-radius:3px;background:${SB.acc}"></i><i style="position:absolute;left:10px;top:48px;width:44px;height:6px;border-radius:3px;background:#64748B"></i>`, `position:absolute;left:${x}px;top:${y}px;width:76px;height:90px;border-radius:12px;background:${SB.card};border:3px solid #3B5079`, 'tw6' + k, 'tw6'); }
+  const w6 = sShot(s6, 'sh6', 70, 1000, 870, 'assets/b_eps.png', 'simedw.com', 872, 180);
+  w6.hl('hl6', 568, 78, 224, 40);
+
+  // S7 208 MB in your browser: drawn browser with a download bar + the post's line
+  const s7 = nlScene(s, 's7', '');
+  sTag(s7, 'tg7', 70, 150, 'RUNS LOCALLY');
+  const bw = sCard(s7, 'bw7', 70, 220, 940, 560); bw.style.overflow = 'hidden';
+  D(bw, '<i></i><i></i><i></i><span>your browser</span>', `position:absolute;left:0;right:0;top:0;height:74px;display:flex;align-items:center;gap:12px;padding:0 26px;background:#0F1828;border-bottom:2px solid ${SB.line};font:600 30px ${SBODY};color:${SB.soft}`, 'bw7b');
+  D(bw, '', `position:absolute;left:80px;top:300px;width:780px;height:40px;border-radius:20px;background:${SB.line}`, 'bw7t');
+  D(bw, '', `position:absolute;left:80px;top:300px;width:780px;height:40px;border-radius:20px;background:${blue};transform-origin:0 50%`, 'bw7f');
+  sCount(bw, 'n7', 80, 140, ['0', '52', '104', '156', '208'], ink, 120);
+  D(bw, 'MB', `position:absolute;left:340px;top:175px;font:800 64px ${SHEAD};color:${SB.soft}`, 'bw7m', 'stxt');
+  D(bw, 'no server &middot; no cloud', `position:absolute;left:80px;top:400px;font:700 40px ${SBODY};color:${SB.acc}`, 'bw7n', 'stxt');
+  const w7 = sShot(s7, 'sh7', 70, 840, 870, 'assets/b_try.png', 'simedw.com', 820, 124);
+  w7.hl('hl7a', 668, 10, 84, 42); w7.hl('hl7b', 36, 70, 424, 42);
+
+  // S8 a dream of a computer: drawn computer melting into a cloud
+  const s8 = nlScene(s, 's8', '');
+  sTag(s8, 'tg8', 70, 150, 'BUT');
+  const [e8, v8] = nlBox(s8, 'dr8', 120, 300, 840, 900);
+  const pc = S('g', { id: 'pc8' }, v8);
+  S('rect', { x: 170, y: 150, width: 500, height: 320, rx: 26, fill: SB.card, stroke: ink, 'stroke-width': 9 }, pc);
+  S('path', { d: 'M360 470 L340 540 M480 470 L500 540 M290 545 L550 545', stroke: ink, 'stroke-width': 9, 'stroke-linecap': 'round' }, pc);
+  const cl = S('g', { id: 'cl8' }, v8);
+  S('path', { d: 'M180 480 Q120 480 120 410 Q120 340 200 340 Q210 240 320 240 Q400 160 500 230 Q600 200 640 290 Q740 290 730 390 Q760 480 660 480 Z', fill: '#1B2B4D', stroke: SB.acc, 'stroke-width': 9, 'stroke-dasharray': '26 16' }, cl);
+  D(e8, 'z z z', `position:absolute;left:600px;top:120px;font:900 70px ${SHEAD};color:${SB.acc};letter-spacing:6px`, 'zz8', 'stxt');
+  sHead(s8, 'h8', 70, 980, 870, 'a <b>dream</b> of a computer', 96);
+
+  // S9 it forgets: the author's own example, typed, + the post's line
+  const s9 = nlScene(s, 's9', '');
+  sTag(s9, 'tg9', 70, 150, "THE AUTHOR'S OWN TEST");
+  sCode(s9, 'cd9', 70, 220, 940, ['$ echo green >> colors', '$ cat colors', '              (line missing)'], 'WORLDTUI');
+  document.getElementById('cd9l2').classList.add('hl');
+  const fx = sSvg(s9); X(fx, 'x9', 820, 420, 50);
+  const w9 = sShot(s9, 'sh9', 70, 640, 870, 'assets/b_forget.png', 'simedw.com', 872, 300);
+  w9.hl('hl9a', 134, 18, 430, 40); w9.hl('hl9b', 720, 190, 78, 40); w9.hl('hl9c', 20, 248, 484, 40);
+  sChip(s9, 'c9', 70, 1130, 'often, <b>not always</b>');
+
+  // S10 learned instead of coded: code file vs neural net
+  const s10 = nlScene(s, 's10', '');
+  sTag(s10, 'tg10', 70, 150, 'FOR DEVELOPERS');
+  const [e10, v10] = nlBox(s10, 'lc10', 70, 230, 940, 560);
+  S('rect', { x: 30, y: 60, width: 330, height: 420, rx: 26, fill: SB.card, stroke: ink, 'stroke-width': 8 }, v10);
+  [110, 170, 230, 290, 350, 410].forEach((y, k) => S('path', { d: `M80 ${y} L${180 + (k * 53) % 140} ${y}`, stroke: k % 2 ? SB.line : SB.acc, 'stroke-width': 14, 'stroke-linecap': 'round' }, v10));
+  D(e10, 'coded', `position:absolute;left:30px;width:330px;top:495px;text-align:center;font:800 44px ${SHEAD};color:${SB.soft}`, 'lc10a', 'stxt');
+  const nn = S('g', { id: 'nn10' }, v10); const L1 = [130, 250, 370], L2 = [100, 200, 300, 400], L3 = [190, 310];
+  L1.forEach(a => L2.forEach(b => S('path', { d: `M600 ${a} L740 ${b}`, stroke: SB.line, 'stroke-width': 4 }, nn)));
+  L2.forEach(a => L3.forEach(b => S('path', { d: `M740 ${a} L880 ${b}`, stroke: SB.line, 'stroke-width': 4 }, nn)));
+  [[600, L1], [740, L2], [880, L3]].forEach(([x, ys]) => ys.forEach(y => S('circle', { cx: x, cy: y, r: 22, fill: blue, stroke: ink, 'stroke-width': 5 }, nn)));
+  D(e10, 'learned', `position:absolute;left:600px;width:300px;top:495px;text-align:center;font:800 44px ${SHEAD};color:${SB.acc}`, 'lc10b', 'stxt');
+  const av = sSvg(e10); sArrow(av, 'ar10', 390, 270, 560, 270, SB.acc, -50);
+  const w10 = sShot(s10, 'sh10', 70, 870, 870, 'assets/b_learned.png', 'simedw.com', 872, 130);
+  w10.hl('hl10a', 250, 20, 570, 40); w10.hl('hl10b', 20, 76, 114, 40);
+
+  // S11 loop back: our run of the demo, is it even real?
+  const s11 = nlScene(s, 's11', '');
+  sPill(s11, 'p11', 70, 150, 'OUR RUN OF THE DEMO');
+  sShot(s11, 'sh11', 70, 230, 940, 'assets/demo_b.png', 'simedw.com/projects/worldtui', 800, 216);
+  sBig(s11, 'q11', 400, 760, '?', SB.acc);
+  sChip(s11, 'c11', 70, 580, 'it made up <b>all of these files</b>');
+  sSub(s11, 'l11', 70, 1100, 870, 'no shell. no files. just a guess.');
+
+  sCaptions('This terminal is fake. Every letter on it is a guess. No shell. No files. No computer behind it. Just a tiny AI model with three hundred and sixty million parameters. You press a key. It predicts how the screen should change. It runs vim and tmux. It even plays snake. It learned from three hundred and thirty six thousand real terminal sessions. The whole thing is two hundred and eight megabytes and runs in your browser. But it is a dream of a computer. Add a line to a file. Read it back. It often forgets. For developers this is a peek at apps that are learned instead of coded. So next time your terminal acts weird. Ask yourself. Is it even real?');
+
+  return () => {
+    sBegin(['#s1', '#s2', '#s3', '#s4', '#s5', '#s6', '#s7', '#s8', '#s9', '#s10', '#s11']);
+    tl.set('.go4', { autoAlpha: 0 }, 0); tl.set('#bw7f', { scaleX: 0 }, 0); tl.set('#cl8', { autoAlpha: 0 }, 0);
+    let t;
+    // S1
+    FADE(['#p1', '#h1', '#sh1'], HEAD + .01, { d: .04 }); SZOOM('sh1', HEAD + .01, 3.2, 1, 1.06);
+    t = W('is fake'); STAMP('st1', t + .1); CUE(t + .3, 'hit');
+    t = W('every letter'); POP('.q1', t, { st: .15 }); CUE(t, 'tick', 5, .15);
+    t = W('a guess'); PULSE('.q1', t, { s: 1.15 });
+    // S2
+    t = NEXT('#s2', 'no shell'); FADE('#tg2', t); IN('#nb2', t, { y: 30, d: .35 });
+    t = W('no shell'); sDraw('x2a', t + .15, .3); CUE(t + .15, 'err');
+    t = W('no files'); sDraw('x2b', t + .1, .3); CUE(t + .1, 'err');
+    t = W('no computer'); sDraw('x2c', t + .1, .3); CUE(t + .1, 'err'); SHAKE('#nb2', t + .45);
+    // S3
+    t = NEXT('#s3', 'just a tiny'); FADE('#tg3', t); IN('#sh3', t + .1, { y: 30, d: .4 }); tl.set('#n3', { autoAlpha: 1 }, t); tl.set('#n3n0', { autoAlpha: 1 }, t);
+    t = W('tiny ai'); FADE('#l3', t); SHL('hl3a', t);
+    t = W('three hundred'); COUNT('n3', t, .22); SHL('hl3b', t + .3); CUE(t + .88, 'chime');
+    t = W('million parameters'); POP('#c3', t + .3); CUE(t + .3, 'pop');
+    // S4
+    t = NEXT('#s4', 'you press'); FADE('#tg4', t); IN('#pp4', t, { y: 30, d: .35 });
+    t = W('a key'); TO('#ky4', t - .1, { y: 18, duration: .1, yoyo: true, repeat: 1 }); CUE(t, 'blip');
+    t = W('it predicts'); sDraw('ar4a', t - .2, .3); PULSE('#md4', t, { s: 1.06 });
+    t = W('the screen'); sDraw('ar4b', t - .2, .3);
+    for (let k = 0; k < 48; k++) tl.fromTo('#go4' + k, { autoAlpha: 0 }, { autoAlpha: k % 3 ? .9 : .5, duration: .05 }, t + (k % 12) * .03 + Math.floor(k / 12) * .02);
+    t = W('should change'); CUE(t, 'tick', 4, .1);
+    // S5
+    t = NEXT('#s5', 'it runs'); FADE('#tg5', t); IN('#sh5', t, { y: 30, d: .4 }); IN('#sn5', t + .2, { y: 30, d: .4 });
+    t = W('vim and'); SHL('hl5', t); CUE(t, 'tick');
+    t = W('plays snake'); TO('#bd5', t - .5, { x: 250, duration: 1.1, ease: 'none' }); POP('#fd5', t, { s: .3 }); CUE(t, 'pop');
+    // S6
+    t = NEXT('#s6', 'it learned'); FADE('#tg6', t); tl.set('#n6', { autoAlpha: 1 }, t); tl.set('#n6n0', { autoAlpha: 1 }, t); FADE('#l6', t + .2);
+    tl.set('#tg6g', { autoAlpha: 1 }, t); for (let k = 0; k < 40; k++) tl.fromTo('#tw6' + k, { autoAlpha: 0, scale: .4 }, { autoAlpha: 1, scale: 1, duration: .25, ease: 'back.out(1.7)' }, t + .1 + k * .02); CUE(t + .1, 'pop');
+    { const t2 = W('real terminal'); for (let k = 0; k < 40; k++) tl.to('#tw6' + k, { scale: 1.12, duration: .1, yoyo: true, repeat: 1 }, t2 - .6 + (k % 10) * .04); }
+    t = W('three hundred'); COUNT('n6', t, .3);
+    t = W('real terminal'); IN('#sh6', t - .3, { y: 30, d: .35 }); SHL('hl6', t); CUE(t, 'chime');
+    // S7
+    t = NEXT('#s7', 'the whole'); FADE('#tg7', t); IN('#bw7', t, { y: 30, d: .35 }); tl.set('#n7', { autoAlpha: 1 }, t); tl.set('#n7n0', { autoAlpha: 1 }, t);
+    t = W('two hundred'); TO('#bw7f', t, { scaleX: 1, duration: 1.0, ease: 'power1.inOut' }); COUNT('n7', t, .22); CUE(t + .9, 'chime');
+    t = W('your browser'); IN('#sh7', t - .5, { y: 30, d: .35 }); SHL('hl7a', t - .2); SHL('hl7b', t); FADE('#bw7n', t);
+    // S8
+    t = NEXT('#s8', 'but it is'); FADE('#tg8', t); IN('#dr8', t, { y: 20, d: .3 });
+    t = W('a dream'); TO('#pc8', t, { autoAlpha: .15, duration: .6 }); FADE('#cl8', t, { d: .6 }); IN('#h8', t, { y: 20, d: .35 }); POP('#zz8', t + .3); CUE(t, 'chime');
+    // S9
+    t = NEXT('#s9', 'add a line'); FADE('#tg9', t); IN('#cd9', t, { y: 30, d: .35 }); TYPEL('cd9', t + .1, 0, .03); CUE(t + .1, 'type', 22, .03);
+    t = W('read it'); TYPEL('cd9', t, 1, .03); CUE(t, 'type', 12, .03); IN('#sh9', t, { y: 30, d: .35 }); SHL('hl9a', t + .3);
+    t = W('often forgets'); TYPEL('cd9', t - .1, 2, .02); sDraw('x9', t + .2, .3); SHL('hl9b', t); SHL('hl9c', t + .25); CUE(t + .2, 'err'); POP('#c9', t + .5);
+    // S10
+    t = NEXT('#s10', 'for developers'); FADE('#tg10', t); IN('#lc10', t, { y: 30, d: .35 });
+    t = W('a peek'); IN('#sh10', t, { y: 30, d: .35 });
+    t = W('are learned'); sDraw('ar10', t - .2, .4); PULSE('#nn10', t + .2, { s: 1.05 }); SHL('hl10a', t); SHL('hl10b', t + .3); CUE(t, 'whoosh');
+    t = W('of coded'); TO('#lc10', t, { autoAlpha: 1, duration: .1 }); CUE(t, 'tick');
+    // S11
+    t = NEXT('#s11', 'so next'); POP('#p11', t, { d: .3 }); IN('#sh11', t, { y: 30, d: .4 }); SZOOM('sh11', t, 4.2, 1, 1.05);
+    t = W('acts weird'); SHAKE('#sh11', t); CUE(t, 'err'); POP('#c11', t + .2);
+    t = W('ask yourself'); POP('#q11', t, { s: .4 }); CUE(t, 'pop'); FADE('#l11', t + .3);
+    t = W('even real'); PULSE('#q11', t, { s: 1.15 }); CUE(t, 'hit');
+    sFinish();
+  };
+} }] };
+
+// ===================== HF SCENE KIT (runtime) =====================
+// Needs before it: const TW=[[t,'word'],...]; const END=<sec>; const VIDEO={theme,scenes:[...]}
+window.__timelines = window.__timelines || {};
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const NS = 'http://www.w3.org/2000/svg';
+function S(tag, at, parent) { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); if (parent) (typeof parent === 'string' ? $(parent) : parent).appendChild(e); return e; }
+function H(tag, cls, css, html, parent, id) { const e = document.createElement(tag); if (cls) e.className = cls; if (css) e.style.cssText = css; if (html != null) e.innerHTML = html; if (id) e.id = id; if (parent) (typeof parent === 'string' ? $(parent) : parent).appendChild(e); return e; }
+function SVG(parent) { return S('svg', { class: 'full', viewBox: '0 0 1920 1080' }, parent); }
+const fmt = t => String(t ?? '').replace(/\*(.+?)\*/g, '<span class="acc">$1</span>').replace(/_(.+?)_/g, '<span class="acc2">$1</span>');
+const ICON = {
+  check: (c = 'var(--good)', s = 40) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="${c}" stroke-width="3"/><polyline points="11,21 18,28 30,13" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  cross: (c = 'var(--bad)', s = 40) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="${c}" stroke-width="3"/><path d="M13 13 L27 27 M27 13 L13 27" stroke="${c}" stroke-width="4" stroke-linecap="round"/></svg>`,
+  dot: (c = 'var(--acc)', s = 40) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 40 40"><circle cx="20" cy="20" r="11" fill="${c}"/></svg>`,
+  warn: (c = 'var(--bad)', s = 40) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 40 40"><path d="M20 4 L37 35 L3 35 Z" fill="none" stroke="${c}" stroke-width="3" stroke-linejoin="round"/><path d="M20 15 L20 25" stroke="${c}" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="30" r="2.4" fill="${c}"/></svg>`,
+  bolt: (c = 'var(--gold)', s = 40) => `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 40 40"><path d="M23 2 L7 23 L19 23 L16 38 L33 15 L21 15 Z" fill="${c}"/></svg>`,
+};
+function arrowD(x1, y1, x2, y2, h = 18) { const a = Math.atan2(y2 - y1, x2 - x1); const p = d => `${(x2 - h * Math.cos(a + d)).toFixed(1)} ${(y2 - h * Math.sin(a + d)).toFixed(1)}`; return `M${x1} ${y1} L${x2} ${y2} M${p(0.5)} L${x2} ${y2} L${p(-0.5)}`; }
+const COL = ['var(--acc)', 'var(--acc2)', 'var(--gold)', 'var(--bad)', 'var(--c5)', 'var(--c6)'];
+
+// ---------- theme ----------
+const THEMES = {
+  green: ['#34d399', '#22d3ee'], blue: ['#60a5fa', '#a78bfa'], orange: ['#fb923c', '#fbbf24'],
+  purple: ['#a78bfa', '#f472b6'], cyan: ['#22d3ee', '#60a5fa'], red: ['#f87171', '#fb923c'],
+};
+const TH = THEMES[VIDEO.theme] || VIDEO.theme || THEMES.green; { const r = $('#root'); r.style.setProperty('--acc', TH[0]); r.style.setProperty('--acc2', TH[1]); }
+
+// ---------- timing ----------
+const NW = TW.map(w => w[1]);
+const norm = p => p.split(/\s+/).map(w => w.toLowerCase().replace(/[^a-z0-9]/g, '')).filter(Boolean);
+function findp(p, from) { const q = norm(p); for (let i = 0; i < TW.length; i++) { if (TW[i][0] < from) continue; let ok = true; for (let j = 0; j < q.length; j++) if (NW[i + j] !== q[j]) { ok = false; break; } if (ok) return TW[i][0]; } console.warn('PHRASE NOT FOUND: ' + p); return null; }
+let CUR = 0, NXT = END;
+function at(p, dflt) { if (typeof p === 'number') return p; if (!p) return dflt ?? CUR; const t = findp(p, CUR - 0.06); if (t === null) return dflt ?? CUR; if (t > NXT + 0.2) console.warn('PHRASE OUTSIDE SCENE: ' + p + ' @' + t); return t; }
+// time for item i of n: its own `at`, else auto-spread through the scene
+function T(item, i, n, start) { const s0 = start ?? CUR + .4; if (item && item.at) return at(item.at); const span = Math.max(1, NXT - s0 - 1.2); return s0 + Math.min(2.2, span / Math.max(1, n)) * i; }
+
+// ---------- tween helpers ----------
+const tl = gsap.timeline({ paused: true });
+const BEATS = []; const B = t => BEATS.push(+(+t).toFixed(2));
+function IN(s, t, o = {}) { B(t); return tl.fromTo(s, { autoAlpha: 0, y: o.y ?? 30, x: o.x ?? 0 }, { autoAlpha: o.to ?? 1, y: 0, x: 0, duration: o.d ?? .6, ease: o.e ?? 'power3.out', stagger: o.st ?? 0 }, t); }
+function POP(s, t, o = {}) { B(t); return tl.fromTo(s, { autoAlpha: 0, scale: o.s ?? .6, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: o.d ?? .5, ease: 'back.out(1.7)', stagger: o.st ?? 0 }, t); }
+function FADE(s, t, o = {}) { B(t); return tl.fromTo(s, { autoAlpha: 0 }, { autoAlpha: o.to ?? 1, duration: o.d ?? .5, stagger: o.st ?? 0 }, t); }
+function OUT(s, t, o = {}) { return tl.to(s, { autoAlpha: o.to ?? 0, duration: o.d ?? .4, stagger: o.st ?? 0 }, t); }
+function DIM(s, t, v = .3) { return tl.to(s, { autoAlpha: v, duration: .4 }, t); }
+function DRAW(s, t, o = {}) { B(t); return tl.fromTo(s, { strokeDashoffset: (i, e) => e.__len }, { strokeDashoffset: 0, duration: o.d ?? 1, ease: o.e ?? 'power2.inOut', stagger: o.st ?? 0 }, t); }
+function PULSE(s, t, o = {}) { B(t); return tl.to(s, { scale: o.s ?? 1.08, transformOrigin: '50% 50%', duration: o.d ?? .25, yoyo: true, repeat: o.r ?? 1, ease: 'sine.inOut' }, t); }
+function SHAKE(s, t) { B(t); return tl.to(s, { x: 10, duration: .06, repeat: 5, yoyo: true }, t); }
+function TO(s, t, v) { B(t); return tl.to(s, Object.assign({ duration: .6, ease: 'power2.inOut' }, v), t); }
+function BAR(s, t, v = 1, d = 1) { B(t); return tl.fromTo(s, { scaleX: 0, transformOrigin: '0% 50%' }, { scaleX: v, duration: d, ease: 'power2.out' }, t); }
+function BARY(s, t, v = 1, d = 1) { B(t); return tl.fromTo(s, { scaleY: 0, transformOrigin: '50% 100%' }, { scaleY: v, duration: d, ease: 'power2.out' }, t); }
+
+// ---------- scene plumbing ----------
+const stage = $('#stage'); const LATER = []; let NID = 0;
+const uid = p => `${p}${NID++}`;
+function head(s, c) { if (!c.head) return null; const id = uid('h'); H('div', 'cx h2', `top:${c.headTop ?? 60}px`, fmt(c.head), s, id); return '#' + id; }
+function note(s, c) { if (!c.note) return null; const id = uid('n'); H('div', 'cx sm', `top:${c.noteTop ?? 990}px`, fmt(c.note), s, id); return '#' + id; }
+function headBeats(hd, nt, c) { if (hd) IN(hd, CUR); if (nt) FADE(nt, c.noteAt ? at(c.noteAt) : CUR + 1); }
+
+const K = {};
+// ---- title: {title, sub, subAt, tag}
+K.title = (s, c) => {
+  const a = uid('t'), b = uid('t'), g = uid('t');
+  if (c.tag) H('div', 'chip', 'left:0;right:0;margin:auto;width:fit-content;top:300px;border-color:var(--acc);color:var(--acc)', fmt(c.tag), s, g);
+  H('div', 'cx h1 kmain', `top:${c.sub ? 400 : 450}px;font-size:${c.size ?? 96}px`, fmt(c.title), s, a);
+  if (c.sub) H('div', 'cx h3 c-dim', 'top:560px', fmt(c.sub), s, b);
+  return () => { if (c.tag) POP('#' + g, CUR); IN('#' + a, CUR + .1, { y: 40, d: .8 }); if (c.sub) IN('#' + b, at(c.subAt, CUR + 1)); };
+};
+// ---- statement: {lines:[{text,at,size,color}]}  big sentences stacked & centred
+K.statement = (s, c) => {
+  const n = c.lines.length, gap = c.gap ?? 150, top0 = 540 - (n - 1) * gap / 2 - 50, ids = [];
+  c.lines.forEach((l, i) => { const id = uid('st'); ids.push(id); H('div', `cx ${l.size ?? 'h2'} kmain`, `top:${top0 + i * gap}px;${l.color ? 'color:' + l.color : ''}`, fmt(l.text), s, id); });
+  return () => c.lines.forEach((l, i) => IN('#' + ids[i], T(l, i, n), { y: 30, d: .7 }));
+};
+// ---- cards: {head, items:[{title,sub,big,color,at}], note}
+K.cards = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), n = c.items.length, W = n <= 2 ? 620 : n === 3 ? 500 : 400, gap = 50, x0 = (1920 - (n * W + (n - 1) * gap)) / 2, ids = [];
+  c.items.forEach((it, i) => {
+    const id = uid('cd'); ids.push(id); const col = it.color || COL[i % COL.length];
+    H('div', 'card kmain', `left:${x0 + i * (W + gap)}px;top:${c.top ?? 280}px;width:${W}px;height:${c.h ?? 520}px;border-top:6px solid ${col};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center`,
+      `${it.big ? `<div style="font-size:${it.bigSize ?? 110}px;font-weight:800;line-height:1;color:${col}">${fmt(it.big)}</div>` : ''}<div class="h3">${fmt(it.title)}</div>${it.sub ? `<div class="sm">${fmt(it.sub)}</div>` : ''}`, s, id);
+  });
+  return () => { headBeats(hd, nt, c); c.items.forEach((it, i) => POP('#' + ids[i], T(it, i, n))); };
+};
+// ---- bars: {head, items:[{label,value,color,at,text}], max, unit, note}
+K.bars = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), n = c.items.length, max = c.max ?? Math.max(...c.items.map(i => i.value)), BW = 1050, rowH = Math.min(150, 620 / n), y0 = 540 - n * rowH / 2 + 30, ids = [];
+  c.items.forEach((it, i) => {
+    const y = y0 + i * rowH, id = uid('br'), col = it.color || COL[i % COL.length], w = Math.max(6, BW * it.value / max);
+    H('div', 'a h3', `left:150px;top:${y + 4}px;width:440px;font-size:36px`, fmt(it.label), s, id + 'l');
+    H('div', 'a', `left:610px;top:${y}px;width:${BW}px;height:64px;border-radius:14px;background:rgba(255,255,255,.06)`, '', s, id + 'k');
+    H('div', 'a kmain', `left:610px;top:${y}px;width:${w}px;height:64px;border-radius:14px;background:${col}`, '', s, id);
+    H('div', 'a h3', `left:${630 + w}px;top:${y + 4}px;font-size:38px`, fmt(it.text ?? (it.value + (c.unit ?? ''))), s, id + 'v');
+    ids.push(id);
+  });
+  return () => { headBeats(hd, nt, c); c.items.forEach((it, i) => { const t = T(it, i, n); FADE(`#${ids[i]}l,#${ids[i]}k`, t - .3); BAR('#' + ids[i], t, 1, 1); FADE('#' + ids[i] + 'v', t + .8); }); };
+};
+// ---- compare: {head, left:{title,color,points:[{text,at}],at}, right:{...}, vs:true, win:'left'|'right', winAt}
+K.compare = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), side = {};
+  ['left', 'right'].forEach((k, j) => {
+    const d = c[k], id = uid('cp'), col = d.color || (j ? 'var(--acc)' : 'var(--c5)'), ch = c.h ?? Math.max(c.left.points?.length || 0, c.right.points?.length || 0) * 110 + 220;
+    const el = H('div', 'card kmain', `left:${j ? 1000 : 120}px;top:${c.top ?? (540 - ch / 2)}px;width:800px;height:${ch}px;border:3px solid ${col}`, `<div class="h2" style="color:${col};text-align:center">${fmt(d.title)}</div>`, s, id);
+    const pts = (d.points || []).map((p, i) => { const pid = uid('pt'); H('div', 'tx', 'display:flex;gap:18px;align-items:center;margin-top:34px', (p.icon === 'cross' ? ICON.cross() : p.icon === 'check' ? ICON.check() : ICON.dot(col, 30)) + `<span>${fmt(p.text)}</span>`, el, pid); return pid; });
+    side[k] = { id, pts };
+  });
+  const vs = uid('vs'); if (c.vs !== false) H('div', 'a h2 c-dim', 'left:910px;top:520px;width:100px;text-align:center', 'vs', s, vs);
+  const ch = c.h ?? Math.max(c.left.points?.length || 0, c.right.points?.length || 0) * 110 + 220;
+  const wid = uid('w'); if (c.win) H('div', 'badge', `left:${c.win === 'left' ? 380 : 1260}px;top:${(c.top ?? (540 - ch / 2)) + ch - 30}px;border-color:var(--good);color:var(--good)`, ICON.check() + (c.winText ?? 'winner'), s, wid);
+  return () => {
+    headBeats(hd, nt, c);
+    ['left', 'right'].forEach((k, j) => { const d = c[k]; const t0 = at(d.at, CUR + .3 + j * 1.5); IN('#' + side[k].id, t0, { x: j ? 60 : -60, y: 0 }); d.points?.forEach((p, i) => IN('#' + side[k].pts[i], p.at ? at(p.at) : t0 + .6 + i * .9, { x: 20, y: 0, d: .4 })); });
+    if (c.vs !== false) POP('#' + vs, CUR + .8); if (c.win) POP('#' + wid, at(c.winAt, NXT - 2));
+  };
+};
+// ---- flow: {head, steps:[{label,sub,at,color}], note}
+K.flow = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), n = c.steps.length, W = Math.min(380, (1700 - (n - 1) * 90) / n), x0 = (1920 - (n * W + (n - 1) * 90)) / 2, y = c.y ?? 400, sv = SVG(s), ids = [], ar = [];
+  c.steps.forEach((st, i) => {
+    const id = uid('fl'), col = st.color || COL[i % COL.length]; ids.push(id);
+    H('div', 'card kmain', `left:${x0 + i * (W + 90)}px;top:${y}px;width:${W}px;height:${c.h ?? 280}px;border:3px solid ${col};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px`, `<div class="h3" style="color:${col}">${fmt(st.label)}</div>${st.sub ? `<div class="sm">${fmt(st.sub)}</div>` : ''}`, s, id);
+    if (i) { const x = x0 + i * (W + 90); const p = S('path', { class: 'draw', d: arrowD(x - 80, y + (c.h ?? 280) / 2, x - 12, y + (c.h ?? 280) / 2, 16), stroke: '#e8eefc', 'stroke-width': 6, fill: 'none' }, sv); ar.push(p); }
+  });
+  return () => { headBeats(hd, nt, c); c.steps.forEach((st, i) => { const t = T(st, i, n); if (i) DRAW(ar[i - 1], t - .35, { d: .35 }); POP('#' + ids[i], t); }); };
+};
+// ---- counter: {head, values:['1×','10×','40×'], at, label, sub, color}
+K.counter = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), od = uid('od'), col = uid('oc'), lb = uid('ol'), H0 = 240;
+  const box = H('div', 'a kmain', `left:260px;top:280px;width:900px;height:${H0}px;overflow:hidden`, null, s, od);
+  const cl = H('div', 'a', 'left:0;top:0;width:900px', null, box, col);
+  c.values.forEach((v, i) => H('div', 'a', `left:0;top:${i * H0}px;width:900px;height:${H0}px;text-align:right;font-size:220px;font-weight:800;line-height:${H0}px;color:${c.color ?? 'var(--acc)'}`, fmt(v), cl));
+  H('div', 'a kmain', 'left:1200px;top:330px;width:620px', `<div class="h2">${fmt(c.label ?? '')}</div><div class="sm" style="margin-top:8px">${fmt(c.sub ?? '')}</div>`, s, lb);
+  return () => { headBeats(hd, nt, c); const t = at(c.at, CUR + .5); FADE('#' + od, CUR + .1); tl.fromTo('#' + col, { y: 0 }, { y: -(c.values.length - 1) * H0, duration: c.dur ?? 1.4, ease: 'power3.out' }, t); B(t); IN('#' + lb, t + .3, { x: 30, y: 0 }); };
+};
+// ---- timeline: {head, events:[{year,label,at,color}]}
+K.timeline = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), n = c.events.length, x0 = 200, x1 = 1720, sv = SVG(s), ids = [];
+  const ln = S('path', { class: 'draw', d: `M${x0} 540 L${x1} 540`, stroke: 'rgba(255,255,255,.4)', 'stroke-width': 6 }, sv);
+  c.events.forEach((e, i) => {
+    const x = n === 1 ? 960 : x0 + 90 + i * (x1 - x0 - 180) / (n - 1), up = i % 2 === 0, id = uid('tm'), col = e.color || COL[i % COL.length]; ids.push(id);
+    H('div', 'a kmain', `left:${x - 18}px;top:522px;width:36px;height:36px;border-radius:50%;background:${col}`, '', s, id + 'd');
+    H('div', 'a kmain', `left:${x - 160}px;top:${up ? 320 : 600}px;width:320px;text-align:center`, `<div class="h2" style="color:${col}">${fmt(e.year)}</div><div class="tx">${fmt(e.label)}</div>`, s, id);
+  });
+  return () => { headBeats(hd, nt, c); DRAW(ln, CUR + .2, { d: 1 }); c.events.forEach((e, i) => { const t = T(e, i, n, CUR + .8); POP('#' + ids[i] + 'd', t); IN('#' + ids[i], t + .1, { y: i % 2 ? -20 : 20 }); }); };
+};
+// ---- checklist: {head, items:[{text,ok:true|false|null,at}]}
+K.checklist = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), n = c.items.length, rowH = Math.min(130, 700 / n), y0 = 560 - n * rowH / 2, ids = [];
+  c.items.forEach((it, i) => { const id = uid('ck'); ids.push(id); H('div', 'card kmain', `left:${c.left ?? 360}px;top:${y0 + i * rowH}px;width:${c.w ?? 1200}px;height:${rowH - 22}px;display:flex;align-items:center;gap:26px;padding:0 34px`, (it.ok === true ? ICON.check('var(--good)', 50) : it.ok === false ? ICON.cross('var(--bad)', 50) : ICON.dot('var(--acc)', 50)) + `<div class="tx" style="font-weight:600;font-size:36px">${fmt(it.text)}</div>`, s, id); });
+  return () => { headBeats(hd, nt, c); c.items.forEach((it, i) => IN('#' + ids[i], T(it, i, n), { x: -50, y: 0 })); };
+};
+// ---- tokens: {head, words:[...], at, focus:index, focusAt, arcs:true, arcsAt, weights:[...], dimAfter:true, note}
+K.tokens = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), n = c.words.length, ws = c.words.map(w => Math.max(110, w.length * 22 + 50)), gap = 16, tot = ws.reduce((a, b) => a + b, 0) + gap * (n - 1), sc = Math.min(1, 1760 / tot), y = c.y ?? 500, sv = SVG(s), ids = [], xs = [];
+  let x = (1920 - tot * sc) / 2;
+  c.words.forEach((w, i) => { const id = uid('tk'); ids.push(id); xs.push(x + ws[i] * sc / 2); H('div', 'tok kmain', `left:${x}px;top:${y}px;width:${ws[i] * sc}px;height:84px;font-size:${32 * Math.max(.75, sc)}px;${i === c.focus ? 'border-color:var(--acc);color:var(--acc);box-shadow:0 0 26px var(--acc)' : ''}`, fmt(w), s, id); x += (ws[i] + gap) * sc; });
+  const arcs = []; if (c.arcs && c.focus != null) for (let i = 0; i < c.focus; i++) { const x1 = xs[c.focus], x2 = xs[i], h = 2 * (40 + .22 * (x1 - x2)); arcs.push(S('path', { class: 'draw', d: `M${x1} ${y - 4} Q${(x1 + x2) / 2} ${y - 4 - h} ${x2} ${y - 4}`, stroke: 'var(--acc)', 'stroke-width': 2 + 14 * (c.weights?.[i] ?? .3), fill: 'none', 'stroke-linecap': 'round' }, sv)); }
+  return () => {
+    headBeats(hd, nt, c); const t0 = at(c.at, CUR + .3); IN(ids.map(i => '#' + i), t0, { st: Math.min(.25, 2 / n), y: 20, d: .4 });
+    if (c.focus != null) { const tf = at(c.focusAt, t0 + 1.5); PULSE('#' + ids[c.focus], tf, { s: 1.15 }); if (c.dimAfter) DIM(ids.slice(c.focus + 1).map(i => '#' + i), tf, .3); if (arcs.length) DRAW(arcs.slice().reverse(), at(c.arcsAt, tf + .5), { st: .3, d: .7 }); }
+  };
+};
+// ---- line chart: {head, curves:[{fn:u=>..(0..1), color, label, at}], xLabel, yLabel, note}
+K.line = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), X0 = 300, Y0 = 900, W = 1250, Hh = 620, sv = SVG(s);
+  const ax = [S('path', { class: 'draw', d: arrowD(X0, Y0, X0, Y0 - Hh - 40), stroke: '#8b97b5', 'stroke-width': 4, fill: 'none' }, sv), S('path', { class: 'draw', d: arrowD(X0, Y0, X0 + W + 50, Y0), stroke: '#8b97b5', 'stroke-width': 4, fill: 'none' }, sv)];
+  const lab = uid('lx'); H('div', 'a', 'left:0;top:0', `<div class="a sm" style="left:${X0 + W - 400}px;top:${Y0 + 20}px;width:450px;text-align:right">${fmt(c.xLabel ?? '')}</div><div class="a sm" style="left:${X0 + 20}px;top:${Y0 - Hh - 50}px;width:500px">${fmt(c.yLabel ?? '')}</div>`, s, lab);
+  const cv = c.curves.map((cu, i) => { const col = cu.color || COL[i % COL.length]; let d = ''; for (let u = 0; u <= 1.0001; u += .01) { const v = Math.max(-.05, Math.min(1.05, cu.fn(u))); d += `${u ? 'L' : 'M'}${(X0 + W * u).toFixed(1)} ${(Y0 - Hh * v).toFixed(1)} `; } const p = S('path', { class: 'draw kmain', d, stroke: col, 'stroke-width': 9, fill: 'none', 'stroke-linecap': 'round' }, sv); const id = uid('lb'); const ve = Math.max(0, Math.min(1, cu.fn(1))); H('div', 'badge', `left:${X0 + W - 330}px;top:${Y0 - Hh * ve - 90 + (cu.dy ?? 0)}px;border-color:${col};color:${col};font-size:28px`, fmt(cu.label ?? ''), s, id); return [p, id]; });
+  return () => { headBeats(hd, nt, c); DRAW(ax, CUR + .2, { d: .6 }); FADE('#' + lab, CUR + .6); c.curves.forEach((cu, i) => { const t = T(cu, i, c.curves.length, CUR + 1); DRAW(cv[i][0], t, { d: 1.4 }); if (cu.label) POP('#' + cv[i][1], t + 1.2); }); };
+};
+// ---- stack: {head, layers:[{label,color,at}] (bottom first), sideL:{text,at}, sideR:{text,at}}
+K.stack = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), n = c.layers.length, h = Math.min(90, 640 / n), ids = [];
+  c.layers.forEach((l, i) => { const id = uid('sk'); ids.push(id); H('div', 'a kmain', `left:660px;top:${900 - (i + 1) * h}px;width:600px;height:${h - 12}px;border-radius:14px;background:${l.color || 'var(--acc)'};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:30px;color:#06121a`, fmt(l.label), s, id); });
+  const sl = uid('sl'), sr = uid('sr');
+  if (c.sideL) H('div', 'a', 'left:100px;top:450px;width:520px;text-align:right', `<div class="h3">${fmt(c.sideL.text)}</div>`, s, sl);
+  if (c.sideR) H('div', 'a', 'left:1300px;top:450px;width:540px', `<div class="h3">${fmt(c.sideR.text)}</div>`, s, sr);
+  return () => { headBeats(hd, nt, c); c.layers.forEach((l, i) => IN('#' + ids[i], T(l, i, n), { y: -30, d: .4 })); if (c.sideL) IN('#' + sl, at(c.sideL.at, NXT - 4), { x: -30, y: 0 }); if (c.sideR) IN('#' + sr, at(c.sideR.at, NXT - 2.5), { x: 30, y: 0 }); };
+};
+// ---- grid: {head, n:10, stages:[{k, at, label}]}  lights k×k cells (quadratic growth)
+K.grid = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), N = c.n ?? 10, P = Math.min(60, 640 / N), C = P - 6, GX = 760 - N * P / 2 + 200, GY = 540 - N * P / 2 + 30, cells = [];
+  for (let r = 0; r < N; r++) for (let q = 0; q < N; q++) { H('div', 'a', `left:${GX + q * P}px;top:${GY + r * P}px;width:${C}px;height:${C}px;border-radius:7px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03)`, '', s); cells.push([r, q, H('div', 'a kmain', `left:${GX + q * P}px;top:${GY + r * P}px;width:${C}px;height:${C}px;border-radius:7px;background:var(--acc);box-shadow:0 0 14px var(--acc)`, '', s)]); }
+  const labs = c.stages.map((st, i) => { const id = uid('gl'); H('div', 'a h3', `left:${GX + N * P + 70}px;top:${GY + 20 + i * 110}px;width:600px`, fmt(st.label ?? ''), s, id); return id; });
+  return () => { headBeats(hd, nt, c); let prev = 0; c.stages.forEach((st, i) => { const t = T(st, i, c.stages.length); const add = cells.filter(([r, q]) => r < st.k && q < st.k && !(r < prev && q < prev)).sort((a, b) => (a[0] + a[1]) - (b[0] + b[1])).map(x => x[2]); POP(add, t, { st: Math.min(.05, 1.5 / add.length), d: .3 }); if (st.label) IN('#' + labs[i], t, { x: 30, y: 0 }); prev = st.k; }); };
+};
+// ---- box: {head, title, items:[{text, keep:true|false, at}], note}  things go into a memory box or get rejected
+K.box = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), bx = uid('bx'), n = c.items.length, keep = c.items.filter(i => i.keep !== false).length;
+  H('div', 'card kmain', `left:1080px;top:230px;width:640px;height:${Math.max(300, 140 + keep * 100)}px;border:4px solid var(--acc);background:rgba(255,255,255,.03)`, `<div class="h3 acc" style="text-align:center">${fmt(c.title ?? 'memory')}</div>`, s, bx);
+  let k = 0; const ids = c.items.map((it, i) => { const id = uid('bi'); const kp = it.keep !== false; H('div', 'tok', `left:${kp ? 1120 : 200}px;top:${kp ? 330 + (k++) * 100 : 300 + i * 110}px;width:${kp ? 560 : 360}px;height:80px;${kp ? 'border-color:var(--gold);color:var(--gold)' : 'color:var(--dim)'}`, fmt(it.text), s, id); return id; });
+  return () => { headBeats(hd, nt, c); FADE('#' + bx, CUR + .2); c.items.forEach((it, i) => { const t = T(it, i, n, CUR + .8); if (it.keep !== false) tl.fromTo('#' + ids[i], { autoAlpha: 0, x: -700 }, { autoAlpha: 1, x: 0, duration: .8, ease: 'power3.out' }, t); else { tl.fromTo('#' + ids[i], { autoAlpha: 0, x: -100 }, { autoAlpha: 1, x: 0, duration: .4 }, t); tl.to('#' + ids[i], { x: 300, autoAlpha: .25, duration: .6 }, t + .6); } B(t); }); };
+};
+// ---- options: {head, items:[{title,sub,color,at}], win:index, winAt}  last/winner glows
+K.options = (s, c) => {
+  const hd = head(s, c), nt = note(s, c), n = c.items.length, W = 520, x0 = (1920 - (n * W + (n - 1) * 60)) / 2, ids = [];
+  c.items.forEach((it, i) => { const id = uid('op'); ids.push(id); const col = it.color || COL[i % COL.length]; H('div', 'card kmain', `left:${x0 + i * (W + 60)}px;top:260px;width:${W}px;height:560px;border:3px solid ${col};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center`, `<div class="h3" style="color:${col}">${fmt(it.title)}</div><div class="tx">${fmt(it.sub ?? '')}</div>`, s, id); });
+  return () => { headBeats(hd, nt, c); c.items.forEach((it, i) => IN('#' + ids[i], T(it, i, n), { y: 40 })); if (c.win != null) { const t = at(c.winAt, NXT - 2); TO('#' + ids[c.win], t, { scale: 1.06, boxShadow: `0 0 60px ${TH[0]}`, duration: .5 }); ids.forEach((id, i) => { if (i !== c.win) DIM('#' + id, t, .45); }); } };
+};
+// ---- custom: {build:(s)=>beatsFn}  for bespoke diagrams (use H/S/SVG + IN/POP/DRAW...)
+K.custom = (s, c) => c.build(s, c);
+
+// ---------- build all scenes ----------
+const SCN = [];
+VIDEO.scenes.forEach((c, i) => {
+  const t = i === 0 ? 0 : findp(c.at, SCN.length ? SCN[SCN.length - 1].t : 0);
+  if (t === null) console.warn('SCENE START NOT FOUND: ' + c.at);
+  const s = H('section', 'scene', '', null, stage, 'sc' + i);
+  SCN.push({ id: '#sc' + i, t: t ?? (SCN.length ? SCN[SCN.length - 1].t + 3 : 0), build: () => K[c.type](s, c), c });
+});
+const sc = i => { CUR = SCN[i].t; NXT = i + 1 < SCN.length ? SCN[i + 1].t : END; return CUR; };
+SCN.forEach((x, i) => { sc(i); x.beats = x.build(); });
+$$('.draw').forEach(p => { const L = p.getTotalLength(); p.__len = L; p.style.strokeDasharray = L + ' ' + L; p.style.strokeDashoffset = L; });
+tl.set('.scene', { autoAlpha: 0 }, 0);
+SCN.forEach((x, i) => {
+  const t0 = Math.max(0, x.t - .2), m = i % 3, from = m === 0 ? { autoAlpha: 0, scale: .97 } : m === 1 ? { autoAlpha: 0, x: 60 } : { autoAlpha: 0, y: 40 };
+  tl.fromTo(x.id, from, { autoAlpha: 1, scale: 1, x: 0, y: 0, duration: .45, ease: 'power2.out' }, t0);
+  if (i < SCN.length - 1) tl.to(x.id, { autoAlpha: 0, duration: .35, ease: 'power1.in' }, SCN[i + 1].t - .05);
+});
+SCN.forEach((x, i) => { sc(i); B(CUR); x.beats && x.beats(); });
+// auto-fill: no scene may sit still > 3.5 s -> gentle float on its main elements (y only: never scale, it breaks bars)
+SCN.forEach((x, i) => {
+  sc(i); const bs = BEATS.filter(b => b >= CUR - .01 && b < NXT).sort((a, b) => a - b).concat([NXT]); const mains = $$(`${x.id} .kmain`); if (!mains.length) return;
+  let k = 0; for (let j = 0; j < bs.length - 1; j++) for (let t = bs[j] + 3; t < bs[j + 1] - .8; t += 3) { const el = mains[(k++) % mains.length]; tl.to(el, { y: -10, duration: .45, yoyo: true, repeat: 1, ease: 'sine.inOut' }, t); BEATS.push(+t.toFixed(2)); }
+});
+const orbT = (d) => Math.max(1, Math.floor(END / d) - 1);
+tl.to('#orb1', { x: 500, y: 250, duration: END / (orbT(40) + 1), yoyo: true, repeat: orbT(40), ease: 'sine.inOut' }, 0);
+tl.to('#orb2', { x: -600, y: -300, duration: END / (orbT(48) + 1), yoyo: true, repeat: orbT(48), ease: 'sine.inOut' }, 0);
+tl.to('#orb3', { x: 300, y: 300, duration: END / (orbT(30) + 1), yoyo: true, repeat: orbT(30), ease: 'sine.inOut' }, 0);
+tl.set({}, {}, END);
+window.__timelines.main = tl;
+window.__BEATS = BEATS; window.__SCN = SCN.map(x => [x.id, x.t]);
+
+</script>
+</body>
+</html>
