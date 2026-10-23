@@ -1,4 +1,4 @@
-// THUMB: YouTube thumbnail (1280x720) in the channel look from a small JSON spec, + a phone-feed-size preview.
+// THUMB: YouTube thumbnail (1280x720) in the channel's dark "Night Blue" look from a small JSON spec, + a phone-feed-size preview.
 //   node ~/nkit/news/thumb.js spec.json out.png        (image paths in the spec are relative to the spec file)
 // Layouts:
 //   "big3"   (weekly long video, the default): one big story (photo + headline on it) + two small numbered stories.
@@ -13,19 +13,19 @@ const { chromium } = require('playwright'); const fs = require('fs'); const path
 const [specFile, out = 'thumb.png'] = process.argv.slice(2), S = JSON.parse(fs.readFileSync(specFile, 'utf8')), dir = path.dirname(path.resolve(specFile));
 const src = p => 'file://' + path.resolve(dir, p), esc = s => String(s ?? '');
 const css = `*{box-sizing:border-box;margin:0}body{width:1280px;height:720px;overflow:hidden;font-family:Inter,sans-serif}
-.t{position:absolute;inset:0;background:radial-gradient(700px 500px at 100% 0%,#DCE7FF 0%,transparent 60%),#F5F8FA;overflow:hidden}
-.ph{position:absolute;border-radius:28px;overflow:hidden;background:#0F172A;box-shadow:0 24px 50px -18px rgba(15,23,42,.45),0 0 0 8px #fff}
+.t{position:absolute;inset:0;background:radial-gradient(700px 500px at 100% 0%,#1C3570 0%,transparent 60%),radial-gradient(700px 600px at 0% 100%,#0E1626 0%,transparent 60%),#070B14;overflow:hidden}
+.ph{position:absolute;border-radius:28px;overflow:hidden;background:#111A2B;box-shadow:0 24px 50px -18px rgba(0,0,0,.8),0 0 0 6px #2A3B5C}
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
-.h{position:absolute;font:900 112px/.92 'Inter Tight',sans-serif;letter-spacing:-4px;color:#0F172A}.h b{color:#2563EB}
-.badge{position:absolute;display:flex;align-items:center;gap:12px;background:#0F172A;color:#fff;font:800 30px Inter;letter-spacing:2px;padding:12px 22px;border-radius:14px;z-index:4}
-.badge i{width:16px;height:16px;border-radius:50%;background:#2563EB}
-.stamp{position:absolute;font:900 64px 'Inter Tight';color:#E11D48;border:8px solid #E11D48;border-radius:16px;padding:4px 20px;background:rgba(255,255,255,.95);transform:rotate(-8deg);white-space:nowrap;z-index:4}
-.tile{position:absolute;background:#fff;border-radius:22px;border:3px solid #E2E8F0;box-shadow:0 16px 30px -16px rgba(15,23,42,.4);padding:18px 22px;font:900 44px/1 'Inter Tight';letter-spacing:-1px;color:#0F172A}
-.tile small{display:block;font:800 22px Inter;letter-spacing:2px;color:#2563EB;margin-bottom:8px}
-.cap{position:absolute;left:0;right:0;bottom:0;padding:14px 18px;background:linear-gradient(transparent,rgba(15,23,42,.92));color:#fff;font:900 36px/1 'Inter Tight';letter-spacing:-1px}
+.h{position:absolute;font:900 112px/.92 'Inter Tight',sans-serif;letter-spacing:-4px;color:#F1F5F9}.h b{color:#60A5FA}
+.badge{position:absolute;display:flex;align-items:center;gap:12px;background:#2563EB;color:#fff;font:800 30px Inter;letter-spacing:2px;padding:12px 22px;border-radius:14px;z-index:4}
+.badge i{width:16px;height:16px;border-radius:50%;background:#fff}
+.stamp{position:absolute;font:900 64px 'Inter Tight';color:#E11D48;border:8px solid #E11D48;border-radius:16px;padding:4px 20px;background:rgba(7,11,20,.92);transform:rotate(-8deg);white-space:nowrap;z-index:4}
+.tile{position:absolute;background:#111A2B;border-radius:22px;border:3px solid #24324A;box-shadow:0 16px 30px -16px rgba(0,0,0,.8);padding:18px 22px;font:900 44px/1 'Inter Tight';letter-spacing:-1px;color:#F1F5F9}
+.tile small{display:block;font:800 22px Inter;letter-spacing:2px;color:#60A5FA;margin-bottom:8px}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:14px 18px;background:linear-gradient(transparent,rgba(7,11,20,.94));color:#fff;font:900 36px/1 'Inter Tight';letter-spacing:-1px}
 .cap b{color:#93B4FF}
-.n{position:absolute;width:56px;height:56px;border-radius:50%;background:#2563EB;color:#fff;font:900 32px 'Inter Tight';display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 5px #fff;z-index:3}
-.code{position:absolute;inset:0;background:#0F172A;padding:26px 28px;font:700 30px/1.45 'JetBrains Mono',monospace;color:#E2E8F0;white-space:pre}`;
+.n{position:absolute;width:56px;height:56px;border-radius:50%;background:#3B82F6;color:#fff;font:900 32px 'Inter Tight';display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 5px #070B14;z-index:3}
+.code{position:absolute;inset:0;background:#0B1222;padding:26px 28px;font:700 30px/1.45 'JetBrains Mono',monospace;color:#E2E8F0;white-space:pre}`;
 const panel = (o, x, y, w, h, k) => `<div class="ph" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">${o.code ? `<div class="code">${o.code.map(esc).join('\n')}</div>` : `<img src="${src(o.img)}" style="object-position:${o.pos || '50% 50%'}">`}<div class="cap">${esc(o.title)}</div></div>` + (k ? `<div class="n" style="left:${x - 18}px;top:${y - 16}px">${k}</div>` : '');
 let body;
 if ((S.layout || 'big3') === 'big3') {

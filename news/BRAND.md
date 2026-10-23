@@ -48,6 +48,7 @@ Decided with the user. The `news` skill and kit follow this file.
 - Long videos: no captions for now (ask the user before adding them).
 
 ## Thumbnails (long videos)
+- Dark "Night Blue" like the videos (since 23 Oct 2026): navy-black bg with a blue glow, white headline with the key word in light blue `#60A5FA`, blue badge, photos in a thin `#2A3B5C` frame.
 - Weekly: "1 big + 2 small" (`thumb.js` layout `big3`): badge THIS WEEK IN TECH, the strongest story big with 2-5 words, two small numbered stories. Prefer stories that had no Short.
 - Big Story: layout `single`, badge BIG STORY.
 - Real photos / screenshots only, nothing the video does not deliver, a "?" when a claim is a rumour.
