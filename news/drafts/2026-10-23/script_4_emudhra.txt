@@ -1,0 +1,12 @@
+A company that tells your browser which websites are real had a secret key.
+The key was the number four.
+Your browser padlock works because a company like this signs for each site.
+Its private key should be a number nobody could ever guess.
+India's eMudhra had eight keys all smaller than two hundred and fifty six.
+With them anyone could fake a certificate for any website.
+Mozilla asked an AI agent to crack them. It did on the first try.
+Firefox blocked them within three hours.
+eMudhra says no real certificates were made with them. And it is quitting the website certificate business.
+But Mozilla says its questions still have no answers.
+eMudhra blamed social media. Google called that not acceptable.
+If your site uses an emSign certificate start moving off it now.
