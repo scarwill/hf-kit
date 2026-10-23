@@ -1,0 +1,21 @@
+TITLES (pick one)
+1. This Terminal Is Fake. An AI Guesses Every Letter.
+2. A 360M AI Model Pretends to Be Your Terminal
+3. No Shell, No Files: The Terminal That's Pure AI
+
+DESCRIPTION
+WorldTUI is a terminal with nothing behind it: no shell, no files, no computer. A 360M-parameter model (fine-tuned from Qwen2.5-Coder 0.5B) predicts how the screen changes after every keypress. It runs vim, tmux and snake, learned from 336k recorded terminal sessions, and the 208 MB demo runs locally in your browser with WebGPU. The catch: it is a dream of a computer, and it often forgets what you wrote to a file.
+We ran the demo ourselves for this video (headless Chrome, software WebGPU, so ours was slow; it is meant for a real GPU).
+
+Sources
+simedw, "WorldTUI: I trained a 360M model to pretend to be a terminal", 21 Oct 2026: https://simedw.com/2026/10/21/world-model-terminal/
+Live demo: https://simedw.com/projects/worldtui
+Hacker News discussion, 22 Oct 2026: https://news.ycombinator.com/item?id=50190363
+
+Drawings (crossed-out shell / folder / computer, key -> model -> screen, browser, cloud, code vs network) are illustrative. Screenshots are the real post and our own run of the demo.
+
+HASHTAGS
+#shorts #ai #programming #terminal #machinelearning #technews
+
+TAGS
+worldtui, world model, ai terminal, fake terminal, neural terminal, qwen2.5 coder, webgpu, llm in browser, small language model, vim, tmux, hacker news, developer news, ai news, merge report
