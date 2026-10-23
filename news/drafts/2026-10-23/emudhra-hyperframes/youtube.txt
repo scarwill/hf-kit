@@ -1,0 +1,23 @@
+TITLES (pick one)
+1. This Website Padlock Key Was the Number 4
+2. The Internet's Padlock Key Was... 4?
+3. A Certificate Company Used the Number 4 as a Secret Key
+
+DESCRIPTION
+Indian certificate authority eMudhra had eight intermediate CA keys that were all smaller than 256. One was literally the number 4. With them, anyone could have issued trusted certificates for any website. Mozilla blocked them in Firefox within three hours, and says even a local AI agent recovered the keys on its first try. eMudhra says no real certificates were issued with them and is leaving the global SSL/TLS business, but Mozilla and Google say their questions still have no answers.
+If your site uses an emSign certificate, start moving to another CA.
+
+Sources
+Mozilla Bugzilla 2083449 (18-23 Oct 2026): https://bugzilla.mozilla.org/show_bug.cgi?id=2083449
+The Register, 22 Oct 2026: https://www.theregister.com/security/2026/10/22/disgraced-indian-cert-issuer-leaves-the-cert-issuing-business/5304848
+The Register, 22 Oct 2026: https://www.theregister.com/security/2026/10/22/certification-authority-emudhra-defends-its-laughably-weak-private-keys/5304647
+eMudhra press release, 22 Oct 2026: https://emudhra.com/en/press-release/emudhra-to-exit-global-ssl-tls-certificate-business
+eMudhra incident statement: https://emudhra.com/en/post/certificate-security-incident
+
+"No real certificates were made" is eMudhra's own statement. The long key, padlock, certificates and terminal command are illustrative; screenshots are real pages.
+
+HASHTAGS
+#shorts #cybersecurity #ssl #webdev #programming #technews
+
+TAGS
+emudhra, emsign, certificate authority, ssl certificate, tls, private key, mozilla, firefox, chrome root program, web security, https padlock, developer news, india tech, merge report
