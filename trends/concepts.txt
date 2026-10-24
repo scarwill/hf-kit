@@ -1,0 +1,128 @@
+# Netlight ML concept list: evergreen DS / ML / AI topics that make good LIGHT explainers.
+# One per line:  name | Wikipedia title (or -) | YouTube search query | match terms (comma, lowercase) | visual idea
+# Match terms are looked for in Hugging Face paper keywords / titles, model tags and Hacker News titles.
+# Add a line when a new concept keeps showing up in the "Fresh this week" part of the report.
+
+# --- LLM internals ---
+Transformer | Transformer (deep learning architecture) | transformer neural network explained | transformer, transformers | tokens -> attention blocks -> next token
+Attention mechanism | Attention (machine learning) | attention mechanism explained | self-attention, attention, cross-attention | attention matrix lighting up between tokens
+Tokenization | Lexical analysis | how llm tokenization works | tokenizer, tokenization, bpe, byte-pair | a sentence split into token chips with ids
+Embeddings | Word embedding | embeddings explained | embedding, embeddings, word2vec | words as dots in a 2D space, similar words cluster
+Large language model | Large language model | llm explained | llm, large language model, large language models | next-token prediction with probability bars
+Mixture of experts | Mixture of experts | mixture of experts explained | mixture of experts, moe, mixture-of-experts, router, routing | router sends each token to 2 of 8 expert boxes
+KV cache | - | kv cache explained | kv cache, kv-cache, key-value cache | cache rows filling as tokens are generated
+Context window | - | llm context window explained | context window, long context, long-context | a sliding window over a long document
+Positional encoding | - | positional encoding explained | positional encoding, rope, rotary | sine waves added to token vectors
+Flash attention | - | flash attention explained | flash attention, flashattention | tiles moving between slow HBM and fast SRAM
+Speculative decoding | - | speculative decoding explained | speculative decoding, draft model | small model drafts, big model checks with ticks / crosses
+Quantization | Quantization (signal processing) | llm quantization explained | quantization, quantized, int4, int8, fp8, gguf | 32-bit number squeezed into 4 bits, size counter dropping
+Distillation | Knowledge distillation | knowledge distillation explained | distillation, distilled, distill | teacher net -> soft labels -> student net
+Scaling laws | Neural scaling law | ai scaling laws explained | scaling law, scaling laws | log-log curve, loss falling as compute grows
+State space models | - | mamba state space model explained | state space model, mamba, ssm | a hidden state carried along a sequence
+Diffusion language models | - | diffusion language model explained | diffusion language model, masked diffusion, dllm | masked tokens filling in over steps
+Hallucination | Hallucination (artificial intelligence) | ai hallucination explained | hallucination, hallucinations | confident wrong answer stamped red
+Temperature and sampling | - | llm temperature explained | top-p, temperature, sampling, decoding | probability bars sharpening / flattening
+
+# --- training an LLM ---
+Pretraining | - | how llms are trained | pretraining, pre-training | huge text stream -> next-token loss curve
+Fine-tuning | Fine-tuning (deep learning) | fine tuning llm explained | fine-tuning, finetuning, fine tuning, sft, supervised fine-tuning | base model + small dataset -> specialised model
+LoRA | - | lora fine tuning explained | lora, low-rank adaptation, qlora, adapter | big frozen matrix + two thin trainable matrices
+RLHF | Reinforcement learning from human feedback | rlhf explained | rlhf, human feedback, reward model, preference | answers -> human ranking -> reward model -> better model
+DPO | - | dpo direct preference optimization explained | dpo, direct preference optimization, preference optimization | chosen vs rejected answer pulling the model
+GRPO | - | grpo explained | grpo, group relative policy optimization | a group of answers scored against their average
+Reinforcement learning with verifiable rewards | - | reinforcement learning llm reasoning | verifiable reward, rlvr, outcome reward, process reward | model answer -> checker -> reward -> update loop
+Synthetic data | Synthetic data | synthetic data for ai explained | synthetic data, data generation, self-generated | a model writing its own training examples
+Recursive self-improvement | - | recursive self improvement | recursive self-improvement, self-improvement, self-improving, self-evolving | model writes its own training data, gets better each loop
+Looped language models | - | looped transformer explained | looped language model, looped language models, looped transformer, recurrent depth | the same block run again and again on its own output
+Catastrophic forgetting | Catastrophic interference | catastrophic forgetting explained | catastrophic forgetting, continual learning | old skill bars fading as a new skill is learned
+
+# --- reasoning / agents / apps ---
+Chain of thought | - | chain of thought prompting explained | chain-of-thought, chain of thought, cot | step boxes leading to the answer
+Reasoning models | - | how reasoning models work | reasoning model, reasoning models, reasoning, test-time compute, thinking | think tokens growing, accuracy curve rising
+AI agents | Intelligent agent | ai agents explained | ai agent, ai agents, agent, agents, agentic, tool use, tool-use | observe -> think -> act loop with tools
+Agentic AI vs AI agents | - | ai agents vs agentic ai | agentic ai, multi-agent | split screen: one agent vs a team of agents
+Multi-agent systems | Multi-agent system | multi agent systems explained | multi-agent, multi agent, agent collaboration | agents passing messages on wires
+Function calling | - | llm function calling explained | function calling, tool calling, tool call | model output -> JSON -> function -> result back
+Model Context Protocol | - | model context protocol explained | mcp, model context protocol | one AI app plugged into many tools via a hub
+RAG | Retrieval-augmented generation | rag explained | rag, retrieval-augmented, retrieval augmented, retrieval | question -> search docs -> paste -> answer
+Vector databases | Vector database | vector database explained | vector database, vector db, vector search, ann | query dot finds nearest dots
+Prompt engineering | Prompt engineering | prompt engineering explained | prompt engineering, prompting, prompt | same model, two prompts, two answers
+Context engineering | - | context engineering explained | context engineering | packing the right pieces into a limited window
+AI memory | - | ai agent memory explained | agent memory, long-term memory, memory | short-term window vs long-term store
+Computer use agents | - | computer use ai agent explained | computer use, gui agent, web agent, browser agent | an agent clicking through a screen
+Coding agents | - | ai coding agents explained | coding agent, code generation, software engineering agent, swe-bench | agent reading a repo, writing a patch, running tests
+LLM evaluation | - | llm benchmarks explained | llm benchmark, benchmark, evaluation, eval, leaderboard | questions -> model -> scored bars
+Guardrails and jailbreaks | - | llm jailbreak explained | jailbreak, red teaming, safety, guardrail | prompt slipping past a filter, filter catching it
+Prompt injection | Prompt injection | prompt injection explained | prompt injection, injection attack | hidden instruction inside a web page hijacking an agent
+
+# --- multimodal / generative ---
+Diffusion models | Diffusion model | diffusion models explained | diffusion, denoising, ddpm, dit, diffusion transformer, denoiser | noise -> image over denoising steps
+Flow matching | - | flow matching explained | flow matching, flow-matching, rectified flow | straight paths from noise to data points
+Text to video | Text-to-video model | how ai video generation works | text-to-video, video generation, video diffusion | frames emerging from noise in a timeline
+Vision transformers | Vision transformer | vision transformer explained | vision transformer, vit, patch | image cut into patches -> tokens
+Multimodal models | Multimodal learning | multimodal ai explained | multimodal, vision-language, vlm, mllm | image + text entering one model
+CLIP | Contrastive Language-Image Pre-training | clip model explained | clip, contrastive, image-text | images and captions pulled together in one space
+Text to speech | Speech synthesis | how ai text to speech works | text-to-speech, tts, speech synthesis | text -> phonemes -> waveform
+Speech recognition | Speech recognition | how speech recognition works | speech recognition, asr, whisper | waveform -> spectrogram -> words
+World models | - | ai world models explained | world model, world models, world action model, world action models | agent imagining future frames before acting
+3D generation | - | gaussian splatting explained | gaussian splatting, 3d generation, nerf | cloud of blobs forming a 3D scene
+GANs | Generative adversarial network | gan explained | gan, generative adversarial | generator vs discriminator duel
+Autoencoders | Autoencoder | autoencoder explained | autoencoder, vae, variational autoencoder | image -> small code -> image
+Image segmentation | Image segmentation | image segmentation explained | segmentation, segment anything, sam | pixels coloured by object
+Object detection | Object detection | object detection explained | object detection, yolo, detection | boxes snapping onto objects
+
+# --- robotics / RL ---
+Reinforcement learning | Reinforcement learning | reinforcement learning explained | reinforcement learning, rl, policy, reward | agent -> action -> reward loop, reward curve up
+Q-learning | Q-learning | q learning explained | q-learning, q learning, dqn | Q-table cells updating as the agent explores
+Self-learning AI (games) | - | self learning ai playing games | self-play, game, alphazero, atari | an AI losing, then winning, the same game
+Policy gradients and PPO | Proximal policy optimization | ppo reinforcement learning explained | ppo, policy gradient, proximal policy | policy nudged toward actions with high reward
+Vision-language-action models | - | vision language action model robot explained | vision-language-action, vla, robot policy, embodied | camera + instruction -> robot arm moves
+Robot learning | Robot learning | how robots learn | robot learning, robot, robotics, embodied, manipulation, humanoid | robot arm trying, failing, succeeding
+Sim to real | - | sim to real robotics explained | sim-to-real, simulation, simulator | robot trained in a sim, then in the real world
+Imitation learning | Imitation learning | imitation learning explained | imitation learning, behavior cloning, demonstration | human demo -> copied trajectory
+
+# --- ML foundations ---
+Neural networks | Neural network (machine learning) | neural networks explained | neural network, neural networks, mlp | data flowing through layers
+Backpropagation | Backpropagation | backpropagation explained | backpropagation, backprop, gradient | error flowing backwards through the net
+Gradient descent | Gradient descent | gradient descent explained | gradient descent, sgd, optimizer, adam | ball rolling down a loss bowl
+Loss functions | Loss function | loss function explained | loss function, cross-entropy, mse | prediction vs target, error bar
+Overfitting | Overfitting | overfitting explained | overfitting, generalization, regularization | train curve down, test curve up
+Activation functions | Activation function | activation functions explained | activation function, relu, gelu, sigmoid | input -> curve -> output
+Convolutional neural networks | Convolutional neural network | cnn explained | cnn, convolution, convolutional | kernel sliding over an image
+Recurrent neural networks | Recurrent neural network | rnn explained | rnn, lstm, recurrent | a state passed along a sequence
+Batch and layer normalization | Batch normalization | batch normalization explained | normalization, layernorm, batchnorm | messy activations squeezed to a neat range
+Dropout | Dropout (neural networks) | dropout explained | dropout | neurons blinking off during training
+Bias-variance tradeoff | Bias–variance tradeoff | bias variance tradeoff explained | bias-variance, bias variance | darts board: biased vs scattered
+Cross-validation | Cross-validation (statistics) | cross validation explained | cross-validation, k-fold | data folds taking turns as test set
+Linear regression | Linear regression | linear regression explained | linear regression, regression | line fitting through dots
+Logistic regression | Logistic regression | logistic regression explained | logistic regression | S-curve splitting two classes
+Decision trees | Decision tree learning | decision tree explained | decision tree, decision trees | yes/no splits down to leaves
+Random forests | Random forest | random forest explained | random forest | many trees voting
+Gradient boosting | Gradient boosting | gradient boosting explained | gradient boosting, xgboost, lightgbm, boosting | trees added one by one fixing errors
+Support vector machines | Support vector machine | svm explained | svm, support vector | widest street between two classes
+K-means clustering | K-means clustering | k means clustering explained | k-means, kmeans, clustering | centroids moving until clusters settle
+PCA | Principal component analysis | pca explained | pca, principal component, dimensionality reduction | cloud of dots rotated onto its main axis
+t-SNE and UMAP | T-distributed stochastic neighbor embedding | tsne umap explained | t-sne, tsne, umap | high-dim points unfolding into 2D clusters
+Naive Bayes | Naive Bayes classifier | naive bayes explained | naive bayes, bayes | word counts -> spam probability
+K-nearest neighbors | K-nearest neighbors algorithm | knn algorithm explained | knn, nearest neighbor, k-nearest | new dot joins the class of its neighbours
+Anomaly detection | Anomaly detection | anomaly detection explained | anomaly detection, outlier | one red dot far from the crowd
+Recommender systems | Recommender system | how recommendation algorithms work | recommender, recommendation, collaborative filtering | user x item matrix filling in
+Time series forecasting | Time series | time series forecasting explained | time series, forecasting, temporal | line extended into the future with a band
+Graph neural networks | Graph neural network | graph neural networks explained | graph neural network, gnn, graph | messages passing between graph nodes
+Transfer learning | Transfer learning | transfer learning explained | transfer learning, pretrained | frozen base + new head
+Self-supervised learning | Self-supervised learning | self supervised learning explained | self-supervised, contrastive learning, masked | hide part of the data, predict it
+Federated learning | Federated learning | federated learning explained | federated learning, federated | phones train locally, server averages
+Explainable AI | Explainable artificial intelligence | explainable ai explained | explainability, interpretability, shap, xai | heatmap over the input showing why
+Mechanistic interpretability | - | mechanistic interpretability explained | mechanistic interpretability, sparse autoencoder, features, circuits | neurons lighting up for a concept
+
+# --- math / data science ---
+Bayes theorem | Bayes' theorem | bayes theorem explained | bayes theorem, bayes' theorem, bayesian, posterior | prior bar updated by evidence
+Probability distributions | Probability distribution | probability distributions explained | probability distribution, gaussian, normal distribution, distribution | histogram becoming a bell curve
+Matrix multiplication | Matrix multiplication | matrix multiplication for machine learning | matrix multiplication, matmul, linear algebra | row x column -> one cell
+Eigenvectors | Eigenvalues and eigenvectors | eigenvectors explained | eigenvector, eigenvalue | arrow that keeps its direction under a transform
+Entropy and information | Entropy (information theory) | entropy information theory explained | entropy, information theory, kl divergence | surprise meter for coin flips
+Statistical significance | Statistical significance | p value explained | p-value, significance, hypothesis test | null curve with a shaded tail
+A/B testing | A/B testing | ab testing explained | a/b test, ab testing, experiment | two page versions, conversion bars
+Feature engineering | Feature engineering | feature engineering explained | feature engineering, features | raw columns -> useful columns
+Data leakage | Leakage (machine learning) | data leakage machine learning | data leakage, leakage | answer column sneaking into training
+Confusion matrix and metrics | Confusion matrix | confusion matrix precision recall explained | confusion matrix, precision, recall, f1, roc | 2x2 grid filling with counts
