@@ -2,9 +2,13 @@
 // Build:  python3 ~/hf-kit/light/lbuild.py video.js audio.m4a      (lint + phrase check + build; cats premium.js + life.js + this + video.js, HEAD 2.6 / TAIL 3.6)
 // Look:   navy-black bg + navy glow on top, NO grid, glowing windows/chips, mono labels. Titles = Space Grotesk, body = Inter, code/labels = JetBrains Mono.
 // Colour = meaning (never decoration):  DATA green · MODEL blue · OUTPUT yellow · ERROR pink · ACCENT purple = ONLY the <b> word in a title.
-// Host: the Model ORB, always in the same bottom-right corner (cOrb), eyes rest up-left; it blinks every ~3 s and looks into the camera now and then (automatic, nlOrbLife). The caret types only in intro/outro and inside a scene's own window.
+// Host: the Model ORB, always in the same corner (cOrb: LONG bottom-right, SHORT top-right), eyes rest on the content (LONG up-left, SHORT down-left); it blinks every ~3 s and looks into the camera now and then (automatic, nlOrbLife). The caret types only in intro/outro and inside a scene's own window.
 // RULE #1: SHOW, DON'T WRITE. Every scene has a moving visual (net, curve, matrix, dots, loop, code...). Text = 1-4 word labels. Voice says the sentences.
 const NL = { bg: '#05070d', data: '#34e0b0', model: '#6cc8ff', out: '#ffcc4d', err: '#ff6b81', acc: '#b48cff', ink: '#eef2f6', dim: '#8e9aae', line: 'rgba(255,255,255,.09)' };
+// SHORT (lbuild.py --short): 1080x1920 frame. Parts are laid out on an 810x1440 canvas (LW x LH) that #stage scales by 4/3, so every kit size
+// reads 1/3 bigger on a phone (a 24 px label shows at 32 px). Keep parts inside the Shorts safe area (lcheck SAFE): the like/comment column on the
+// right and the caption at the bottom cover the frame there.  LONG: LW x LH = 1920x1080, nothing changes.
+const NLV = typeof VERT !== 'undefined' && VERT, LW = NLV ? 810 : 1920, LH = NLV ? 1440 : 1080;
 const NLMONO = "'JetBrains Mono','DejaVu Sans Mono',monospace", NLHEAD = "'Space Grotesk',Inter,sans-serif", NLBODY = "Inter,'Space Grotesk',sans-serif";
 const NLX = (c, sz = 26) => `<svg width="${sz}" height="${sz}" viewBox="0 0 26 26"><path d="M6 6L20 20M20 6L6 20" stroke="${c}" stroke-width="4" stroke-linecap="round"/></svg>`;
 const NLOK = (c, sz = 26) => `<svg width="${sz}" height="${sz}" viewBox="0 0 26 26"><path d="M5 14L11 19L21 7" stroke="${c}" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -35,7 +39,9 @@ function nlInit(s) {
   .ncell{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:8px;font:600 26px ${NLMONO};color:#fff}
   .nchar{display:inline-block;white-space:pre}
   .ncar{display:inline-block;margin-left:6px;border-radius:4px;background:${NL.data};box-shadow:0 0 18px ${NL.data}}
-  .nhero{position:absolute;z-index:5}`;
+  .nhero{position:absolute;z-index:5}` + (NLV ? `
+  #stage{width:810px!important;height:1440px!important;right:auto!important;bottom:auto!important;transform:scale(1.3333334);transform-origin:0 0}
+  .nttl{top:110px;left:40px;right:180px;text-align:left;font-size:52px;line-height:1.08;white-space:normal}` : '');
   document.head.appendChild(css);
   nlInit.top = D(stage, '', 'position:absolute;inset:0;pointer-events:none;z-index:20', 'nlTop');   // hero objects live here, above every scene
   return s;
@@ -55,7 +61,7 @@ const nlText = (par, id, x, y, html, css = '') => D(par, html, `position:absolut
 const nlRow = (par, id, left, right, rc) => D(par, `<span style="flex:1">${left}</span><span style="color:${rc || NL.data}">${right ?? ''}</span>`, '', id, 'nrow');
 // glow frame around one row (lives inside the row, so it always lines up). POP('#'+id, t) to show it.
 const nlRowHL = (row, id, c = NL.out) => D(row, '', `position:absolute;inset:2px 6px;border:3px solid ${c};border-radius:10px;box-shadow:0 0 20px ${c}`, id);
-const nlSvg = par => { const v = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); v.style.cssText = 'position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:visible;pointer-events:none'; par.appendChild(v); return v; };
+const nlSvg = par => { const v = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); v.style.cssText = `position:absolute;left:0;top:0;width:${LW}px;height:${LH}px;overflow:visible;pointer-events:none`; par.appendChild(v); return v; };
 const nlWire = (v, id, d, c, dash, w = 3.5) => { const g = S('g', { id }, v); S('path', { d, stroke: c, 'stroke-width': w * 3, fill: 'none', opacity: .16, 'stroke-linecap': 'round' }, g); S('path', { class: 'draw', d, stroke: c, 'stroke-width': w, fill: 'none', 'stroke-linecap': 'round', 'stroke-dasharray': dash || null }, g); NLWIRES.push(g); return g; };
 const nlDocs = (par, id, x, y, cols, rows, w, h, gap, c) => { const g = D(par, '', '', id); for (let r = 0; r < rows; r++) for (let k = 0; k < cols; k++) D(g, '<i style="top:28%"></i><i style="top:48%"></i><i style="top:68%;right:40%"></i>', `left:${x + k * (w + gap)}px;top:${y + r * (h + gap)}px;width:${w}px;height:${h}px;--c:${c}`, null, 'ndoc ' + id + 'd'); return g; };
 // a box holding its own svg (local coords 0..w, 0..h) -> [div, svg]
@@ -79,10 +85,12 @@ function nlOrb(par, id, cx, cy, r = 120, c = NL.model) {
   const C = S('g', { id: id + 'C', opacity: 0 }, v); [-1, 1].forEach(sd => S('path', { d: `M${o + sd * r * .3 - r * .09} ${o - r * .02} Q${o + sd * r * .3} ${o + r * .06} ${o + sd * r * .3 + r * .09} ${o - r * .02}`, stroke: '#fff', 'stroke-width': Math.max(2, r * .04), fill: 'none', 'stroke-linecap': 'round' }, C));
   return e;
 }
-// orb beats (all add a beat): assemble with eyes opening / blink / think (nodes ripple) / bounce / surprised / sleep / ORB_CAM (look into the camera).  No ORB_LOOK: the eyes rest up-left.
+// orb beats (all add a beat): assemble with eyes opening / blink / think (nodes ripple) / bounce / surprised / sleep / ORB_CAM (look into the camera).  No ORB_LOOK: the eyes rest on the content (NLEYE).
+// eyes at rest look toward the content: LONG orb bottom-right -> up-left, SHORT orb top-right -> down-left (scaled to the smaller Short orb)
+const NLEYE = NLV ? { x: -9, y: 6 } : { x: -12, y: -7 };
 function ORB_ON(id, t) { B(t); tl.set('#' + id, { autoAlpha: 1 }, t); tl.set('#' + id + 'E', { autoAlpha: 0 }, t); tl.fromTo('.' + id + 'n', { scale: 0, transformOrigin: '50% 50%' }, { scale: 1, duration: .25, stagger: .006 }, t); tl.fromTo(['#' + id + 'l', '#' + id + 'g'], { opacity: 0 }, { opacity: 1, duration: .4 }, t + .3); tl.set('#' + id + 'E', { autoAlpha: 1 }, t + .7); tl.fromTo('#' + id + 'E', { scaleY: .1, transformOrigin: '50% 50%' }, { scaleY: 1, duration: .15 }, t + .7); return t + .85; }
-// ORB_CAM(id, t, d): eyes turn to the camera (centre) for d seconds with a blink in the middle, then back to their up-left rest
-function ORB_CAM(id, t, d = 1.6) { B(t); TO('#' + id + 'E', t, { x: 0, y: 0, duration: .25, ease: 'power2.out' }); ORB_BLINK(id, t + d * .45); return TO('#' + id + 'E', t + d, { x: -12, y: -7, duration: .3, ease: 'power2.inOut' }); }
+// ORB_CAM(id, t, d): eyes turn to the camera (centre) for d seconds with a blink in the middle, then back to their rest on the content
+function ORB_CAM(id, t, d = 1.6) { B(t); TO('#' + id + 'E', t, { x: 0, y: 0, duration: .25, ease: 'power2.out' }); ORB_BLINK(id, t + d * .45); return TO('#' + id + 'E', t + d, { ...NLEYE, duration: .3, ease: 'power2.inOut' }); }
 function ORB_BLINK(id, t) { B(t); return tl.to('#' + id + 'E', { scaleY: .1, transformOrigin: '50% 50%', duration: .07, yoyo: true, repeat: 1 }, t); }
 function ORB_THINK(id, t, d = 1.2) { B(t); return tl.to('.' + id + 'n', { scale: 1.7, transformOrigin: '50% 50%', duration: .18, yoyo: true, repeat: 1, stagger: d / 46 }, t); }
 function ORB_BOUNCE(id, t, n = 2) { B(t); return tl.to('#' + id, { y: -16, duration: .22, yoyo: true, repeat: n * 2 - 1, ease: 'sine.inOut' }, t); }
@@ -255,12 +263,18 @@ function COUNT(id, t, step = .22) { B(t); const ns = document.querySelectorAll('
 // INTRO A "Boot" (0..HEAD = 2.6 s, before the voice) and OUTRO A "Sleep" (END .. END+TAIL).  Build both in build(s); call the beats inside beats.
 // =====================================================================================================
 const NLNAME = 'netlight.ml';
-function nlIntro(s) { const e = D(stage, '', `position:absolute;inset:0;z-index:30;background:radial-gradient(1100px 650px at 50% -10%,#0f1a33 0%,transparent 65%),${NL.bg}`, 'nlI');
+function nlIntro(s) { if (NLV) return null;   // a Short starts on its hook: no boot intro
+  const e = D(stage, '', `position:absolute;inset:0;z-index:30;background:radial-gradient(1100px 650px at 50% -10%,#0f1a33 0%,transparent 65%),${NL.bg}`, 'nlI');
   nlOrb(e, 'nlIo', 560, 540, 170); nlType(e, 'nlIt', 800, 498, '> ' + NLNAME, 72); return e; }
-function nlIntroBeats() { tl.set('#nlIo', { autoAlpha: 0 }, 0); tl.set('#nlIt', { autoAlpha: 1 }, 0); CARET('nlIt', 0, 1); TYPE('nlIt', .4, .05); ORB_ON('nlIo', 1.0); PULSE('#nlIo', 1.9, { s: 1.06 }); tl.to('#nlI', { autoAlpha: 0, duration: .35 }, HEAD - .4); }
-function nlOutro(s) { const e = D(stage, '', `position:absolute;inset:0;z-index:30;background:radial-gradient(1100px 650px at 50% -10%,#0f1a33 0%,transparent 65%),${NL.bg}`, 'nlO');
+function nlIntroBeats() { if (NLV) return; tl.set('#nlIo', { autoAlpha: 0 }, 0); tl.set('#nlIt', { autoAlpha: 1 }, 0); CARET('nlIt', 0, 1); TYPE('nlIt', .4, .05); ORB_ON('nlIo', 1.0); PULSE('#nlIo', 1.9, { s: 1.06 }); tl.to('#nlI', { autoAlpha: 0, duration: .35 }, HEAD - .4); }
+let NL_END_TXT = '> follow for more';   // SHORT end card text; set it at the top of video.js, e.g. NL_END_TXT = '> full video below';
+function nlOutro(s) { if (NLV) { const e = D(stage, '', `position:absolute;inset:0;z-index:30;background:radial-gradient(700px 600px at 50% 30%,#0f1a33 0%,transparent 70%),${NL.bg}`, 'nlO');
+    nlOrb(e, 'nlOo', 405, 520, 110); nlType(e, 'nlOt', Math.round(405 - [...NL_END_TXT].length * 40 * .6 / 2), 760, NL_END_TXT, 40); return e; }
+  const e = D(stage, '', `position:absolute;inset:0;z-index:30;background:radial-gradient(1100px 650px at 50% -10%,#0f1a33 0%,transparent 65%),${NL.bg}`, 'nlO');
   nlOrb(e, 'nlOo', 960, 400, 170); const txt = '> subscribe --next'; nlType(e, 'nlOt', Math.round(960 - txt.length * 60 * .6 / 2), 700, txt, 60); return e; }
-function nlOutroBeats() { const t = END + .2; tl.set('#nlO', { autoAlpha: 0 }, 0); tl.set('#nlOt', { autoAlpha: 0 }, 0); tl.set('#nlOoC', { autoAlpha: 0 }, 0); FADE('#nlO', t, { d: .4 }); ORB_BOUNCE('nlOo', t + .3, 2); const te = TYPE('nlOt', t + .5, .045); CARET('nlOt', te + .1, 2);
+function nlOutroBeats() { if (NLV) { const t = END + .1; tl.set('#nlO', { autoAlpha: 0 }, 0); tl.set('#nlOt', { autoAlpha: 0 }, 0); tl.set('#nlOoC', { autoAlpha: 0 }, 0);
+    FADE('#nlO', t, { d: .25 }); ORB_BOUNCE('nlOo', t + .2, 1); TYPE('nlOt', t + .3, .03); tl.set({}, {}, END + TAIL); return; }
+  const t = END + .2; tl.set('#nlO', { autoAlpha: 0 }, 0); tl.set('#nlOt', { autoAlpha: 0 }, 0); tl.set('#nlOoC', { autoAlpha: 0 }, 0); FADE('#nlO', t, { d: .4 }); ORB_BOUNCE('nlOo', t + .3, 2); const te = TYPE('nlOt', t + .5, .045); CARET('nlOt', te + .1, 2);
   ORB_SLEEP('nlOo', t + 2.4); tl.to('#nlO', { opacity: 0, duration: .5 }, END + TAIL - .6); tl.set({}, {}, END + TAIL); }
 
 // =====================================================================================================
@@ -270,8 +284,8 @@ function nlOutroBeats() { const t = END + .2; tl.set('#nlO', { autoAlpha: 0 }, 0
 // Guards (console.error = nlcheck/lcheck fails): orb in the last scene, a scene with no orb, a scene missing from nlBegin, a scene start
 // phrase not found (two scenes on the same time), scenes out of order, NEXT called with the scene that is already showing.
 // =====================================================================================================
-const OX = 1790, OY = 962, OR = 56, ORBS = [];
-// the host orb: always the same bottom-right corner, same size. Never call nlOrb in a video (lbuild bans it).
+const OX = NLV ? 735 : 1790, OY = NLV ? 175 : 962, OR = NLV ? 40 : 56, ORBS = [];   // SHORT: top-right, above the like/comment column
+// the host orb: always the same corner (LONG bottom-right, SHORT top-right), same size. Never call nlOrb in a video (lbuild bans it).
 const cOrb = (sc, id) => { ORBS.push([id, sc.id]); return nlOrb(sc, id, OX, OY, OR); };
 // arrowhead at (x,y) on a wire group g: dir 'r' right, 'l' left, 'd' down, 'u' up
 const arw = (g, x, y, c, dir = 'r') => { const P = { r: [[-16, -11], [-16, 11]], l: [[16, -11], [16, 11]], d: [[-11, -16], [11, -16]], u: [[-11, 16], [11, 16]] }[dir];
@@ -287,15 +301,47 @@ function NEXT(sel, ph) {
   if (t <= prev + .05) console.error(`LIGHT: scene ${sel} start phrase '${ph}' not found or not after the previous scene (t=${t.toFixed(2)})`);
   NLT.push([sel, t]); return CUE(t, 'whoosh');
 }
+// ---- CAPTIONS (Shorts): 2-3 of the script's own words at a time, the spoken word lit. Call nlCaptions() once at the end of build;
+// nlFinish adds the beats. Band: SHORT y 1012-1092 on the 810x1440 canvas, above the Shorts caption area (keep scene parts above y 995:
+// lcheck CAPTION); LONG y 948. The words come from meta.json via lbuild (NLCAPW), the times from words.json (TW).
+const NLCAP = [];
+function nlCaptions(o = {}) {
+  if (typeof NLCAPW === 'undefined' || !NLCAPW) { console.error('LIGHT: nlCaptions() but the script words do not line up with words.json (lbuild CAPTIONS)'); return; }
+  const top = o.top ?? (NLV ? 1012 : 948), fs = o.fs ?? (NLV ? 44 : 40), maxc = o.maxc ?? (NLV ? 24 : 34);
+  const lay = D(stage, '', 'position:absolute;inset:0;pointer-events:none;z-index:25', 'nlCap');
+  let g = [];
+  const flush = () => { if (g.length) NLCAP.push(g); g = []; };
+  // a sentence's last word joins the group before it (no lonely "word." card); a comma ends a group only after 2+ words
+  // a pause > 0.7 s starts a new group, but never leaves one word alone
+  TW.forEach(([t], i) => { const w = NLCAPW[i], end = /[.!?]$/.test(w), pun = /[.!?,;:]$/.test(w), gap = i ? t - TW[i - 1][0] : 0, len = (g.map(x => x[1]).join(' ') + ' ' + w).length;
+    if (g.length && ((gap > .7 && !(g.length === 1 && gap < 1.2)) || g.length >= (pun ? 4 : 3) || len > maxc + (pun ? 4 : 0))) flush();
+    g.push([t, w, i]); if (end || (/[,;:]$/.test(w) && g.length >= 2)) flush(); });
+  flush();
+  // SHORT: centred in the safe column x 40..690 (the like / comment buttons sit right of it); a long group gets a smaller font to fit 640 px
+  const [cx0, cw] = NLV ? [40, 650] : [0, LW];
+  NLCAP.forEach((grp, k) => { const n = grp.map(x => x[1]).join(' ').length, f2 = Math.round(Math.min(fs, (cw - 54) / (n * .56)));
+    D(lay, `<span class="ncapc" style="display:inline-block;padding:8px 22px 10px;border-radius:16px;background:rgba(5,7,13,.88);border:2px solid #24324a;box-shadow:0 0 24px -6px #000;font:700 ${f2}px ${NLHEAD};color:${NL.ink};white-space:nowrap">`
+      + grp.map(([, w, i]) => `<span id="ncw${i}">${w.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</span>`).join(' ') + '</span>',
+      `position:absolute;left:${cx0}px;width:${cw}px;top:${top}px;display:flex;justify-content:center`, 'ncg' + k, 'ncap'); });
+}
+function nlCapBeats() {
+  NLCAP.forEach((grp, k) => {
+    const el = '#ncg' + k, t0 = grp[0][0] - .05, last = grp[grp.length - 1][0], nx = k + 1 < NLCAP.length ? NLCAP[k + 1][0][0] - .05 : END + .1;
+    const t1 = Math.min(nx, nx - last > 1.2 ? last + .8 : nx, END + .1);
+    tl.set(el, { autoAlpha: 0 }, 0); tl.set(el, { autoAlpha: 1 }, t0); tl.set(el, { autoAlpha: 0 }, t1);
+    grp.forEach(([t, , i], j) => { tl.set('#ncw' + i, { color: NL.model, textShadow: `0 0 18px ${NL.model}` }, t);
+      if (j + 1 < grp.length) tl.set('#ncw' + i, { color: NL.ink, textShadow: 'none' }, grp[j + 1][0]); });
+  });
+}
 function nlSetup(s) { nlInit(s); nlIntro(s); nlOutro(s); return s; }
 function nlBegin(scs) {
   nlIntroBeats(); nlStart(scs); NLT.push([scs[0], HEAD]);
   const all = [...document.querySelectorAll('.nsc')].map(e => '#' + e.id), last = scs[scs.length - 1];
   all.forEach(sc => { if (scs.indexOf(sc) < 0) console.error(`LIGHT: scene ${sc} exists but is missing from nlBegin([...])`); });
   scs.forEach(sc => { const has = ORBS.some(([, p]) => '#' + p === sc); if (sc === last && has) console.error(`LIGHT: orb in the last scene ${sc} (the outro already shows it)`); if (sc !== last && !has) console.error(`LIGHT: scene ${sc} has no corner orb - add cOrb(${sc.slice(1)}, 'o..')`); });
-  ORBS.forEach(([id]) => tl.set('#' + id + 'E', { x: -12, y: -7 }, 0));
+  ORBS.forEach(([id]) => tl.set('#' + id + 'E', NLEYE, 0));
   NLHL.forEach(h => tl.set('#' + h, { autoAlpha: 0 }, 0));
-  CUE(.4, 'type', 13, .05); CUE(1.0, 'blip'); CUE(1.9, 'chime');
+  if (NLV) CUE(.05, 'pop'); else { CUE(.4, 'type', 13, .05); CUE(1.0, 'blip'); CUE(1.9, 'chime'); }
 }
 // orb life (automatic, called by nlFinish): in every scene with a corner orb it blinks every 2.6-4.2 s and looks into the camera (ORB_CAM)
 // at 35 % of the scene, again at 75 % in scenes longer than 11 s. Set NL_ORB_LIFE = false in video.js build to switch it off.
@@ -305,9 +351,10 @@ function nlOrbLife() { if (!NL_ORB_LIFE) return;
     for (let tb = t0 + 1.4 + rnd(i) * .8; tb < t1 - .6; tb += 2.6 + rnd(i * 7 + tb) * 1.6) ORB_BLINK(id, tb);
     [.35, .75].forEach((f, k) => { if (!k || t1 - t0 >= 11) ORB_CAM(id, t0 + (t1 - t0) * f); }); }); }
 function nlFinish() {
-  nlOrbLife();
+  nlOrbLife(); if (NLCAP.length) nlCapBeats();
   if (NLCUR !== NLSC[NLSC.length - 1]) console.error(`LIGHT: video ends on ${NLCUR}, not on the last scene ${NLSC[NLSC.length - 1]} (a NEXT is missing)`);
-  OUT(NLCUR, END + .1, { d: .3 }); nlOutroBeats(); CUE(END + .2, 'whoosh'); CUE(END + .5, 'type', 18, .045); CUE(END + 2.4, 'down');
+  OUT(NLCUR, END + .1, { d: .3 }); nlOutroBeats();
+  if (NLV) { CUE(END + .1, 'whoosh'); CUE(END + .3, 'type', [...NL_END_TXT].length, .03); } else { CUE(END + .2, 'whoosh'); CUE(END + .5, 'type', 18, .045); CUE(END + 2.4, 'down'); }
 }
 
 // ---- real pages: screenshot inside a browser window + scroll/zoom focus, highlight box, cursor + click ----

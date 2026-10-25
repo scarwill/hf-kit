@@ -9,6 +9,8 @@ import json, re, subprocess, sys, os
 import numpy as np
 K = os.path.dirname(os.path.abspath(__file__))
 a = [x for x in sys.argv[1:] if not x.startswith('--')]
+print('lmix.py: the user REJECTED these fixed moods and cue sounds (25 Oct 2026). For a delivery use ~/hf-kit/light/music/ '
+      '(a generator made for this video + sfx.py + lremix.py, see music/README.md).', file=sys.stderr)
 if len(a) < 3: sys.exit(__doc__ or 'usage: lmix.py index.html <voice audio> <mood>')
 html, voice, mood = a[:3]
 MU = float(sys.argv[sys.argv.index('--music') + 1]) if '--music' in sys.argv else -13.0
