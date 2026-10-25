@@ -16,6 +16,9 @@ vid, aud = args[0], args[1]; out = args[2] if len(args) > 2 else 'index.html'
 HEAD, TAIL = (0.3, 2.0) if SHORT else (2.6, 3.6)
 M = json.load(open('meta.json')); AUD = M['END']; END = round(HEAD + AUD, 2)
 WJ = json.load(open('words.json')); TW = [[round(t + HEAD, 2), w] for t, w in WJ]
+# the script's own words (case + punctuation) in words.json order, for on-screen captions (nlCaptions); null when they do not line up
+CAPW = [t for st in M.get('sents', []) for t in st[2].split() if re.sub(r'[^a-z0-9]', '', t.lower())]
+CAPW = CAPW if len(CAPW) == len(TW) else None
 V0 = open(vid, encoding='utf-8').read()
 err, warn = [], []
 E = lambda m: err.append(m); Wn = lambda m: warn.append(m)
@@ -47,6 +50,7 @@ for m in re.finditer(r"nlShotHL\(\s*'[^']*'\s*,\s*'[^']*'\s*,\s*-?\d", src): E(f
 for m in re.finditer(r"nlShot\([^)]*?'(assets/[^']+\.(?:png|jpg|jpeg|webp))'", src):
     bx = os.path.splitext(m.group(1))[0] + '.boxes.json'
     if not os.path.exists(bx): E(f"NOBOXES  line {line_of(m.start())}: {m.group(1)} has no OCR boxes - run: python3 ~/hf-kit/light/lfind.py {m.group(1)}")
+if 'nlCaptions(' in V0 and CAPW is None: E('CAPTIONS nlCaptions() but the script words do not line up with words.json - re-run align.py with the same script.txt')
 for need, why in (('nlSetup(', 'first line of build'), ('nlBegin(', 'first line of beats'), ('nlFinish(', 'last line of beats')):
     if need not in src: E(f'MISSING  {need}) - {why}')
 
@@ -103,7 +107,7 @@ BOXES = {}
 for bf in glob.glob('assets/*.boxes.json'):
     for ext in ('.png', '.jpg', '.jpeg', '.webp'):
         if os.path.exists(bf[:-11] + ext): BOXES[bf[:-11] + ext] = json.load(open(bf))
-js = (f"const VERT={'true' if SHORT else 'false'};\nconst NLBOXES={json.dumps(BOXES, separators=(',', ':'))};\nconst TW={json.dumps(TW, separators=(',', ':'))};\nconst HEAD={HEAD};\nconst END={END};\nconst TAIL={TAIL};\nconst TITLE={json.dumps(M.get('title'))};\n"
+js = (f"const VERT={'true' if SHORT else 'false'};\nconst NLCAPW={json.dumps(CAPW, ensure_ascii=False)};\nconst NLBOXES={json.dumps(BOXES, separators=(',', ':'))};\nconst TW={json.dumps(TW, separators=(',', ':'))};\nconst HEAD={HEAD};\nconst END={END};\nconst TAIL={TAIL};\nconst TITLE={json.dumps(M.get('title'))};\n"
       + js_src + "\n" + open(os.path.join(V, 'kit.js'), encoding='utf-8').read())
 h = open(os.path.join(V, 'template.html'), encoding='utf-8').read()
 h = h.replace('family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700',

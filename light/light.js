@@ -301,6 +301,38 @@ function NEXT(sel, ph) {
   if (t <= prev + .05) console.error(`LIGHT: scene ${sel} start phrase '${ph}' not found or not after the previous scene (t=${t.toFixed(2)})`);
   NLT.push([sel, t]); return CUE(t, 'whoosh');
 }
+// ---- CAPTIONS (Shorts): 2-3 of the script's own words at a time, the spoken word lit. Call nlCaptions() once at the end of build;
+// nlFinish adds the beats. Band: SHORT y 1012-1092 on the 810x1440 canvas, above the Shorts caption area (keep scene parts above y 995:
+// lcheck CAPTION); LONG y 948. The words come from meta.json via lbuild (NLCAPW), the times from words.json (TW).
+const NLCAP = [];
+function nlCaptions(o = {}) {
+  if (typeof NLCAPW === 'undefined' || !NLCAPW) { console.error('LIGHT: nlCaptions() but the script words do not line up with words.json (lbuild CAPTIONS)'); return; }
+  const top = o.top ?? (NLV ? 1012 : 948), fs = o.fs ?? (NLV ? 44 : 40), maxc = o.maxc ?? (NLV ? 24 : 34);
+  const lay = D(stage, '', 'position:absolute;inset:0;pointer-events:none;z-index:25', 'nlCap');
+  let g = [];
+  const flush = () => { if (g.length) NLCAP.push(g); g = []; };
+  // a sentence's last word joins the group before it (no lonely "word." card); a comma ends a group only after 2+ words
+  // a pause > 0.7 s starts a new group, but never leaves one word alone
+  TW.forEach(([t], i) => { const w = NLCAPW[i], end = /[.!?]$/.test(w), pun = /[.!?,;:]$/.test(w), gap = i ? t - TW[i - 1][0] : 0, len = (g.map(x => x[1]).join(' ') + ' ' + w).length;
+    if (g.length && ((gap > .7 && !(g.length === 1 && gap < 1.2)) || g.length >= (pun ? 4 : 3) || len > maxc + (pun ? 4 : 0))) flush();
+    g.push([t, w, i]); if (end || (/[,;:]$/.test(w) && g.length >= 2)) flush(); });
+  flush();
+  // SHORT: centred in the safe column x 40..690 (the like / comment buttons sit right of it); a long group gets a smaller font to fit 640 px
+  const [cx0, cw] = NLV ? [40, 650] : [0, LW];
+  NLCAP.forEach((grp, k) => { const n = grp.map(x => x[1]).join(' ').length, f2 = Math.round(Math.min(fs, (cw - 54) / (n * .56)));
+    D(lay, `<span class="ncapc" style="display:inline-block;padding:8px 22px 10px;border-radius:16px;background:rgba(5,7,13,.88);border:2px solid #24324a;box-shadow:0 0 24px -6px #000;font:700 ${f2}px ${NLHEAD};color:${NL.ink};white-space:nowrap">`
+      + grp.map(([, w, i]) => `<span id="ncw${i}">${w.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</span>`).join(' ') + '</span>',
+      `position:absolute;left:${cx0}px;width:${cw}px;top:${top}px;display:flex;justify-content:center`, 'ncg' + k, 'ncap'); });
+}
+function nlCapBeats() {
+  NLCAP.forEach((grp, k) => {
+    const el = '#ncg' + k, t0 = grp[0][0] - .05, last = grp[grp.length - 1][0], nx = k + 1 < NLCAP.length ? NLCAP[k + 1][0][0] - .05 : END + .1;
+    const t1 = Math.min(nx, nx - last > 1.2 ? last + .8 : nx, END + .1);
+    tl.set(el, { autoAlpha: 0 }, 0); tl.set(el, { autoAlpha: 1 }, t0); tl.set(el, { autoAlpha: 0 }, t1);
+    grp.forEach(([t, , i], j) => { tl.set('#ncw' + i, { color: NL.model, textShadow: `0 0 18px ${NL.model}` }, t);
+      if (j + 1 < grp.length) tl.set('#ncw' + i, { color: NL.ink, textShadow: 'none' }, grp[j + 1][0]); });
+  });
+}
 function nlSetup(s) { nlInit(s); nlIntro(s); nlOutro(s); return s; }
 function nlBegin(scs) {
   nlIntroBeats(); nlStart(scs); NLT.push([scs[0], HEAD]);
@@ -319,7 +351,7 @@ function nlOrbLife() { if (!NL_ORB_LIFE) return;
     for (let tb = t0 + 1.4 + rnd(i) * .8; tb < t1 - .6; tb += 2.6 + rnd(i * 7 + tb) * 1.6) ORB_BLINK(id, tb);
     [.35, .75].forEach((f, k) => { if (!k || t1 - t0 >= 11) ORB_CAM(id, t0 + (t1 - t0) * f); }); }); }
 function nlFinish() {
-  nlOrbLife();
+  nlOrbLife(); if (NLCAP.length) nlCapBeats();
   if (NLCUR !== NLSC[NLSC.length - 1]) console.error(`LIGHT: video ends on ${NLCUR}, not on the last scene ${NLSC[NLSC.length - 1]} (a NEXT is missing)`);
   OUT(NLCUR, END + .1, { d: .3 }); nlOutroBeats();
   if (NLV) { CUE(END + .1, 'whoosh'); CUE(END + .3, 'type', [...NL_END_TXT].length, .03); } else { CUE(END + .2, 'whoosh'); CUE(END + .5, 'type', 18, .045); CUE(END + 2.4, 'down'); }

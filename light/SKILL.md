@@ -27,7 +27,7 @@ Netlight videos broke on long scripts for three reasons, and this skill removes 
 - **SHOW, DON'T WRITE** (the user: "audience sirf text dekh ke bor ho jayegi"):
   - Every scene has a moving technical visual.
   - Text is 1-4 word labels, at most 2-3 chips per scene.
-  - Never caption the narration.
+  - Never caption the narration on screen in a LONG video unless the user asks (Shorts have captions: `nlCaptions()`, see net-shorts). Always deliver `captions.srt` for YouTube: `python3 ~/lkit/light/lcaps.py` after lbuild.
 - **When the script talks ABOUT a text, show that exact text** ("text ka kuch aaye to usme text dikhaya kar"):
   - This covers a prompt, chat message, command, search query, error, log line, string in a file, quote, headline, tweet, file/function/variable name, formula, URL, password example, or a word being tokenized or translated.
   - Type it in its window on the words that say it (`nlType` + `TYPE`), use `nlCode` for code, a highlighted row (`nlRow` + `nlRowHL`), or `nlBig` for a short quote or number.
@@ -183,7 +183,7 @@ When the script names a real paper, repo, site, post or doc, show the **real thi
    - Send `preview_mix.m4a` with the delivery (we cannot listen; the user does). If the user dislikes it, make a different style, never just change the volume.
 
 6. **Deliver:**
-   - Copy `index.html` + `bgm.m4a` + `preview_mix.m4a` (+ `assets/*.png`) to `~/<name>-hyperframes/` and send them with SendUserFile.
+   - Copy `index.html` + `bgm.m4a` + `preview_mix.m4a` + `captions.srt` (+ `assets/*.png`) to `~/<name>-hyperframes/` and send them with SendUserFile.
    - Short Hinglish message: long + synced, the scene list (title + main visual), what is illustrative / placeholder, and the setup:
      - `mkdir assets`
      - `copy "<path>" assets\<name>.m4a`

@@ -82,7 +82,7 @@ For each Short, in its own folder. The light kit's full part list and checks are
 1. **Align:** copy the audio in, put the script in `script.txt`, `python3 ~/skit/video/align.py <audio> script.txt`, `python3 ~/skit/light/realign.py`, fix every CHECK, then `python3 ~/skit/light/lverify.py` until `sync ok`.
 2. **video.js** with the light kit parts (`nlSetup`, `nlScene`, `cOrb`, `nlBegin`, `NEXT`, `W`, `nlFinish`, nl* visuals), laid out for the Short:
    - **Canvas 810 x 1440** (the kit scales it to 1080x1920, every size reads 1/3 bigger on a phone). Title band at the top (y 110-250, left side), orb in the top-right corner (automatic with `cOrb`).
-   - **Safe area for parts: x 40-690, y 300-1110.** Below y 1125 the Shorts caption covers the frame, right of x 705 below y 675 the like / comment buttons do. lcheck `SAFE` catches it.
+   - **Safe area for parts: x 40-690, y 300-990** (the captions sit below). Below y 1125 the Shorts caption covers the frame, right of x 705 below y 675 the like / comment buttons do. lcheck `SAFE` catches it.
    - **Hook at second 0:** the first scene's main visual is on screen when the voice starts (there is no intro). Something new moves every 2-3 s; 3-6 scenes of 4-9 s.
    - One main visual per scene, at most 2 chips; text 1-4 words; lcheck `TEXT` limit is 70 characters.
    - When the voice talks about a text, show that exact text (typed / code / highlighted row), as in the light rules.
@@ -92,6 +92,7 @@ For each Short, in its own folder. The light kit's full part list and checks are
      - Then `node ~/skit/light/lshotcheck.js index.html` and read every `out/pages_NN.png`: each box on exactly the spoken words, nothing cut by the window edge.
      - Blocked / unstyled page (`node ~/skit/light/netlog.js <url>` finds the host; github.com pages often fail in a cloud session that was not started with that repo): ask the user once, in the scripts message, with a numbered list: exact URL, the part to capture, the file name, desktop browser, zoom 100 %, PNG, dark mode if the site has it. Keep building with a placeholder card meanwhile. Uploads land in `/root/.claude/uploads/...`: copy them into `assets/`.
      - Numbers that change (stars, downloads) get "as of <date>". No recreated logos or fake site UI.
+   - **Captions on screen (always in a Short; the user asked on 25 Oct 2026):** `nlCaptions();` as the last line of build. 2-3 of the script's own words at a time, the spoken word lit blue, in the band y 1012-1092 of the canvas inside the safe column. So keep every scene part **above y 990** (lcheck CAPTION / SAFE).
    - End card: set `NL_END_TXT = '> full video below';` at the top of video.js when there is a Related video (default `'> follow for more'`).
    - Different opening and main visual for every Short of the batch.
 3. **Build + check:** `python3 ~/skit/light/lbuild.py video.js <audio> --short`, fix every ERROR; `node ~/skit/light/lcheck.js index.html --every 2` -> 0 warnings (SAFE, ORBCORNER, EMPTY, OUT ...), 0 JS errors; read its sheet(s) (one or two per Short); motion sheet for moving dots (`node ~/skit/light/lsheet.js index.html range a b .25 --name motion`).
@@ -101,10 +102,11 @@ For each Short, in its own folder. The light kit's full part list and checks are
    - music from a generator in `~/skit/light/music/` tied to the story (build per scene, drop on the reveal word, stop on the twist, resolve on the ending; times from the lbuild scene table / words.json), or write a new generator for a new style;
    - `python3 ~/skit/light/music/sfx.py cues.json <DUR> sfx.wav <palette> --root <key> --max 30`, then `python3 ~/skit/light/music/lremix.py index.html <audio>` -> `bgm.m4a` + `preview_mix.m4a`;
    - check the level shape (no silent gap where music should play); add the line to `log.md`.
-6. **youtube.txt:** title (50 chars max), 2-3 line description with the sources, 3 hashtags (#shorts plus two topic tags), and the Related video to set (title + link) if any.
+6. **captions.srt for YouTube:** `python3 ~/skit/light/lcaps.py` -> `captions.srt` (+ `captions.vtt`) on the video timeline; the user uploads it in YouTube Studio -> Subtitles -> Upload file -> With timing.
+7. **youtube.txt:** title (50 chars max), 2-3 line description with the sources, 3 hashtags (#shorts plus two topic tags), and the Related video to set (title + link) if any.
 
 ## Step 4: deliver
-- Copy each Short's `index.html` + `bgm.m4a` + `preview_mix.m4a` (voice + music, for the user to listen: we cannot) + `assets/*.png` (the screenshots) + `youtube.txt` to `~/shorts-<date>-hyperframes/short_N/` and send them with SendUserFile (`display: 'attach'`).
+- Copy each Short's `index.html` + `bgm.m4a` + `preview_mix.m4a` (voice + music, for the user to listen: we cannot) + `assets/*.png` (the screenshots) + `captions.srt` + `youtube.txt` to `~/shorts-<date>-hyperframes/short_N/` and send them with SendUserFile (`display: 'attach'`).
 - Short Hinglish message: the list (title + main visual), what is illustrative, and the setup per Short (same as the light skill):
   `mkdir assets` · `copy "<path>" assets\<name>.m4a` · `copy "<path>\bgm.m4a" assets\bgm.m4a` · every screenshot png into `assets\` with the same name · `dir assets` · `npx hyperframes render --output short_N.mp4`
 - Upload: a vertical video under 3 minutes is a Short automatically. In YouTube Studio set the **Related video**, and **schedule** one Short per day so they post while the laptop is off.

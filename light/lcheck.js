@@ -7,6 +7,7 @@
 //   OVERFLOW text spills out of its window / chip
 //   OVERLAP  two windows/chips/labels cover each other (> 15% of the smaller)
 //   ORBCORNER a window/chip/label sits in the orb's corner (LONG bottom-right, SHORT top-right)
+//   CAPTION  a scene part sits under a visible caption (nlCaptions) -> keep parts out of the caption band
 //   SAFE     SHORT only: a part sits where the Shorts player covers the frame (like/comment column on the right, caption at the bottom, top bar)
 //   NOORB    the scene's corner orb is not visible 1.5 s after the scene start (forgot ORB_ON)
 //   NOVISUAL a scene has no drawn visual (svg / net / curve / cells / docs) -> every scene needs one
@@ -39,10 +40,13 @@ require('./lsheet.js').testPage(src, 'nl_test.html'); fs.mkdirSync('out', { recu
     // coverage grid (40 px cells) over the content area: LONG below the title, SHORT between the title and the caption
     const GX = FW / 40, GY = VT ? 27 : 22, G0 = VT ? 400 : 160, G = new Uint8Array(GX * GY);
     const mark = r => { for (let gx = Math.max(0, Math.floor(r.left / 40)); gx < Math.min(GX, Math.ceil(r.right / 40)); gx++) for (let gy = Math.max(0, Math.floor((r.top - G0) / 40)); gy < Math.min(GY, Math.ceil((r.bottom - G0) / 40)); gy++) G[gy * GX + gx] = 1; };
-    R.safe = [];
+    R.safe = []; R.capov = [];
+    const caps = [...document.querySelectorAll('.ncap')].filter(e => op(e) > .5).map(e => e.firstElementChild.getBoundingClientRect());
+    if (VT) caps.forEach(c => { if (c.right > 940 || c.left < 40 || c.bottom > 1500) R.safe.push('caption'); });
     parts.forEach(e => { let r = e.getBoundingClientRect(); if (r.width < 2 && e.firstElementChild) r = e.firstElementChild.getBoundingClientRect(); if (r.width < 2 || r.height < 2) return; if (r.width > FW - 20 && r.height > FH - 80) return; mark(r);
       const isOrb = orbIds.some(o => e.id.startsWith(o));
       if ((r.left < -8 || r.top < -8 || r.right > FW + 8 || r.bottom > FH + 8) && !isOrb) R.out.push(e.id);
+      if (!isOrb && caps.some(c => Math.min(r.right, c.right) - Math.max(r.left, c.left) > 4 && Math.min(r.bottom, c.bottom) - Math.max(r.top, c.top) > 4)) R.capov.push(e.id);
       if (VT && !isOrb && (r.bottom > 1500 || r.top < 120 || (r.right > 940 && r.bottom > 900 && r.top < 1700))) R.safe.push(e.id); });
     R.cov = G.reduce((a, v) => a + v, 0) / G.length;
     R.vis = !!sc.querySelector('svg path, svg circle, .ncell, .ndoc, .nbox');
@@ -77,6 +81,7 @@ require('./lsheet.js').testPage(src, 'nl_test.html'); fs.mkdirSync('out', { recu
     if (!r.vis) once('NOVISUAL', 'no drawn visual in this scene');
     r.cut.forEach(s => once('CUTTEXT', s)); r.sshot.forEach(s => once('SMALLSHOT', s)); r.svgout.forEach(s => once('SVGOUT', s));
     r.corner.forEach(x => once('ORBCORNER', x + (VT ? ' sits in the orb corner (keep the top-right free: x<850 or y>330 on the 1080x1920 frame)' : ' sits in the orb corner (keep x<1700 or y<870 free)')));
+    r.capov.forEach(x => once('CAPTION', x + ' is under the caption band (keep parts above y 995 on the 810x1440 canvas)'));
     r.safe.forEach(x => once('SAFE', x + ' is under the Shorts player UI (keep parts in x 40..690 below y 675 and y 90..1110 on the 810x1440 canvas, the scene drift grows them 3%)'));
     if (r.orb === false && t - scT[r.sc][0] > 1.5) once('NOORB', 'corner orb not visible - ORB_ON it at the scene start');
   }
