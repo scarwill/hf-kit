@@ -2,7 +2,7 @@
 // Build:  python3 ~/hf-kit/light/lbuild.py video.js audio.m4a      (lint + phrase check + build; cats premium.js + life.js + this + video.js, HEAD 2.6 / TAIL 3.6)
 // Look:   navy-black bg + navy glow on top, NO grid, glowing windows/chips, mono labels. Titles = Space Grotesk, body = Inter, code/labels = JetBrains Mono.
 // Colour = meaning (never decoration):  DATA green · MODEL blue · OUTPUT yellow · ERROR pink · ACCENT purple = ONLY the <b> word in a title.
-// Host: the Model ORB, always in the same corner (cOrb: LONG bottom-right, SHORT top-right), eyes rest up-left; it blinks every ~3 s and looks into the camera now and then (automatic, nlOrbLife). The caret types only in intro/outro and inside a scene's own window.
+// Host: the Model ORB, always in the same corner (cOrb: LONG bottom-right, SHORT top-right), eyes rest on the content (LONG up-left, SHORT down-left); it blinks every ~3 s and looks into the camera now and then (automatic, nlOrbLife). The caret types only in intro/outro and inside a scene's own window.
 // RULE #1: SHOW, DON'T WRITE. Every scene has a moving visual (net, curve, matrix, dots, loop, code...). Text = 1-4 word labels. Voice says the sentences.
 const NL = { bg: '#05070d', data: '#34e0b0', model: '#6cc8ff', out: '#ffcc4d', err: '#ff6b81', acc: '#b48cff', ink: '#eef2f6', dim: '#8e9aae', line: 'rgba(255,255,255,.09)' };
 // SHORT (lbuild.py --short): 1080x1920 frame. Parts are laid out on an 810x1440 canvas (LW x LH) that #stage scales by 4/3, so every kit size
@@ -85,10 +85,12 @@ function nlOrb(par, id, cx, cy, r = 120, c = NL.model) {
   const C = S('g', { id: id + 'C', opacity: 0 }, v); [-1, 1].forEach(sd => S('path', { d: `M${o + sd * r * .3 - r * .09} ${o - r * .02} Q${o + sd * r * .3} ${o + r * .06} ${o + sd * r * .3 + r * .09} ${o - r * .02}`, stroke: '#fff', 'stroke-width': Math.max(2, r * .04), fill: 'none', 'stroke-linecap': 'round' }, C));
   return e;
 }
-// orb beats (all add a beat): assemble with eyes opening / blink / think (nodes ripple) / bounce / surprised / sleep / ORB_CAM (look into the camera).  No ORB_LOOK: the eyes rest up-left.
+// orb beats (all add a beat): assemble with eyes opening / blink / think (nodes ripple) / bounce / surprised / sleep / ORB_CAM (look into the camera).  No ORB_LOOK: the eyes rest on the content (NLEYE).
+// eyes at rest look toward the content: LONG orb bottom-right -> up-left, SHORT orb top-right -> down-left (scaled to the smaller Short orb)
+const NLEYE = NLV ? { x: -9, y: 6 } : { x: -12, y: -7 };
 function ORB_ON(id, t) { B(t); tl.set('#' + id, { autoAlpha: 1 }, t); tl.set('#' + id + 'E', { autoAlpha: 0 }, t); tl.fromTo('.' + id + 'n', { scale: 0, transformOrigin: '50% 50%' }, { scale: 1, duration: .25, stagger: .006 }, t); tl.fromTo(['#' + id + 'l', '#' + id + 'g'], { opacity: 0 }, { opacity: 1, duration: .4 }, t + .3); tl.set('#' + id + 'E', { autoAlpha: 1 }, t + .7); tl.fromTo('#' + id + 'E', { scaleY: .1, transformOrigin: '50% 50%' }, { scaleY: 1, duration: .15 }, t + .7); return t + .85; }
-// ORB_CAM(id, t, d): eyes turn to the camera (centre) for d seconds with a blink in the middle, then back to their up-left rest
-function ORB_CAM(id, t, d = 1.6) { B(t); TO('#' + id + 'E', t, { x: 0, y: 0, duration: .25, ease: 'power2.out' }); ORB_BLINK(id, t + d * .45); return TO('#' + id + 'E', t + d, { x: -12, y: -7, duration: .3, ease: 'power2.inOut' }); }
+// ORB_CAM(id, t, d): eyes turn to the camera (centre) for d seconds with a blink in the middle, then back to their rest on the content
+function ORB_CAM(id, t, d = 1.6) { B(t); TO('#' + id + 'E', t, { x: 0, y: 0, duration: .25, ease: 'power2.out' }); ORB_BLINK(id, t + d * .45); return TO('#' + id + 'E', t + d, { ...NLEYE, duration: .3, ease: 'power2.inOut' }); }
 function ORB_BLINK(id, t) { B(t); return tl.to('#' + id + 'E', { scaleY: .1, transformOrigin: '50% 50%', duration: .07, yoyo: true, repeat: 1 }, t); }
 function ORB_THINK(id, t, d = 1.2) { B(t); return tl.to('.' + id + 'n', { scale: 1.7, transformOrigin: '50% 50%', duration: .18, yoyo: true, repeat: 1, stagger: d / 46 }, t); }
 function ORB_BOUNCE(id, t, n = 2) { B(t); return tl.to('#' + id, { y: -16, duration: .22, yoyo: true, repeat: n * 2 - 1, ease: 'sine.inOut' }, t); }
@@ -305,7 +307,7 @@ function nlBegin(scs) {
   const all = [...document.querySelectorAll('.nsc')].map(e => '#' + e.id), last = scs[scs.length - 1];
   all.forEach(sc => { if (scs.indexOf(sc) < 0) console.error(`LIGHT: scene ${sc} exists but is missing from nlBegin([...])`); });
   scs.forEach(sc => { const has = ORBS.some(([, p]) => '#' + p === sc); if (sc === last && has) console.error(`LIGHT: orb in the last scene ${sc} (the outro already shows it)`); if (sc !== last && !has) console.error(`LIGHT: scene ${sc} has no corner orb - add cOrb(${sc.slice(1)}, 'o..')`); });
-  ORBS.forEach(([id]) => tl.set('#' + id + 'E', { x: -12, y: -7 }, 0));
+  ORBS.forEach(([id]) => tl.set('#' + id + 'E', NLEYE, 0));
   NLHL.forEach(h => tl.set('#' + h, { autoAlpha: 0 }, 0));
   if (NLV) CUE(.05, 'pop'); else { CUE(.4, 'type', 13, .05); CUE(1.0, 'blip'); CUE(1.9, 'chime'); }
 }

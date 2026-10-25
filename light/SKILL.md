@@ -37,7 +37,7 @@ Netlight videos broke on long scripts for three reasons, and this skill removes 
 - **Background:** #05070d + navy glow. No grid, vignette, particles, captions, header, footer or progress bar (the kit already does this).
 - **Model Orb:**
   - `cOrb(scene, id)` in every scene except the last; it always sits in the same bottom-right corner ("beech beech me aayega dimag khayega").
-  - It is alive on its own: the kit (`nlOrbLife`, called by `nlFinish`) makes it blink every ~3 s and look into the camera (`ORB_CAM`) once or twice per scene, eyes resting up-left in between ("kabhi camere ki taraf bhi dekhna chahiye, blink zyada"). Don't add your own blink loops.
+  - It is alive on its own: the kit (`nlOrbLife`, called by `nlFinish`) makes it blink every ~3 s and look into the camera (`ORB_CAM`) once or twice per scene, eyes resting on the content in between (long: up-left, Short: down-left; the user: "orb ko content ki taraf dekhna chahiye") ("kabhi camere ki taraf bhi dekhna chahiye, blink zyada"). Don't add your own blink loops.
   - Beats allowed on top: `ORB_ON`, `ORB_BLINK`, `ORB_THINK`, `ORB_WOW`, `ORB_BOUNCE`, `ORB_CAM`. Never `ORB_LOOK`.
   - "The model / the agent" as an object in the middle = `nlWin` + `nlNet`.
 - **Intro A "Boot"** (HEAD 2.6 s) and **Outro A** (TAIL 3.6 s) come from the kit; never change their text.
