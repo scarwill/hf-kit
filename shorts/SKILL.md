@@ -28,6 +28,7 @@ This skill does the **Shorts**: about 5 a week, 35-50 s each, the same neon LIGH
 - **Monetization safety:** YouTube demonetizes "inauthentic", mass-produced channels. Every Short has its own topic, its own opening and its own visuals made for it, and real, sourced information. Never reuse one layout with new words.
 - **No repeats without a memory file:** the channel's own Shorts tab is read every run (`--channel`), so a concept that already has a Short is flagged `MADE`.
 - **Netlight Shorts are concepts, not news.** Product launches belong to Merge Report (`news` skill).
+- **Real proof on screen, like the news skill** (the user: "jaisi news skill short me screenshots deti hai har cheez ka net-short ne bhi waisa hi karna chahiye"): every claim the voice makes about a real thing (a paper, its numbers, a repo, a model card, a benchmark table, a doc) is shown as the REAL page, cropped to the line, highlighted on the words the voice says. Drawings explain the idea; screenshots prove it.
 
 ## Step 0: setup (one block)
 ```bash
@@ -57,12 +58,13 @@ Drop: `MADE`; `IN` 30%+; pure news; noise (a best Short that is clearly not abou
 
 Give the user, in Hinglish:
 
-| # | Short | Hook (first 1-2 s) | Kyun | LIGHT visual (vertical) | Title | Related video |
-|---|---|---|---|---|---|---|
+| # | Short | Hook (first 1-2 s) | Kyun | LIGHT visual (vertical) | Screenshots (proof) | Title | Related video |
+|---|---|---|---|---|---|---|---|
 
 - **Hook**: the first spoken line, 8 words at most, a question or a surprising claim, and the visual that is on screen at second 0.
 - **Kyun**: the evidence ("ML Shorts on this get ~16k median views, 5 HF papers this week").
 - **Title**: English, 50 characters at most, the searched words first, no clickbait.
+- **Screenshots (proof)**: the real pages this Short will show (paper abstract line, repo header + stars, model card, benchmark table).
 Then: "Konse banau? Number bolo." and stop.
 
 ## Step 2: scripts
@@ -71,7 +73,8 @@ For each picked Short write `~/shorts-<date>/short_N/script.txt` (only the spoke
 - **Shape:** hook line (the claim or question) -> 3-5 beats, one concrete idea each, each one a thing that can be drawn -> payoff (the answer, in short punchy words) -> last line: "Full breakdown in the video linked below." when there is a Related video, else a line that loops back to the hook.
 - **Spoken English for TTS:** sentences of 5-10 words, one idea each; no symbols, emoji, brackets or abbreviations the voice cannot read ("K V cache" if the TTS spells it badly, write numbers the way they are said); end with a full sentence (a very short last word can be cut by the TTS).
 - **Facts:** verify every number, name and claim (paper, official docs, repo). Nothing you cannot source. Note what is illustrative.
-- Under each script, one line per sentence: the visual planned for it.
+- Under each script, one line per sentence: the visual planned for it. Every sentence that states a fact about a real paper / repo / model / number gets its **screenshot** (URL + the exact phrase to highlight); at least 2 screenshots per Short when the topic has real sources.
+- Before showing the scripts, fetch every source page and try its screenshot (Step 3, point 2), so missing ones can be asked for in the same message.
 Show the user all scripts with the word count, then stop: "Theek hai to har Short ka TTS alag file mein bana ke bhej do."
 
 ## Step 3: build (after the audio arrives)
@@ -83,16 +86,23 @@ For each Short, in its own folder. The light kit's full part list and checks are
    - **Hook at second 0:** the first scene's main visual is on screen when the voice starts (there is no intro). Something new moves every 2-3 s; 3-6 scenes of 4-9 s.
    - One main visual per scene, at most 2 chips; text 1-4 words; lcheck `TEXT` limit is 70 characters.
    - When the voice talks about a text, show that exact text (typed / code / highlighted row), as in the light rules.
+   - **Screenshots (real pages), same workflow as the light skill's "Real sources":** `node ~/skit/light/webshot.js <url> assets/<name>.png 1`, Read it once (must be fully styled), crop with PIL to the part the voice talks about, BETWEEN lines, then `python3 ~/skit/light/lfind.py assets/<name>.png "phrase" ...` (OCR boxes; `EDGE:` = crop cut words -> crop again).
+     - **Vertical crop:** the shot window is at most ~650 px wide on the canvas, so crop a narrow column: the title line, one abstract sentence, one table row, the repo header. Page text must stay 9 px+ on screen (lcheck SMALLSHOT); never squeeze a whole page in.
+     - Show it with `nlShot` in a browser window (URL in the header = the credit), `nlShotHL(shot, 'hlN', 'the exact words', colour)` on the words as the voice says them, `nlCursor` + `CURSOR_TO` + `CLICK` for a click. Highlights and the cursor go BY PHRASE (OCR), never by pixel numbers.
+     - Then `node ~/skit/light/lshotcheck.js index.html` and read every `out/pages_NN.png`: each box on exactly the spoken words, nothing cut by the window edge.
+     - Blocked / unstyled page (`node ~/skit/light/netlog.js <url>` finds the host; github.com pages often fail in a cloud session that was not started with that repo): ask the user once, in the scripts message, with a numbered list: exact URL, the part to capture, the file name, desktop browser, zoom 100 %, PNG, dark mode if the site has it. Keep building with a placeholder card meanwhile. Uploads land in `/root/.claude/uploads/...`: copy them into `assets/`.
+     - Numbers that change (stars, downloads) get "as of <date>". No recreated logos or fake site UI.
    - End card: set `NL_END_TXT = '> full video below';` at the top of video.js when there is a Related video (default `'> follow for more'`).
    - Different opening and main visual for every Short of the batch.
 3. **Build + check:** `python3 ~/skit/light/lbuild.py video.js <audio> --short`, fix every ERROR; `node ~/skit/light/lcheck.js index.html --every 2` -> 0 warnings (SAFE, ORBCORNER, EMPTY, OUT ...), 0 JS errors; read its sheet(s) (one or two per Short); motion sheet for moving dots (`node ~/skit/light/lsheet.js index.html range a b .25 --name motion`).
-4. **Audio:** `python3 ~/skit/light/lmix.py index.html <audio> upbeat` (or `lofi` for calm topics); a Short uses about 15-30 cues.
-5. **youtube.txt:** title (50 chars max), 2-3 line description with the sources, 3 hashtags (#shorts plus two topic tags), and the Related video to set (title + link) if any.
+4. **Proof check:** every factual sentence has its real screenshot on screen while it is spoken (or the user was asked for it).
+5. **Audio:** `python3 ~/skit/light/lmix.py index.html <audio> upbeat` (or `lofi` for calm topics); a Short uses about 15-30 cues.
+6. **youtube.txt:** title (50 chars max), 2-3 line description with the sources, 3 hashtags (#shorts plus two topic tags), and the Related video to set (title + link) if any.
 
 ## Step 4: deliver
-- Copy each Short's `index.html` + `bgm.m4a` (+ `assets/*.png`) + `youtube.txt` to `~/shorts-<date>-hyperframes/short_N/` and send them with SendUserFile (`display: 'attach'`).
+- Copy each Short's `index.html` + `bgm.m4a` + `assets/*.png` (the screenshots) + `youtube.txt` to `~/shorts-<date>-hyperframes/short_N/` and send them with SendUserFile (`display: 'attach'`).
 - Short Hinglish message: the list (title + main visual), what is illustrative, and the setup per Short (same as the light skill):
-  `mkdir assets` · `copy "<path>" assets\<name>.m4a` · `copy "<path>\bgm.m4a" assets\bgm.m4a` · `dir assets` · `npx hyperframes render --output short_N.mp4`
+  `mkdir assets` · `copy "<path>" assets\<name>.m4a` · `copy "<path>\bgm.m4a" assets\bgm.m4a` · every screenshot png into `assets\` with the same name · `dir assets` · `npx hyperframes render --output short_N.mp4`
 - Upload: a vertical video under 3 minutes is a Short automatically. In YouTube Studio set the **Related video**, and **schedule** one Short per day so they post while the laptop is off.
 - Ask the user to report glitches with the Short number and the time.
 
