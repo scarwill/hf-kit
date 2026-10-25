@@ -1,13 +1,13 @@
 ---
 name: "light"
-description: "Build a Netlight ML neon-tech explainer video with the LIGHT kit (fixed version of netlightml for long videos): glowing UI windows, Model Orb in the corner, visuals drawn from the script's own objects, real papers / GitHub / web pages in a browser window, mood-matched music + sound cues, as one HyperFrames index.html + bgm.m4a (+ assets) synced to the user's script + audio. Builds in batches of scenes, checks with contact sheets and kit guards so 2-10 min videos stay correct. Use when the user says light / light skill, or asks for a Netlight / neon-tech DSML video and wants the light skill."
+description: "Build a Netlight ML neon-tech explainer video with the LIGHT kit (fixed version of netlightml for long videos): glowing UI windows, Model Orb in the corner, visuals drawn from the script's own objects, real papers / GitHub / web pages in a browser window, the video's own custom music + sound cues (never the old fixed moods), as one HyperFrames index.html + bgm.m4a (+ assets) synced to the user's script + audio. Builds in batches of scenes, checks with contact sheets and kit guards so 2-10 min videos stay correct. Use when the user says light / light skill, or asks for a Netlight / neon-tech DSML video and wants the light skill."
 ---
 
 # LIGHT: Netlight ML neon-tech HyperFrames video (long-video safe)
 
 The user's channel is **Netlight ML** (`netlight.ml`): data science, ML and AI explainers.
 - Reply in Hinglish, short and clear.
-- Deliver ONE `index.html` + ONE `bgm.m4a` (music and sound cues mixed), plus any `assets/*.png` screenshots. Attach with SendUserFile (`display: 'attach'`). Paste code only if asked. Never zip.
+- Deliver ONE `index.html` + ONE `bgm.m4a` (the video's own music and sound cues mixed) + `preview_mix.m4a`, plus any `assets/*.png` screenshots. Attach with SendUserFile (`display: 'attach'`). Paste code only if asked. Never zip.
 - Runs in **Claude Code** (cloud session). Tools: Bash, Read/Write/Edit, WebSearch/WebFetch (load with ToolSearch first), SendUserFile, AskUserQuestion.
 - **No preview MP4** unless the user asks. Check with lcheck + contact sheets.
 - **Ask before doing anything beyond what was asked** (changing the kit, other skills, pushing). The user: "kuch bhi karne se pahele pucha kar".
@@ -49,7 +49,7 @@ Netlight videos broke on long scripts for three reasons, and this skill removes 
   - Anything inside a frame fits fully inside it.
   - After moving or resizing a part, re-check everything connected to it.
 - **Motion looks physical:** a ball, packet or dot never sits frozen; it moves continuously and lands on its word. A hit shows the hit.
-- **Audio:** music (mood from the script) + sound cues in every video.
+- **Audio:** the video's own music + sound cues in every video (`music/README.md`), never the lmix.py moods.
 - **Facts and code:**
   - Only real numbers and real, short, correct code. Verify numbers in Python.
   - Say in the delivery message what is illustrative.
@@ -162,7 +162,7 @@ When the script names a real paper, repo, site, post or doc, show the **real thi
 2. **Plan** (short table, in chat):
    - Columns: scene, time range, title, main visual (type from the menu + what exactly is drawn), exact text shown, real source (URL), hero position, cues.
    - Scenes are about 6-15 s each. Group them into **batches of about 6 scenes** (about 60-90 s of audio) and number the batches.
-   - Pick the music mood (Audio) and say why in one line.
+   - Pick the music style for this story (`music/README.md`, different from the last line of `music/log.md`) and where its drop / stop / resolve land; say it in one line.
    - Right after the plan, fetch every real source, try the screenshots, and send ONE message listing the screenshots you still need.
 3. **Build in batches.** For each batch, in order:
    1. `cat ~/lkit/light/RULES.md` (every batch, even if you think you remember it).
@@ -175,20 +175,15 @@ When the script names a real paper, repo, site, post or doc, show the **real thi
    8. Fix, then re-check only the fixed moments: `node ~/lkit/light/lsheet.js index.html at <t1> <t2> ... --name fix`.
 4. **Final check (whole video):** `lbuild` clean, then `node ~/lkit/light/lcheck.js index.html` → 0 warnings, 0 JS errors. Read every `out/sheet_NN.png` once (about one sheet per minute of video). Check the hook in the first 5 s and the intro/outro frames. Then `node ~/lkit/light/lshotcheck.js index.html` and read every `out/pages_NN.png`.
    - **0 warnings is NOT "done".** No tool checks these; look for them yourself in the sheets: a highlight that is on the right words but the wrong moment; a cursor body covering the text the voice reads; text you typed that differs from the source; a drawing that looks wrong but stays inside its box; anything the user complained about in an earlier video. Never send a video because the checker passed.
-5. **Audio:** `python3 ~/lkit/light/lmix.py index.html <audio> <mood>` (uses `cues.json` from lcheck) → `bgm.m4a` + cue onset check.
+5. **Audio, made for THIS video** (`~/lkit/light/music/README.md`). The user rejected the `lmix.py` / `score.py` moods and cue sounds on 25 Oct 2026: never use them again.
+   - Read `~/lkit/light/music/log.md` and pick a music style and an sfx palette different from the last entry.
+   - Music: a generator in `~/lkit/light/music/` tied to the story (the build follows the scenes, a drop / hit on the reveal, a stop on the twist, a resolve on the ending), or write a new generator for a new style and add it to the README table.
+   - Cues: `python3 ~/lkit/light/music/sfx.py cues.json <DUR> sfx.wav <palette> --root <key>` (palette and key matching the music).
+   - Mix: `python3 ~/lkit/light/music/lremix.py index.html <audio>` -> `bgm.m4a` (music ducks under the voice) + `preview_mix.m4a`. Check the level shape, then add the line to `log.md`.
+   - Send `preview_mix.m4a` with the delivery (we cannot listen; the user does). If the user dislikes it, make a different style, never just change the volume.
 
-   | mood | use for |
-   |---|---|
-   | `dark` | hacking, security, reverse engineering, mysteries, "how it really works" |
-   | `lofi` | calm explainers, tutorials, study topics, step-by-step how-tos |
-   | `upbeat` | news, launches, "this changes everything", fast lists, tools roundups |
-   | `calm` | gentle / emotional topics, health, nature, reflective endings |
-   | `cinematic` | history, big stakes, epic reveals, "the race to build X" |
-
-   - If the user dislikes it, switch mood; don't just change the volume.
-   - For louder / softer music, use `--music -11` (dB under the voice; default -13) or change `data-volume` on `<audio id="bgm">`.
 6. **Deliver:**
-   - Copy `index.html` + `bgm.m4a` (+ `assets/*.png`) to `~/<name>-hyperframes/` and send them with SendUserFile.
+   - Copy `index.html` + `bgm.m4a` + `preview_mix.m4a` (+ `assets/*.png`) to `~/<name>-hyperframes/` and send them with SendUserFile.
    - Short Hinglish message: long + synced, the scene list (title + main visual), what is illustrative / placeholder, and the setup:
      - `mkdir assets`
      - `copy "<path>" assets\<name>.m4a`

@@ -96,11 +96,15 @@ For each Short, in its own folder. The light kit's full part list and checks are
    - Different opening and main visual for every Short of the batch.
 3. **Build + check:** `python3 ~/skit/light/lbuild.py video.js <audio> --short`, fix every ERROR; `node ~/skit/light/lcheck.js index.html --every 2` -> 0 warnings (SAFE, ORBCORNER, EMPTY, OUT ...), 0 JS errors; read its sheet(s) (one or two per Short); motion sheet for moving dots (`node ~/skit/light/lsheet.js index.html range a b .25 --name motion`).
 4. **Proof check:** every factual sentence has its real screenshot on screen while it is spoken (or the user was asked for it).
-5. **Audio:** `python3 ~/skit/light/lmix.py index.html <audio> upbeat` (or `lofi` for calm topics); a Short uses about 15-30 cues.
+5. **Audio, made for THIS Short** (`~/skit/light/music/README.md`; the user rejected the `lmix.py` moods and cue sounds on 25 Oct 2026: never use `lmix.py` / `score.py`):
+   - read `~/skit/light/music/log.md`; pick a music style and an sfx palette different from the last entry;
+   - music from a generator in `~/skit/light/music/` tied to the story (build per scene, drop on the reveal word, stop on the twist, resolve on the ending; times from the lbuild scene table / words.json), or write a new generator for a new style;
+   - `python3 ~/skit/light/music/sfx.py cues.json <DUR> sfx.wav <palette> --root <key> --max 30`, then `python3 ~/skit/light/music/lremix.py index.html <audio>` -> `bgm.m4a` + `preview_mix.m4a`;
+   - check the level shape (no silent gap where music should play); add the line to `log.md`.
 6. **youtube.txt:** title (50 chars max), 2-3 line description with the sources, 3 hashtags (#shorts plus two topic tags), and the Related video to set (title + link) if any.
 
 ## Step 4: deliver
-- Copy each Short's `index.html` + `bgm.m4a` + `assets/*.png` (the screenshots) + `youtube.txt` to `~/shorts-<date>-hyperframes/short_N/` and send them with SendUserFile (`display: 'attach'`).
+- Copy each Short's `index.html` + `bgm.m4a` + `preview_mix.m4a` (voice + music, for the user to listen: we cannot) + `assets/*.png` (the screenshots) + `youtube.txt` to `~/shorts-<date>-hyperframes/short_N/` and send them with SendUserFile (`display: 'attach'`).
 - Short Hinglish message: the list (title + main visual), what is illustrative, and the setup per Short (same as the light skill):
   `mkdir assets` · `copy "<path>" assets\<name>.m4a` · `copy "<path>\bgm.m4a" assets\bgm.m4a` · every screenshot png into `assets\` with the same name · `dir assets` · `npx hyperframes render --output short_N.mp4`
 - Upload: a vertical video under 3 minutes is a Short automatically. In YouTube Studio set the **Related video**, and **schedule** one Short per day so they post while the laptop is off.
