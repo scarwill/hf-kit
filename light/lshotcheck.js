@@ -5,14 +5,14 @@
 // is each box around the words the voice says, does the cursor tip sit on its target, is any line cut by the window edge?
 // (Contact sheets are too small for this - a box on the wrong row looks fine at 1/4 size.)
 const { chromium } = require('playwright'); const fs = require('fs'); const path = require('path');
-const { testPage, lab } = require('./lsheet.js');
+const { testPage, lab, fitFrame } = require('./lsheet.js');
 const A = process.argv.slice(2), opt = (k, d) => { const i = A.indexOf(k); if (i < 0) return d; const v = A[i + 1]; A.splice(i, 2); return v; };
 const FROM = +opt('--from', 0), TO = +opt('--to', 1e9), src = A[0] || 'index.html', STEP = .2;
 (async () => {
   testPage(src, 'nl_shot.html'); fs.mkdirSync('out', { recursive: true });
   fs.readdirSync('out').filter(f => /^pages_\d+\.png$/.test(f)).forEach(f => fs.unlinkSync(path.join('out', f)));
   const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1920, height: 1080 } });
-  await p.goto('file://' + path.resolve('nl_shot.html')); await p.waitForTimeout(800);
+  await p.goto('file://' + path.resolve('nl_shot.html')); await p.waitForTimeout(800); const [FW, FH] = await fitFrame(p);
   const end = await p.evaluate(() => END + TAIL);
   // state of every visible screenshot window: which highlights are on, where the cursor is, the image transform
   const probe = () => {
@@ -38,7 +38,7 @@ const FROM = +opt('--from', 0), TO = +opt('--to', 1e9), src = A[0] || 'index.htm
   const crops = [];
   for (const m of moments) {
     await p.evaluate(t => window.__timelines.main.seek(t), m.t); await p.waitForTimeout(30);
-    const [x, y, w, h] = m.rect, cx = Math.max(0, x - 70), cy = Math.max(0, y - 20), cw = Math.min(1920 - cx, w + 140), ch = Math.min(1080 - cy, h + 90);
+    const [x, y, w, h] = m.rect, cx = Math.max(0, x - 70), cy = Math.max(0, y - 20), cw = Math.min(FW - cx, w + 140), ch = Math.min(FH - cy, h + 90);
     crops.push({ m, img: (await p.screenshot({ type: 'png', clip: { x: cx, y: cy, width: cw, height: ch } })).toString('base64'), cw, ch });
   }
   const comp = await b.newPage({ viewport: { width: 1920, height: 1080 } }); const files = []; let i = 0;

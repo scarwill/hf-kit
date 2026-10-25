@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
-# LIGHT build:  python3 ~/hf-kit/light/lbuild.py video.js <audio e.g. talk.m4a> [index.html] [--no-bgm] [--force]
-# Run in the folder that has words.json + meta.json (align.py). LONG 1920x1080 only.
+# LIGHT build:  python3 ~/hf-kit/light/lbuild.py video.js <audio e.g. talk.m4a> [index.html] [--short] [--no-bgm] [--force]
+# Run in the folder that has words.json + meta.json (align.py). LONG 1920x1080 (default) or --short = YouTube Short 1080x1920
+# (VERT=true, 810x1440 layout canvas scaled 4/3, no boot intro: HEAD 0.3 s, end card TAIL 2.0 s).
 # 1. LINT    banned helpers (other looks, nlOrb, nlCmd, ORB_LOOK, nlNext, house helpers pasted again) -> ERROR
 #            SHOTPX (nlShotHL with pixel numbers) / NOBOXES (nlShot image without lfind.py OCR boxes) -> ERROR
 # 2. PHRASES every go / NEXT / W phrase is checked against words.json scene by scene (NEXT knows the scene starts):
 #            NOTFOUND, SCENE START NOT AFTER THE PREVIOUS ONE, OUTSIDE (W fires in a later scene) -> ERROR ; AMBIGUOUS (phrase occurs again in the scene) -> WARN
 # 3. BUILD   premium.js + life.js + light.js + video.js + kit.js into template.html; adds the bgm track (assets/bgm.m4a) unless --no-bgm.
 # Any ERROR = no index.html is written (unless --force). Fix the errors, run again.
-# timeline = HEAD 2.6 s (Intro A, no voice) + audio + TAIL 3.6 s (Outro A). Word times are shifted by HEAD; END = HEAD + audio length.
+# timeline = HEAD 2.6 s (Intro A, no voice) + audio + TAIL 3.6 s (Outro A) (SHORT: 0.3 + audio + 2.0). Word times are shifted by HEAD; END = HEAD + audio length.
 import json, sys, os, re
 K = os.path.dirname(os.path.abspath(__file__)); V = os.path.join(K, '..', 'video')
-args = [a for a in sys.argv[1:] if not a.startswith('--')]; FORCE = '--force' in sys.argv; BGM = '--no-bgm' not in sys.argv
+args = [a for a in sys.argv[1:] if not a.startswith('--')]; FORCE = '--force' in sys.argv; BGM = '--no-bgm' not in sys.argv; SHORT = '--short' in sys.argv
 vid, aud = args[0], args[1]; out = args[2] if len(args) > 2 else 'index.html'
-HEAD, TAIL = 2.6, 3.6
+HEAD, TAIL = (0.3, 2.0) if SHORT else (2.6, 3.6)
 M = json.load(open('meta.json')); AUD = M['END']; END = round(HEAD + AUD, 2)
 WJ = json.load(open('words.json')); TW = [[round(t + HEAD, 2), w] for t, w in WJ]
 V0 = open(vid, encoding='utf-8').read()
@@ -84,8 +85,11 @@ print('scene starts (video time):')
 for j, (_, t, nm) in enumerate(starts):
     d = (starts[j + 1][1] if j + 1 < len(starts) else END) - t
     print(f'  {nm:<8} {int(t // 60)}:{t % 60:05.2f}  {d:5.1f}s')
-    if d > 25: Wn(f'LONG     scene {nm} lasts {d:.1f}s - split it or make sure something new moves every 3-4 s')
+    if d > (9 if SHORT else 25): Wn(f'LONG     scene {nm} lasts {d:.1f}s - split it or make sure something new moves every {"2-3" if SHORT else "3-4"} s')
 print(f'phrases checked: {len(starts)} scene starts, {nW} W()')
+if SHORT:
+    if AUD > 180: E(f'SHORT    the voice is {AUD:.0f}s - YouTube Shorts are 3 min at most')
+    elif AUD > 60: Wn(f'SHORT    the voice is {AUD:.0f}s - Netlight Shorts are 35-50 s (YouTube allows up to 3 min)')
 
 for m in warn: print('WARN ', m)
 for m in err: print('ERROR', m)
@@ -99,17 +103,17 @@ BOXES = {}
 for bf in glob.glob('assets/*.boxes.json'):
     for ext in ('.png', '.jpg', '.jpeg', '.webp'):
         if os.path.exists(bf[:-11] + ext): BOXES[bf[:-11] + ext] = json.load(open(bf))
-js = (f"const VERT=false;\nconst NLBOXES={json.dumps(BOXES, separators=(',', ':'))};\nconst TW={json.dumps(TW, separators=(',', ':'))};\nconst HEAD={HEAD};\nconst END={END};\nconst TAIL={TAIL};\nconst TITLE={json.dumps(M.get('title'))};\n"
+js = (f"const VERT={'true' if SHORT else 'false'};\nconst NLBOXES={json.dumps(BOXES, separators=(',', ':'))};\nconst TW={json.dumps(TW, separators=(',', ':'))};\nconst HEAD={HEAD};\nconst END={END};\nconst TAIL={TAIL};\nconst TITLE={json.dumps(M.get('title'))};\n"
       + js_src + "\n" + open(os.path.join(V, 'kit.js'), encoding='utf-8').read())
 h = open(os.path.join(V, 'template.html'), encoding='utf-8').read()
 h = h.replace('family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700',
               'family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700;800')
 DUR = round(END + TAIL, 2)
 for a, b in (('%%DUR%%', str(DUR)), ('%%HEAD%%', str(HEAD)), ('%%AUD%%', str(AUD)), ('%%AUDIO%%', aud),
-             ('%%TITLE%%', 'Netlight ML'), ('%%W%%', '1920'), ('%%H%%', '1080'), ('%%JS%%', js)):
+             ('%%TITLE%%', 'Netlight ML'), ('%%W%%', '1080' if SHORT else '1920'), ('%%H%%', '1920' if SHORT else '1080'), ('%%JS%%', js)):
     h = h.replace(a, b)
 if BGM:
     tag = f'<audio id="bgm" data-start="0" data-duration="{DUR}" data-track-index="1" data-volume="1" src="assets/bgm.m4a"></audio>'
     h = re.sub(r'(<audio id="voiceover"[^>]*></audio>)', lambda m: m.group(1) + '\n  ' + tag, h, count=1)
 open(out, 'w', encoding='utf-8').write(h)
-print(out, len(h), 'END', END, 'DUR', DUR, 'bgm' if BGM else 'no bgm', '(FORCED with errors)' if err else '')
+print(out, len(h), 'SHORT 1080x1920' if SHORT else 'LONG 1920x1080', 'END', END, 'DUR', DUR, 'bgm' if BGM else 'no bgm', '(FORCED with errors)' if err else '')
