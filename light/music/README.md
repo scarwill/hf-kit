@@ -19,6 +19,7 @@ So, for every Netlight video (long `light` and `net-shorts`):
 | file | style | story hooks | first used |
 |---|---|---|---|
 | layers.py | builds one layer per scene (muffled pad -> bass pulse -> arpeggio -> hats), drop on the reveal, dead stop + ticking clock on the twist, major resolve on the ending | `--scenes --drop --stop --resolve` | NCM Short (25 Oct 2026) |
+| denoise.py | 80s synthwave buried in tape static that clears in steps (crushed arp -> clean), keyframe stutter section, gated-snare drop, dead stop + rising sub drone and filling noise, major resolve, static swell on the callback | `--clean --glitch --wrong --drop --stop --resolve --static` | Short "How AI video generation works" (26 Oct 2026) |
 
 ## Sound palettes (`sfx.py`)
 glass (airy, clean, futuristic) · analog (wood, paper, warm) · chip (8-bit) · pulse (sub thumps, sonar) · string (pizzicato, timpani)
