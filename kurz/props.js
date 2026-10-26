@@ -408,6 +408,7 @@ function kBEAM(id, t0, dur = 1) { tl.fromTo('#' + id, { autoAlpha: 0, scaleX: .1
 // TECH:      kCopy(par, defs, cx, cy, w, h, id, {bean}) digital copy = holo screen with the person as a bust (bean ids id+'p…')  kChipN(par, cx, cy, s, id) artificial neuron chip
 //            kRoads(par, cx, cy, w, h, id) road-grid map (cars id+'c'+k)  kDrive / kBolt / kOffice / kLaw / kLock (risk icons, draw inside nCard)  kBulbL(par, cx, cy, s, id) hanging bulb (glow id+'g')
 //            kPower(par, x, by, s, id) small power plant  kNuke(par, x, by, s, id) big nuclear plant (chimney, reactor dome, 2 cooling towers + steam; grow with scaleY from 50% 100%)
+// PHOTO:     kPhoto(par, cx, cy, w, h, href, id, {col, tilt, frame, fit, tint, tintA, label, credit}) real photo in a Kurz frame (glow, shadow, light frame, rounded clip); image id+'i' (Ken Burns: kKEN(id, t, d)). Rules: RULES.md 'Real photos'.
 // LIFE:      kNeuron2(par, cx, cy, s, col, id, {ax, axLen, n, hidAx}) neuron with branching dendrites + myelinated axon (axon group id+'a', g.__ax = axon path for kStream)
 //            kWorm(par, cx, cy, s, id, col, {glow}) C. elegans (body id+'b' -> kWIGGLE)  kFly(par, cx, cy, s, id) fruit fly (wings id+'w' -> kFLAP)  kLeaf(par, cx, cy, w, col)  kRice(par, cx, cy, s, id)
 // THINGS:    kShipT(par, defs, cx, cy, s, id) wooden ship, 10 planks (old id+'o'+k, new id+'n'+k hidden: FADE them in)  kCage(par, cx, cy, w, h, id) cage bars (drop it in)
@@ -632,4 +633,22 @@ function kCamPath(keys, endT) { keys.forEach((k, i) => { const [t, x, y, z, d = 
 const kBlinks = (id, t0, t1, every = 3.4) => { const ts = []; for (let t = t0 + 1.2; t < t1 - .3; t += every) ts.push(t); eyes('#' + id + 'E', ts); };
 const kFLAP = (id, t0, t1) => tl.to('#' + id + 'w', { scaleY: .6, transformOrigin: '50% 100%', duration: .08, yoyo: true, repeat: Math.max(1, Math.round((t1 - t0) / .08) | 1), ease: 'sine.inOut' }, t0);
 const kWIGGLE = (id, t0, t1, a = 6) => tl.to('#' + id + 'b', { skewX: a, transformOrigin: '50% 50%', duration: .7, yoyo: true, repeat: Math.max(1, Math.round((t1 - t0) / .7) | 1), ease: 'sine.inOut' }, t0);
-
+// real photo (downloaded to assets/, see RULES.md 'Real photos') inside a Kurz-style frame: soft glow behind, drop shadow, light rounded frame,
+// image clipped to rounded corners (cover by default, o.fit 'contain' keeps the whole picture), optional palette tint, label pill under it and a tiny credit line.
+// ids: id (whole, hidden until you POP / kGROW it), id+'i' the image (slow push: kKEN), id+'L' label pill
+function kPhoto(par, cx, cy, w, h, href, id, o = {}) {
+  const d = kDefs(par), col = o.col || NPAL.cyan, r = o.r ?? 26, x = cx - w / 2, y = cy - h / 2, f = o.pad ?? 12;
+  const g = S('g', Object.assign({ id }, o.tilt ? { transform: `rotate(${o.tilt} ${cx} ${cy})` } : {}), par);
+  kGlow(g, cx, cy, Math.max(w, h) * .78, col, .32);
+  S('rect', { x: x - f + 12, y: y - f + 18, width: w + 2 * f, height: h + 2 * f, rx: r + f, fill: '#000', opacity: .38 }, g);
+  kShade(g, S('rect', { x: x - f, y: y - f, width: w + 2 * f, height: h + 2 * f, rx: r + f, fill: o.frame || '#eef1fa' }, g), '#a7b1cc', '#ffffff');
+  const cg = S('g', { 'clip-path': kClip(d, S('rect', { x, y, width: w, height: h, rx: r }, d)) }, g);
+  S('rect', { x, y, width: w, height: h, fill: '#1b1240' }, cg);
+  S('image', { id: id + 'i', href, x, y, width: w, height: h, preserveAspectRatio: o.fit === 'contain' ? 'xMidYMid meet' : 'xMidYMid slice' }, cg);
+  if (o.tint) S('rect', { x, y, width: w, height: h, fill: o.tint, opacity: o.tintA ?? .16 }, cg);
+  if (o.credit) { const t = S('text', { x: x + w - 10, y: y + h - 12, 'text-anchor': 'end', 'font-family': 'Poppins', 'font-size': 16, 'font-weight': 500, fill: '#ffffff', opacity: .75 }, cg); t.textContent = o.credit; }
+  if (o.label) nPill(g, cx, y + h + f + 34, o.label, col, id + 'L', 30);
+  return g;
+}
+// slow push into a photo (Ken Burns) from t over d s; call once per photo, after it pops
+const kKEN = (id, t, d = 4, s = 1.08) => tl.fromTo('#' + id + 'i', { scale: 1, transformOrigin: '50% 50%' }, { scale: s, transformOrigin: '50% 50%', duration: d, ease: 'sine.inOut' }, t);
