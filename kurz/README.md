@@ -17,6 +17,7 @@ python3 ~/hf-kit/build.py all.js audio.m4a [index.html --short]
 - `organs.js` — `kEye2`, `kView2`, `kVoid`, `kPhone2`, `kEyeFull`, `kBrain2`, `kCamR2`.
 - `tech.js` — AI / data props: `kMind` (the model), `kCube`, `kCrystal`, `kTablet`, `kServer`, `kScreen`, `kNet` + `kFIRE`, `kStream` + `kFLOW`, `kSay` + `kSAY`, `kBot`.
 - `techviz.js` — `kMatrix`, `kAttn`, `kStack`, `kVector`, `kPlot`, `kCode`, `kEq`, `kProbs`, `kBox3D` (+ CAPS reveal beats).
+- `props.js` — ready shaded props (rooms, animals, body, lab / tech) and `kPhoto` + `kKEN`: a real downloaded photo in a Kurz frame (rules: RULES.md 'Real photos').
 - `kbgm.py` — `python3 ~/hf-kit/kurz/kbgm.py index.html <voice> <mood>` after build.py: background music only (no SFX) from `light/score.py`, mixed 13 dB under the voice -> `bgm.m4a` + `<audio id="bgm">` in index.html.
 - `kurzlint.py` — fails if video.js uses Infographics helpers (chat, pill, ic, card, scene, charB/botB/charP/botP, …) and warns on outlines, white cards, long labels.
 - Examples: `examples/kurz-neon-demo.js` (neon look + parts), `examples/kurz-blindspot-long.js` (older nature look; structure only).
