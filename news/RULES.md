@@ -35,7 +35,7 @@
 - Children of a card show with the card: give them ids and FADE / POP them to reveal later (POP and fromTo hide from frame 0).
 - `fromTo` needs autoAlpha in both from and to (the check shim ignores from-only autoAlpha); no colour tweens, no onUpdate, finite repeats, no emoji, comments on their own line.
 - Never use `stage`, `document.body` or old neon parts (`nl*` windows, `nw*` cards): build.py bans them.
-- `CUE(t, kind)` next to its beat: `hit` big reveals and stamps, `err` problems, `tick` rows / list items, `pop` new parts, `chime` confirmations, `type` typed text, `whoosh` comes with NEXT.
+- `CUE(t, kind)` next to its beat: `hit` big reveals and stamps, `err` problems, `tick` rows / list items, `pop` new parts, `chime` confirmations, `type` typed text. No whoosh: scene changes are silent (BRAND.md Sound cues, 27 Oct 2026).
 
 ## Checking (context budget)
 - Look ONLY at contact sheets (`out/sheet_NN.png`, `out/fix_NN.png`, `out/motion_NN.png`), never single frames.

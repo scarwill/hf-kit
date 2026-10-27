@@ -47,6 +47,10 @@ Decided with the user. The `news` skill and kit follow this file.
 ## Music (decided 23 Oct 2026)
 - Every video gets its own custom BGM made for that story (generators and steps in `music/README.md`). Never the plain nmix.py moods, never the same style twice in a row. Hit / stop / drop on the story's twist, resolve on the end card. Always send a voice + music preview with the delivery.
 
+## Sound cues (decided 27 Oct 2026)
+- "Clean Glass" pack in `score.py` (picked from 3 options): soft felt thud for stamps, glass bubble pop, glass tap blip, wooden tick, two-note bell chime, muted double bonk for errors, soft glide down, soft laptop keys.
+- **No whoosh**: scene changes are silent (`NEXT` still writes the cue, `score.py` ignores it). Do not add a whoosh back without asking.
+
 ## Captions (decided 21 Oct 2026)
 - Shorts have word-by-word captions: 2-4 words at a time, the word being spoken turns blue, Inter Tight 800, light text on a dark navy rounded card (`#111A2B`, border `#24324A`). Place them in a fixed band (about y 1380-1540), inside the safe zone; scene layouts keep that band free.
 - Long videos: no captions for now (ask the user before adding them).

@@ -65,27 +65,30 @@ musL *= g; musR *= g
 sfL = np.zeros(n); sfR = np.zeros(n)
 def both(a, s, g=1., p=0.): add(sfL, a, s, g * (1 - p)); add(sfR, a, s, g * (1 + p))
 def env(L, att, dec): tt = np.arange(int(L * SR)) / SR; return tt, np.minimum(1, tt / att) * np.exp(-tt * dec)
-tt = np.arange(int(.7 * SR)) / SR; sh = np.sin(np.pi * np.clip(tt / .7, 0, 1)) ** 2
-nz = rng.standard_normal(len(tt)); WH = np.array(bp(nz[:len(tt) // 2], 300, 1200).tolist() + bp(nz[len(tt) // 2:], 900, 3500).tolist()) * sh
-tt, e = env(1.2, .005, 3.5); HIT = np.sin(2 * np.pi * (50 * tt + 70 * (1 - np.exp(-tt * 18)) / 18)) * e + lpf(rng.standard_normal(len(tt)), 2500) * np.exp(-tt * 25) * .5
-tt, e = env(1.1, .003, 4); CHM = (np.sin(2 * np.pi * f(86) * tt) + .6 * np.sin(2 * np.pi * f(93) * tt) * np.minimum(1, np.maximum(0, tt - .07) * 50)) * e
-tt, e = env(.09, .002, 40); BLP = np.sign(np.sin(2 * np.pi * 988 * tt)) * e * .5
-tt, e = env(.03, .001, 160); TCK = np.sin(2 * np.pi * 2200 * tt) * e
-tt, e = env(.22, .004, 14); ERR = lpf(np.sign(np.sin(2 * np.pi * (180 - 60 * tt) * tt)) + np.sign(np.sin(2 * np.pi * 120 * tt)), 1800) * e * .4
-tt, e = env(.02, .001, 260); KEY = hpf(rng.standard_normal(len(tt)), 2500) * e
-tt, e = env(1.0, .01, 3); DWN = np.sin(2 * np.pi * (f(74) * tt - 120 * tt * tt)) * e
-tt, e = env(.35, .004, 9); POPS = np.sin(2 * np.pi * (500 * tt + 900 * tt * tt)) * e * .6
+# "Clean Glass" pack (picked 27 Oct 2026): soft, premium, quiet. No whoosh: scene changes are silent.
+def nrm(x, g): return x / (np.abs(x).max() + 1e-9) * g
+def nz(L): return rng.standard_normal(int(L * SR))
+tt, e = env(.45, .002, 14); HIT = nrm(np.sin(2 * np.pi * (48 * tt + 40 * (1 - np.exp(-tt * 30)) / 30)) * e + lpf(nz(.45), 900) * np.exp(-tt * 60) * .35, .6)        # soft felt thud
+tt, e = env(.18, .002, 26); POPS = nrm(np.sin(2 * np.pi * (620 * tt + 1500 * tt * tt)) * e * np.minimum(1, tt / .006), .3)                                             # glass bubble
+tt, e = env(.22, .001, 30); BLP = nrm((np.sin(2 * np.pi * 2093 * tt) + .5 * np.sin(2 * np.pi * 2093 * 2.76 * tt) * np.exp(-tt * 40)) * e, .2)                           # glass tap
+tt, e = env(.035, .0005, 140); TCK = nrm(bp(nz(.035), 2500, 5000) * e + .5 * np.sin(2 * np.pi * 1800 * tt) * e, .18)                                                  # wooden tick
+def bell(fr, L=1.4): tt, e = env(L, .002, 3.2); return np.sin(2 * np.pi * fr * tt + 1.8 * np.exp(-tt * 4) * np.sin(2 * np.pi * fr * 3.5 * tt)) * e
+CHM = np.zeros(int(1.6 * SR)); CHM[:int(1.4 * SR)] += bell(f(88)); b2 = bell(f(95)); CHM[int(.12 * SR):int(.12 * SR) + len(b2)] += .8 * b2; CHM = nrm(CHM, .2)               # two-note FM bell
+tt, e = env(.16, .003, 22); k1 = lpf(np.sin(2 * np.pi * 233 * tt) + .3 * np.sin(2 * np.pi * 466 * tt), 1200) * e
+tt, e = env(.3, .003, 12); k2 = lpf(np.sin(2 * np.pi * 175 * tt) + .3 * np.sin(2 * np.pi * 350 * tt), 1000) * e
+ERR = np.zeros(int(.5 * SR)); ERR[:len(k1)] += k1; ERR[int(.14 * SR):int(.14 * SR) + len(k2)] += k2; ERR = nrm(ERR, .32)                                             # muted double "bonk"
+tt, e = env(.7, .01, 4.5); DWN = nrm(lpf(np.sin(2 * np.pi * (700 * tt - 380 * tt * tt)), 1500) * e, .25)                                                             # soft glide down
+tt, e = env(.05, .0008, 110); KEYS = [nrm(bp(nz(.05), 1400, 4200) * e + .4 * np.sin(2 * np.pi * 180 * tt) * np.exp(-tt * 90), .16) for _ in range(8)]                # soft laptop keys
 for t, k, cnt, dt in cues:
-    if k == 'whoosh': both(t - .4, WH, .5)
-    elif k == 'hit': both(t, HIT, .8)
-    elif k == 'chime': both(t, CHM, .22, .2)
-    elif k == 'blip': both(t, BLP, .18)
-    elif k == 'tick': both(t, TCK, .22, -.15)
-    elif k == 'err': both(t, ERR, .35)
-    elif k == 'down': both(t, DWN, .3)
-    elif k == 'pop': both(t, POPS, .3)
+    if k == 'hit': both(t, HIT)
+    elif k == 'chime': both(t, CHM, 1, .1)
+    elif k == 'blip': both(t, BLP)
+    elif k == 'tick': both(t, TCK, 1, -.15)
+    elif k == 'err': both(t, ERR)
+    elif k == 'down': both(t, DWN)
+    elif k == 'pop': both(t, POPS)
     elif k == 'type':
-        for j in range(cnt): both(t + j * dt, KEY * (.7 + .3 * rng.random()), .25, (rng.random() - .5) * .3)
+        for j in range(cnt): both(t + j * dt, KEYS[j % 8], .6 + .4 * rng.random(), (rng.random() - .5) * .3)
 def wr(fn, L, R):
     s = np.stack([L, R], 1); s = (np.clip(s, -1, 1) * 32767).astype(np.int16); w = wave.open(fn, 'wb'); w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes(s.tobytes()); w.close()
 pk = max(abs(musL).max(), abs(musR).max(), 1e-9); wr(sys.argv[5], musL / pk * .6, musR / pk * .6)
