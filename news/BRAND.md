@@ -7,6 +7,7 @@ Decided with the user. The `news` skill and kit follow this file.
 - **Channel keywords** (YouTube Studio > Settings > Channel > Keywords, 433 / 500 chars): `brand/channel_keywords.txt`.
 - **Niche:** AI news + developer news. About 60 % AI (new models from OpenAI / Google / Anthropic / Meta / xAI / DeepSeek..., Hugging Face trending and open models, AI agents, AI tools, AI failures and hacks), 30 % coding and dev tools (GitHub viral repos, languages, editors, open source), 10 % cloud and security (only big ones: AWS / Azure / GCP outages, price changes, big hacks that hit developers).
 - **Not covered:** gadgets and phones unless the story is about AI or developers, crypto prices, politics / celebrity drama, unconfirmed leaks (or say "reportedly"), tiny updates.
+- **AI money IS covered (decided 28 Oct 2026, after we missed China's $480B AI selloff):** big AI market moves (bubble talk, a $100B+ crash or rally, Big Tech AI earnings surprises), giant AI deals and funding rounds, big AI IPOs. Rules: never investment advice (no buy / sell / targets), always say WHICH market (China's STAR 50 is not 'the AI bubble'), numbers from Reuters / Bloomberg / FT / the company, and one line on what it means for developers or AI tools.
 - **Audience:** US / UK. Voice: English TTS from Clipchamp, the same voice and speed in every video. The user talks to Claude in Hinglish.
 - **Angle that sets us apart:** every story says what it means for developers, and shows the real thing (repo, model page, docs, code, a demo run by us when possible).
 
@@ -27,13 +28,29 @@ Decided with the user. The `news` skill and kit follow this file.
 - Length: the 3 longest Shorts (50-53 s) are all in the bottom 4. The top 3 are 40-43 s.
 - The low ones pack product names and versions in the middle (PyPI, 1.107, Docker, SSH, 1.106.2 / Europe West 2B, Cloud Run, Kubernetes Engine, App Engine / Workers AI, GLM 5.3, SGLang, 200 OK).
 
-Script rules (Shorts), with a checklist shown next to every script:
-1. Topic: lead with a strange / surprising fact or a wow demo. A breach / outage / advisory story is a Short only with a strange-fact angle (like "the key was the number four"), and at most 1 per day.
-2. 90-110 words, under 45 s.
-3. Max 2 product / version names besides the main subject; explain each in plain words.
-4. Hook: one concrete surprising fact a non-developer gets in 2 s.
-5. Caveat in 1-2 short lines. End on the fact or a question, not only on an instruction.
+Script rules (Shorts), enforced by `scriptcheck.py` (tested on our 11 real Shorts: the top 3 PASS, 5 of the 8 weakest FAIL):
+1. Topic: lead with a strange / surprising fact or a wow demo. A breach / outage / advisory story is a Short only with a strange-fact angle (like "the key was the number four"), and at most 1 per day. (scriptcheck WARN)
+2. Under 45 s (~135 words at the user's Clipchamp speed: 110 words = 37.5 s). (FAIL)
+3. Max 2 product / version names besides the main subject; explain each in plain words. Our best 3 had none. (FAIL)
+4. Hook: one concrete surprising fact a non-developer gets in 2 s (our best: 4-14 words).
+5. Caveat in 1-2 short lines. End on the fact or a question, not only on an instruction. (WARN)
+Not rules (the data did not support them): a 90-110 word cap, max 2 numbers, max 10-word first line. Our best Shorts had 114-131 words, 3-5 numbers, 14-word first lines.
 Missing data: swipe rate (stayed vs swiped) is known only for 2 low Shorts. Ask the user for the Engagement tab of the top 3 to confirm the first-seconds story.
+
+## Daily research checklist (decided 28 Oct 2026). Do every step before sending the news table; list it under the table.
+1. `scan.py` (36 h, Monday 72 h) and READ every section, including **AI MARKETS / MONEY** (Google News: AI bubble, AI stocks, funding, IPO, Reuters + CNBC) and the Bloomberg tech / markets feeds.
+2. Two extra web searches: "AI stocks / AI bubble today" and "AI funding / AI IPO today".
+3. Sort the candidates by the topic rule (Lessons below): a strange / surprising fact or a wow demo first; a plain breach / outage / advisory only with a strange-fact angle, max 1 a day.
+4. Under the table: a **Skipped** list with every big story you did not pick and why (one line each), so nothing big disappears silently.
+
+## Click + watch rules (decided 28 Oct 2026, from analytics.md)
+Long videos (problem = CTR 1.0-1.6 % on 1.6k-4.7k impressions; YouTube stops showing a video after 1-2 days of low CTR):
+- Always 3 thumbnails for YouTube Studio "Test & compare" (thumb.js, check every *_feed.png at phone size): ONE big object / photo / face, max 3 big words, high contrast. Never a paragraph screenshot or small text.
+- Always 3 titles: the name people search goes first (OpenCode, P vs NP, Nvidia...), plain English, under 60 characters, no jargon before the hook.
+- Script: the answer the searcher came for inside the first 20 s (~55 words). No "First, what is X?" before the story starts (OpenCode long: 17 % retention).
+Shorts (problem = 78-82 % swipe in the first 1-2 s; those who stay watch it all):
+- Story choice first (topic rule). First frame = one big drawing / photo, short hook text (check.js FIRSTFRAME warns above 12 words or with no big visual). Unproven until we have swipe data for our best Shorts.
+- `python3 ~/nkit/news/scriptcheck.py script_N.txt` must PASS before a script is sent; paste its result under the script. Long: `scriptcheck.py --long`.
 
 ## Look (dark theme "Night Blue", decided 23 Oct 2026; replaces the light "Clean Blue")
 | token | hex | use |
