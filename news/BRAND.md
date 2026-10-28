@@ -1,4 +1,4 @@
-# Merge Report: locked decisions for the AI + Dev news channel (updated 23 Oct 2026, no weekly video)
+# Merge Report: locked decisions for the AI + Dev news channel (updated 28 Oct 2026, lessons from analytics)
 
 Decided with the user. The `news` skill and kit follow this file.
 
@@ -20,6 +20,20 @@ Decided with the user. The `news` skill and kit follow this file.
 - Shorts and long videos: about **8 pm IST** (= US East morning, UK afternoon). Weekdays 7:30-9:30 pm, weekends 6:30-8:30 pm.
 - After 1 Nov 2026 (US clock change): one hour later (weekdays 8:30-10:30 pm, weekends 7:30-9:30 pm). UK changes on 25 Oct.
 - News beats perfect timing: never hold a fresh story for hours just to hit the slot.
+
+## Lessons from YouTube analytics (28 Oct 2026, from the real transcripts + views of 11 Shorts; data in analytics.md). These override older word counts.
+- What did NOT decide views: the hook wording. Low Shorts had good plain-English hooks too ("Developers went to bed on Friday night. Their AI bills did not." = 29 views).
+- Topic decided most: the 3 best Shorts were one strange, instantly clear fact (fake terminal 768, a secret key that was the number 4: 282, a secret date leaked 3 times: 419). 5 of the 7 lowest were breach / outage / "rotate your keys" advisories (LiteLLM 16, OpenCode 29, Google Cloud 41, Cloudflare 49, Railway 55).
+- Length: the 3 longest Shorts (50-53 s) are all in the bottom 4. The top 3 are 40-43 s.
+- The low ones pack product names and versions in the middle (PyPI, 1.107, Docker, SSH, 1.106.2 / Europe West 2B, Cloud Run, Kubernetes Engine, App Engine / Workers AI, GLM 5.3, SGLang, 200 OK).
+
+Script rules (Shorts), with a checklist shown next to every script:
+1. Topic: lead with a strange / surprising fact or a wow demo. A breach / outage / advisory story is a Short only with a strange-fact angle (like "the key was the number four"), and at most 1 per day.
+2. 90-110 words, under 45 s.
+3. Max 2 product / version names besides the main subject; explain each in plain words.
+4. Hook: one concrete surprising fact a non-developer gets in 2 s.
+5. Caveat in 1-2 short lines. End on the fact or a question, not only on an instruction.
+Missing data: swipe rate (stayed vs swiped) is known only for 2 low Shorts. Ask the user for the Engagement tab of the top 3 to confirm the first-seconds story.
 
 ## Look (dark theme "Night Blue", decided 23 Oct 2026; replaces the light "Clean Blue")
 | token | hex | use |
