@@ -213,7 +213,9 @@ $$('.draw').forEach(p => { const L = p.getTotalLength(); p.__len = L; p.style.st
 tl.set('.scene', { autoAlpha: 0 }, 0);
 SCN.forEach((x, i) => {
   const t0 = Math.max(0, x.t - .2), m = i % 3, from = m === 0 ? { autoAlpha: 0, scale: .97 } : m === 1 ? { autoAlpha: 0, x: 60 } : { autoAlpha: 0, y: 40 };
-  tl.fromTo(x.id, from, { autoAlpha: 1, scale: 1, x: 0, y: 0, duration: .45, ease: 'power2.out' }, t0);
+  // a LIGHT Short opens on its hook: the first scene is fully visible at frame 0, no fade-in (Studio showed a black 0:00 frame, light/analytics.md)
+  if (i === 0 && typeof NLV !== 'undefined' && NLV) tl.set(x.id, { autoAlpha: 1, scale: 1, x: 0, y: 0 }, 0);
+  else tl.fromTo(x.id, from, { autoAlpha: 1, scale: 1, x: 0, y: 0, duration: .45, ease: 'power2.out' }, t0);
   if (i < SCN.length - 1) tl.to(x.id, { autoAlpha: 0, duration: .35, ease: 'power1.in' }, SCN[i + 1].t - .05);
 });
 SCN.forEach((x, i) => { sc(i); B(CUR); x.beats && x.beats(); });

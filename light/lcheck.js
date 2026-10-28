@@ -8,6 +8,7 @@
 //   OVERLAP  two windows/chips/labels cover each other (> 15% of the smaller)
 //   ORBCORNER a window/chip/label sits in the orb's corner (LONG bottom-right, SHORT top-right)
 //   CAPTION  a scene part sits under a visible caption (nlCaptions) -> keep parts out of the caption band
+//   HOOK0    SHORT only: frame 0 (and 0.5 s) under 25% covered or no drawn visual -> HOOK(['#part', ...]) the hook visual
 //   SAFE     SHORT only: a part sits where the Shorts player covers the frame (like/comment column on the right, caption at the bottom, top bar)
 //   NOORB    the scene's corner orb is not visible 1.5 s after the scene start (forgot ORB_ON)
 //   NOVISUAL a scene has no drawn visual (svg / net / curve / cells / docs) -> every scene needs one
@@ -72,10 +73,14 @@ require('./lsheet.js').testPage(src, 'nl_test.html'); fs.mkdirSync('out', { recu
     const orb = (typeof ORBS !== 'undefined' ? ORBS : []).find(([, p]) => p === sc.id); R.orb = orb ? op(document.getElementById(orb[0] + 'N') || document.getElementById(orb[0])) > .3 : null;
     return R; };
   const seen = {}, scT = {};
+  // SHORT: frame 0 is what the Shorts feed shows while the viewer decides to swipe; it must already hold the hook visual
+  if (VT && FROM < 0) for (const t of [0.04, 0.5]) { await p.evaluate(t => window.__timelines.main.seek(t), t); const r = await p.evaluate(probe, { t, FW, FH, VT });
+    if (!r.sc) warn(t, 'HOOK0', 'no scene visible at the start - HOOK the first scene\'s main visual');
+    else if (r.cov < .25 || !r.vis) warn(t, 'HOOK0', `[${r.sc}] frame ${t < .1 ? '0' : 'at 0.5 s'} is ${Math.round(r.cov * 100)}% covered${r.vis ? '' : ', no drawn visual'} - HOOK(['#part', ...]) the hook visual`); }
   for (let t = Math.max(meta.head + .5, FROM); t < Math.min(meta.end, TO); t += 1) {
     await p.evaluate(t => window.__timelines.main.seek(t), t); const r = await p.evaluate(probe, { t, FW, FH, VT }); if (!r.sc) continue;
     (scT[r.sc] = scT[r.sc] || []).push(t); const once = (k, m) => { const key = r.sc + k + m; if (seen[key]) return; seen[key] = 1; warn(t, k, `[${r.sc}] ${m}`); };
-    if (r.cov < .25 && t - scT[r.sc][0] > 1.5) warn(t, 'EMPTY', `[${r.sc}] only ${Math.round(r.cov * 100)}% covered`);
+    if (r.cov < .25 && t - scT[r.sc][0] > (VT ? .6 : 1.5)) warn(t, 'EMPTY', `[${r.sc}] only ${Math.round(r.cov * 100)}% covered`);
     if (r.txt > (VT ? 70 : 110)) once('TEXT', `${r.txt} chars on screen`);
     r.small.forEach(s => once('SMALL', s)); r.out.forEach(s => once('OUT', s)); r.ovf.forEach(s => once('OVERFLOW', s)); r.ovl.forEach(s => once('OVERLAP', s));
     if (!r.vis) once('NOVISUAL', 'no drawn visual in this scene');
@@ -92,7 +97,7 @@ require('./lsheet.js').testPage(src, 'nl_test.html'); fs.mkdirSync('out', { recu
   if (!NOSHEET) { await p.reload(); await p.waitForTimeout(500); const ts = [];
     const f0 = FROM >= 0 ? FROM : 1.2, f1 = Math.min(TO, meta.end + meta.tail - .2);
     for (let t = f0; t <= f1; t += EVERY) ts.push(t);
-    if (FROM < 0) ts.push(meta.head + 1, meta.end + 2);
+    if (FROM < 0) ts.push(VT ? 0.04 : meta.head + 1, VT ? meta.end + 1 : meta.end + 2);
     meta.nlt.forEach(([, t]) => { if (t + 1.5 >= f0 && t + 1.5 <= f1) ts.push(t + 1.5); });
     files = await sheets(b, p, ts, 'sheet'); }
   W.sort(); console.log(W.join('\n')); errs.filter(e => !e.includes('ERR_FILE_NOT_FOUND')).forEach(e => console.log('JS     ', e));

@@ -8,4 +8,4 @@ The `net-shorts` skill (`SKILL.md`): ideas -> scripts -> vertical 1080x1920 Shor
 | `CHANNEL.txt` | the channel handle |
 | `SKILL.md` | the `net-shorts` skill |
 
-LIGHT Short mode (`lbuild.py --short`): 810x1440 layout canvas scaled 4/3 to 1080x1920, orb top-right, no boot intro (HEAD 0.3 s), 2 s end card (`NL_END_TXT`), lcheck `SAFE` keeps parts out of the Shorts player UI (safe area x 40-690, y 300-1110 on the canvas).
+LIGHT Short mode (`lbuild.py --short`): 810x1440 layout canvas scaled 4/3 to 1080x1920, orb top-right, no boot intro (HEAD 0.3 s), `HOOK([...])` = the hook visual at frame 0 (lcheck `HOOK0`), 1.2 s end card (`NL_END_TXT`), 30-40 s, `nlCaptions()` at the end of build, lcheck `SAFE` keeps parts out of the Shorts player UI (safe area x 40-690, y 300-1110 on the canvas).

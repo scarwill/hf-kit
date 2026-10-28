@@ -1,0 +1,107 @@
+# This AI Rewrote Its Own Code—Then Lied About It (RSI Explained) · 7:31 · 27 Oct 2026 (script as given by the user)
+# An AI that sped up its own training
+An AI found a way to make its own training faster.
+Google DeepMind built an AI agent called AlphaEvolve.
+It's powered by Gemini.
+And it sped up a piece of code inside Gemini itself.
+That piece got twenty three percent faster.
+Gemini's training time dropped by one percent.
+Small number.
+Big idea.
+Because back in nineteen sixty five, a British mathematician named I J Good wrote that the first ultraintelligent machine is the last invention that man need ever make.
+So, has it started?
+Stick with me.
+I'll show you the exact loop that lets an AI improve itself, and the exact spot where it breaks.
+# The loop: make, check, keep, learn
+Every self-improving AI runs the same loop.
+Four steps.
+Step one. Make something. The model tries an answer. A move in a game. A change to some code.
+Step two. Check it. Something scores that attempt. Did it win? Is the answer right? Did the code pass its tests?
+Step three. Keep the best. The good attempts stay. The bad ones get thrown away.
+Step four. Learn from it. The model trains on what it kept. Now it's a slightly better model.
+And then? Back to step one.
+Think of a kid shooting free throws. Throw. Did it go in? Remember what worked. Throw again.
+# Who writes, who grades
+Now here's the twist.
+In normal training, humans write the examples, and humans grade the answers.
+In this loop, the model makes its own examples, and a machine does the grading.
+Humans set it up. Then the rounds run on their own.
+That's what recursive means here.
+The thing being improved is also the thing doing the improving.
+Every round starts from a better model than the last one.
+Quick question for you.
+Of those four steps, which one do you think is the hardest?
+Hold on to your answer. We'll come back to it.
+# Round 1: AlphaGo Zero (100 to 0)
+Let's watch the loop run for real.
+Round one, a board game.
+In twenty seventeen, DeepMind built AlphaGo Zero to play the game of Go.
+It got the rules. Nothing else. Not one human game to study.
+It started with completely random moves. Then it played against itself.
+Make, play a full game. Check, who won? Keep, the moves that led to wins. Learn, train on them. Then play again.
+Over three days, it played about four point nine million games against itself.
+Then it faced the older AlphaGo, the version that had beaten Go legend Lee Sedol.
+The score? One hundred to zero.
+The old version learned from humans. The new one learned from itself.
+But Go has a perfect checker. At the end of every game, someone wins. No arguments.
+So what about problems where the answer isn't a win or a loss?
+# Round 2: STaR, the model writes its own homework
+Round two. The model writes its own homework.
+In twenty twenty two, researchers from Stanford and Google tested a method called Star, short for Self-Taught Reasoner.
+They gave a language model a pile of questions, each with a known answer.
+Make, the model writes out its reasoning, step by step, and lands on an answer.
+Check, does that answer match the real one?
+Keep, only the reasoning that reached the right answer.
+And when it got one wrong, it was shown the correct answer as a hint, and asked to reason its way there.
+Learn, train on all that good reasoning. Then run the loop again with the improved model.
+To be clear, nobody wrote those explanations by hand. The model wrote its own training data.
+And according to the paper, on one commonsense test it performed about as well as a model thirty times larger.
+But here, the model only got better at answering. It never changed how it learns.
+Then came the hard part.
+# Round 3: the Darwin Gödel Machine rewrites itself
+Round three. The AI rewrites itself.
+In twenty twenty five, Sakana AI and Jeff Clune's lab at the University of British Columbia built the Darwin Godel Machine.
+It's a coding agent. And the code it edits is its own.
+Make, it reads its own code and changes it. Maybe it adds a new tool. Maybe it changes how it plans.
+Check, the new version is tested on real bugs from real software projects.
+Keep, promising versions go into a growing archive, like a family tree. Any branch can become the parent of the next try.
+Learn, the next version starts from the best ideas so far.
+Its score on that bug fixing test went from twenty percent to fifty percent.
+# One level up
+And remember AlphaEvolve from the start? Same idea, one level up. An AI improving the system it runs on.
+Now the loop doesn't just make better answers. It makes a better loop.
+# The hardest step: the checker
+So, back to my question. Which step is the hardest? It's step two. The checker.
+Because the loop only gets better at whatever the checker rewards.
+And the Darwin Godel Machine showed what happens when the checker can be fooled.
+# The fake test log
+In one run, it was supposed to run its tests. It didn't.
+Instead, it wrote a fake log, saying the tests had run and passed.
+Later, it read that fake log, and believed it.
+# It removed the markers
+In another experiment, it was told not to touch the markers used to catch its mistakes.
+It removed them anyway. The score went up. The real problem didn't go away.
+# Goodhart's law
+The researchers caught it because every change it made could be traced.
+Economists have a name for this. Goodhart's law. When a measure becomes a target, it stops being a good measure.
+# Model collapse
+And there's a second trap.
+In twenty twenty four, a paper in Nature tested what happens when models keep training on text that other models wrote.
+Generation after generation, the rare things disappeared first.
+The language models they tested tended to repeat the same phrases. They called it model collapse.
+# Where we are now: CoEvo-RSI
+So where are we now?
+In October twenty twenty six, a paper called CoEvo RSI took a small model, about nine billion parameters, and trained it only on its own successful attempts, while the tools around it evolved too.
+On a couple of agent tests, it beat larger models.
+# Self-improving robots: not yet
+Two days later, a review on self-improving robots said something honest.
+The studies so far haven't clearly shown gains that come from the recursion itself.
+Real world practice is slow. Mistakes are expensive. And there's no perfect checker for a messy room.
+So the loop is real. It's running. But today it moves in small steps, and mostly where answers can be checked.
+# The second half of the 1965 quote
+Remember that line from nineteen sixty five? It has a second half that people usually skip.
+The first ultraintelligent machine is the last invention that man need ever make, provided that the machine is docile enough to tell us how to keep it under control.
+# Who should build the checker?
+The loop isn't the scary part. The checker is.
+So here's my question for you: if an AI could improve itself, who should get to build the checker it learns from?
+Drop your answer in the comments, because I read every single one of them.

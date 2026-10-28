@@ -28,6 +28,7 @@ This skill does the **Shorts**: about 5 a week, 35-50 s each, the same neon LIGH
 - **Monetization safety:** YouTube demonetizes "inauthentic", mass-produced channels. Every Short has its own topic, its own opening and its own visuals made for it, and real, sourced information. Never reuse one layout with new words.
 - **No repeats without a memory file:** the channel's own Shorts tab is read every run (`--channel`), so a concept that already has a Short is flagged `MADE`.
 - **Netlight Shorts are concepts, not news.** Product launches belong to Merge Report (`news` skill).
+- **Lessons from YouTube analytics (`~/skit/light/analytics.md`, read it every run):** the AI Shorts lost 37-59 % of viewers on the first swipe and their 0:00 frame was black; the math Shorts (one strange visual + one plain question) got 1-2k views, the AI Shorts 68-860; the 60 s, 188-word Short was watched 32 s; the NCM Short said five technical words in its first lines but kept the most viewers thanks to its "here is the catch" twist. So: hook visual on screen at frame 0 (`HOOK`), 30-40 s, one technical word at most, plain-word titles.
 - **Real proof on screen, like the news skill** (the user: "jaisi news skill short me screenshots deti hai har cheez ka net-short ne bhi waisa hi karna chahiye"): every claim the voice makes about a real thing (a paper, its numbers, a repo, a model card, a benchmark table, a doc) is shown as the REAL page, cropped to the line, highlighted on the words the voice says. Drawings explain the idea; screenshots prove it.
 
 ## Step 0: setup (one block)
@@ -50,9 +51,11 @@ mkdir -p ~/shorts-out && python3 -I ~/skit/shorts/sscout.py --channel @HANDLE --
 (Bash timeout 600000.) Read `~/shorts-out/last.md`: ranked concepts (score = 35% momentum + 65% median views of the ML Shorts a search shows), details, the channel's latest long videos and existing Shorts, and the fresh HF / HN list. `python3 -I ~/skit/shorts/sscout.py --yt "query"` checks any other search.
 
 Pick **5 different Shorts**, a mix:
-- **2 from the latest long videos** (the "Latest long videos" list): one sharp idea from each, linked back as Related video. You need what the long video says: if its script is not in this chat, ask the user to paste it (or use the title and only claims you can verify).
+- **2 from the latest long videos** (the "Latest long videos" list): one sharp idea from each, linked back as Related video. You need what the long video says: the published scripts are in `~/skit/light/scripts/` (if one is missing, ask the user to paste it and save it there; ask before pushing).
 - **2 trending concepts** from the ranking (high Shorts views, not `MADE`).
 - **1 myth / one-number Short** ("AI does not read words", "a 7B model = 14 GB in fp16") built on a concept from the report.
+
+Prefer ONE strange visual + ONE plain question (the math Shorts). A Short from a long video cuts the single moment that works alone (usually the title's promise: the fake test log, the 63 bytes, 19 neurons), never a summary.
 
 Drop: `MADE`; `IN` 30%+; pure news; noise (a best Short that is clearly not about the concept, e.g. a hairstyle under CLIP); topics that need a screen recording. Shorts numbers are noisy between runs: use them to compare, never as exact promises.
 
@@ -61,29 +64,30 @@ Give the user, in Hinglish:
 | # | Short | Hook (first 1-2 s) | Kyun | LIGHT visual (vertical) | Screenshots (proof) | Title | Related video |
 |---|---|---|---|---|---|---|---|
 
-- **Hook**: the first spoken line, 8 words at most, a question or a surprising claim, and the visual that is on screen at second 0.
+- **Hook**: the first spoken line, 8 words at most, a question or a surprising claim in plain words, and the visual that is ALREADY on screen at frame 0 (one big strange object or one big number, not an empty window that fills later).
 - **Kyun**: the evidence ("ML Shorts on this get ~16k median views, 5 HF papers this week").
-- **Title**: English, 50 characters at most, the searched words first, no clickbait.
+- **Title**: English, 50 characters at most, the searched words first, no clickbait. **No acronym a new viewer does not know** (NCM, RSI, REA: say what it does); AI, GPT, GPU are fine. A number or a plain contrast helps ("19 Neurons Drove a Car").
 - **Screenshots (proof)**: the real pages this Short will show (paper abstract line, repo header + stars, model card, benchmark table).
 Then: "Konse banau? Number bolo." and stop.
 
 ## Step 2: scripts
 For each picked Short write `~/shorts-<date>/short_N/script.txt` (only the spoken lines, one sentence per line) and `sources.md` (links for every fact).
-- **Length: 85-120 words = 35-50 s** of TTS. Count the words.
-- **Shape:** hook line (the claim or question) -> 3-5 beats, one concrete idea each, each one a thing that can be drawn -> payoff (the answer, in short punchy words) -> last line: "Full breakdown in the video linked below." when there is a Related video, else a line that loops back to the hook.
+- **Length: 75-100 words = 30-40 s** of TTS. Count the words. (lbuild warns over 42 s and stops over 50 s.)
+- **Shape:** hook line (the claim or question, no acronym) -> 3-4 beats, one concrete idea each, each one a thing that can be drawn -> payoff (the answer, in short punchy words) -> last line: "Full breakdown in the video linked below." when there is a Related video, else a line that loops back to the hook.
+- **One idea, plain words:** at most ONE technical word per Short, explained in the same sentence ("a token, a piece of a word"). Cut every beat the payoff does not need. A "here is the catch" twist before the payoff when the topic has one. None of the old long-video template lines ("Stick with me", "Quick question for you", "To be clear"...).
 - **Spoken English for TTS:** sentences of 5-10 words, one idea each; no symbols, emoji, brackets or abbreviations the voice cannot read ("K V cache" if the TTS spells it badly, write numbers the way they are said); end with a full sentence (a very short last word can be cut by the TTS).
 - **Facts:** verify every number, name and claim (paper, official docs, repo). Nothing you cannot source. Note what is illustrative.
 - Under each script, one line per sentence: the visual planned for it. Every sentence that states a fact about a real paper / repo / model / number gets its **screenshot** (URL + the exact phrase to highlight); at least 2 screenshots per Short when the topic has real sources.
 - Before showing the scripts, fetch every source page and try its screenshot (Step 3, point 2), so missing ones can be asked for in the same message.
-Show the user all scripts with the word count, then stop: "Theek hai to har Short ka TTS alag file mein bana ke bhej do."
+Check every script: `python3 ~/skit/light/scriptcheck.py short_N/script.txt --short --title "<title>" --promise "<the hook's claim words>"` -> 0 errors (LENGTH, JARGON, STOCK, HOOK, TITLE). Show the user all scripts with the word count and the check result, then stop: "Theek hai to har Short ka TTS alag file mein bana ke bhej do."
 
 ## Step 3: build (after the audio arrives)
 For each Short, in its own folder. The light kit's full part list and checks are in `~/skit/light/SKILL.md` (sections "Kit", "Real sources" and "Workflow") and `~/skit/light/RULES.md`: read both once; where they say LONG only, the Short rules here win.
 1. **Align:** copy the audio in, put the script in `script.txt`, `python3 ~/skit/video/align.py <audio> script.txt`, `python3 ~/skit/light/realign.py`, fix every CHECK, then `python3 ~/skit/light/lverify.py` until `sync ok`.
-2. **video.js** with the light kit parts (`nlSetup`, `nlScene`, `cOrb`, `nlBegin`, `NEXT`, `W`, `nlFinish`, nl* visuals), laid out for the Short:
+2. **video.js** with the light kit parts (`nlSetup`, `nlScene`, `cOrb`, `nlBegin`, `HOOK`, `NEXT`, `W`, `nlFinish`, nl* visuals; read `~/skit/examples/light-short-demo.js` once), laid out for the Short:
    - **Canvas 810 x 1440** (the kit scales it to 1080x1920, every size reads 1/3 bigger on a phone). Title band at the top (y 110-250, left side), orb in the top-right corner (automatic with `cOrb`).
    - **Safe area for parts: x 40-690, y 300-990** (the captions sit below). Below y 1125 the Shorts caption covers the frame, right of x 705 below y 675 the like / comment buttons do. lcheck `SAFE` catches it.
-   - **Hook at second 0:** the first scene's main visual is on screen when the voice starts (there is no intro). Something new moves every 2-3 s; 3-6 scenes of 4-9 s.
+   - **Hook at frame 0:** `HOOK(['#mainPart', ...])` right after `nlBegin` puts the first scene's main visual fully on screen at frame 0 (no fade, wires drawn, orb awake); animate it on the hook words with `PULSE` / `TO` / a moving part, never `IN` / `POP` / `FADE` / `ORB_ON` (that hides it again). lbuild `HOOK` and lcheck `HOOK0` stop a Short without it. The 0:00 frame (first frame of the first sheet) is what the feed shows while the viewer decides: look at it. Something new moves every 2-3 s; 3-6 scenes of 4-9 s.
    - One main visual per scene, at most 2 chips; text 1-4 words; lcheck `TEXT` limit is 70 characters.
    - When the voice talks about a text, show that exact text (typed / code / highlighted row), as in the light rules.
    - **Screenshots (real pages), same workflow as the light skill's "Real sources":** `node ~/skit/light/webshot.js <url> assets/<name>.png 1 1 480` (last number = browser width: 480-640 makes the page wrap into a narrow column, so the crop fits the vertical window with big text), Read it once (must be fully styled), crop with PIL to the part the voice talks about, BETWEEN lines, then `python3 ~/skit/light/lfind.py assets/<name>.png "phrase" ...` (OCR boxes; `EDGE:` = crop cut words -> crop again).
@@ -92,10 +96,10 @@ For each Short, in its own folder. The light kit's full part list and checks are
      - Then `node ~/skit/light/lshotcheck.js index.html` and read every `out/pages_NN.png`: each box on exactly the spoken words, nothing cut by the window edge.
      - Blocked / unstyled page (`node ~/skit/light/netlog.js <url>` finds the host; github.com pages often fail in a cloud session that was not started with that repo): ask the user once, in the scripts message, with a numbered list: exact URL, the part to capture, the file name, desktop browser, zoom 100 %, PNG, dark mode if the site has it. Keep building with a placeholder card meanwhile. Uploads land in `/root/.claude/uploads/...`: copy them into `assets/`.
      - Numbers that change (stars, downloads) get "as of <date>". No recreated logos or fake site UI.
-   - **Captions on screen (always in a Short; the user asked on 25 Oct 2026):** `nlCaptions();` as the last line of build. 2-3 of the script's own words at a time, the spoken word lit blue, in the band y 1012-1092 of the canvas inside the safe column. So keep every scene part **above y 990** (lcheck CAPTION / SAFE).
+   - **Captions on screen (always in a Short; the user asked on 25 Oct 2026):** `nlCaptions();` as the last line of BUILD (before `return () => {`; in the beats every caption shows at once, lbuild refuses it). 2-3 of the script's own words at a time, the spoken word lit blue, in the band y 1012-1092 of the canvas inside the safe column. So keep every scene part **above y 990** (lcheck CAPTION / SAFE).
    - End card: set `NL_END_TXT = '> full video below';` at the top of video.js when there is a Related video (default `'> follow for more'`).
    - Different opening and main visual for every Short of the batch.
-3. **Build + check:** `python3 ~/skit/light/lbuild.py video.js <audio> --short`, fix every ERROR; `node ~/skit/light/lcheck.js index.html --every 2` -> 0 warnings (SAFE, ORBCORNER, EMPTY, OUT ...), 0 JS errors; read its sheet(s) (one or two per Short); motion sheet for moving dots (`node ~/skit/light/lsheet.js index.html range a b .25 --name motion`).
+3. **Build + check:** `python3 ~/skit/light/lbuild.py video.js <audio> --short`, fix every ERROR; `node ~/skit/light/lcheck.js index.html --every 2` -> 0 warnings (HOOK0, SAFE, ORBCORNER, EMPTY, OUT ...), 0 JS errors; read its sheet(s), the 0:00 frame first (one or two per Short); motion sheet for moving dots (`node ~/skit/light/lsheet.js index.html range a b .25 --name motion`).
 4. **Proof check:** every factual sentence has its real screenshot on screen while it is spoken (or the user was asked for it).
 5. **Audio, made for THIS Short** (`~/skit/light/music/README.md`; the user rejected the `lmix.py` moods and cue sounds on 25 Oct 2026: never use `lmix.py` / `score.py`):
    - read `~/skit/light/music/log.md`; pick a music style and an sfx palette different from the last entry;

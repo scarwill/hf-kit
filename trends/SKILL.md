@@ -37,6 +37,7 @@ mkdir -p ~/trends-out && python3 -I ~/tkit/trends/scout.py --out ~/trends-out > 
 - **Source notes** at the top: a source that failed. Mention it in one line; the rest is still valid.
 
 ## Step 2: judge
+First read `~/tkit/light/analytics.md` (what got clicked and watched on this channel).
 1. **Map the fresh list to concepts.** For each big model / paper / HN story ask "which concept would a viewer need to understand this?" (a new MoE model -> Mixture of experts; a new TTS model -> Text to speech; a looped-LM paper -> Looped language models). Pick at most 5 such concepts that are not already in the top of the ranking and check them:
    `python3 -I ~/tkit/trends/scout.py --yt "mixture of experts explained" "looped transformer explained"`
    Judge them with the same numbers (median views/day of the top 10, recent hits = videos under 90 days with 20k+ views, share older than 1 year, India share).
@@ -62,6 +63,8 @@ In Hinglish, in this order:
    - **US/UK demand**: median views/day + the best autocomplete hint ("'explained simply' suggested").
    - **Competition**: the top video's views and age, and whether recent videos still get views.
    - **Title**: English, under 60 characters, searched words first, no clickbait (YouTube: short, keyword first, accurate).
+   - **No acronym a new viewer does not know** in the title (NCM, RSI, REA: 0.4-0.8 % clicks on 3-9k impressions, `~/tkit/light/analytics.md`). Plain words first, one number or a plain contrast ("19 Neurons Beat Giant AI": 3.8 %); "(Mamba Explained)" at the end is fine for search.
+   - The topic's payoff must be showable in the first minute of the video (viewers left at the first background lecture). If it only comes after a long explanation, pick another angle or say so.
 3. **Meri top 3**, one line each on why (demand, gap, how strong the LIGHT visual is).
 4. **Skip / India wale**: one line each.
 5. **Sources**: the links behind the top 3 (HF / paper / HN / top YouTube videos).

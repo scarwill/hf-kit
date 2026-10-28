@@ -88,7 +88,7 @@ function nlOrb(par, id, cx, cy, r = 120, c = NL.model) {
 // orb beats (all add a beat): assemble with eyes opening / blink / think (nodes ripple) / bounce / surprised / sleep / ORB_CAM (look into the camera).  No ORB_LOOK: the eyes rest on the content (NLEYE).
 // eyes at rest look toward the content: LONG orb bottom-right -> up-left, SHORT orb top-right -> down-left (scaled to the smaller Short orb)
 const NLEYE = NLV ? { x: -9, y: 6 } : { x: -12, y: -7 };
-function ORB_ON(id, t) { B(t); tl.set('#' + id, { autoAlpha: 1 }, t); tl.set('#' + id + 'E', { autoAlpha: 0 }, t); tl.fromTo('.' + id + 'n', { scale: 0, transformOrigin: '50% 50%' }, { scale: 1, duration: .25, stagger: .006 }, t); tl.fromTo(['#' + id + 'l', '#' + id + 'g'], { opacity: 0 }, { opacity: 1, duration: .4 }, t + .3); tl.set('#' + id + 'E', { autoAlpha: 1 }, t + .7); tl.fromTo('#' + id + 'E', { scaleY: .1, transformOrigin: '50% 50%' }, { scaleY: 1, duration: .15 }, t + .7); return t + .85; }
+function ORB_ON(id, t) { if (id === NLHOOKORB) return t; B(t); tl.set('#' + id, { autoAlpha: 1 }, t); tl.set('#' + id + 'E', { autoAlpha: 0 }, t); tl.fromTo('.' + id + 'n', { scale: 0, transformOrigin: '50% 50%' }, { scale: 1, duration: .25, stagger: .006 }, t); tl.fromTo(['#' + id + 'l', '#' + id + 'g'], { opacity: 0 }, { opacity: 1, duration: .4 }, t + .3); tl.set('#' + id + 'E', { autoAlpha: 1 }, t + .7); tl.fromTo('#' + id + 'E', { scaleY: .1, transformOrigin: '50% 50%' }, { scaleY: 1, duration: .15 }, t + .7); return t + .85; }
 // ORB_CAM(id, t, d): eyes turn to the camera (centre) for d seconds with a blink in the middle, then back to their rest on the content
 function ORB_CAM(id, t, d = 1.6) { B(t); TO('#' + id + 'E', t, { x: 0, y: 0, duration: .25, ease: 'power2.out' }); ORB_BLINK(id, t + d * .45); return TO('#' + id + 'E', t + d, { ...NLEYE, duration: .3, ease: 'power2.inOut' }); }
 function ORB_BLINK(id, t) { B(t); return tl.to('#' + id + 'E', { scaleY: .1, transformOrigin: '50% 50%', duration: .07, yoyo: true, repeat: 1 }, t); }
@@ -111,7 +111,16 @@ let NLCUR = null; const NLSC = [];
 function nlStart(scs) { NLSC.push(...scs); NLCUR = scs[0]; tl.set(scs.slice(1), { autoAlpha: 0 }, 0);
   scs.forEach(sc => document.querySelectorAll(sc + ' > [id]:not(.nttl)').forEach(e => tl.set(e, { autoAlpha: 0 }, 0)));
   NLWIRES.forEach(g => tl.set(g, { autoAlpha: 0 }, 0)); document.querySelectorAll('#nlTop > [id]').forEach(e => tl.set(e, { autoAlpha: 0 }, 0)); tl.set(scs[0] + 'T', { autoAlpha: 0 }, 0);
-  IN(scs[0] + 'T', HEAD - .3, { y: -20, d: .5 }); nlDrift(scs[0], HEAD - .3); }
+  if (NLV) tl.set(scs[0] + 'T', { autoAlpha: 1 }, 0); else IN(scs[0] + 'T', HEAD - .3, { y: -20, d: .5 }); nlDrift(scs[0], NLV ? 0 : HEAD - .3); }
+// SHORT: HOOK(['#id', ...]) right after nlBegin = the hook visual is fully on screen at frame 0 (no fade-in, its wires already drawn,
+// the scene's corner orb already awake). In the Shorts feed the first second decides the swipe; Studio showed a black 0:00 frame
+// on our Shorts (Oct 2026, light/analytics.md). lbuild --short needs it; lcheck HOOK0 checks frame 0.
+// Never IN / POP / FADE / DRAW / ORB_ON a hooked part later (that hides it again at frame 0): animate it with PULSE / TO.
+const NLHOOK = []; let NLHOOKORB = null;
+function HOOK(sels) { [].concat(sels).forEach(sel => { NLHOOK.push(sel); tl.set(sel, { autoAlpha: 1 }, 0);
+    document.querySelectorAll(sel + ' .draw, ' + sel + '.draw').forEach(pth => tl.set(pth, { strokeDashoffset: 0 }, 0)); });
+  const o = ORBS.find(([, sc]) => '#' + sc === NLCUR); if (o) { NLHOOKORB = o[0]; tl.set('#' + o[0], { autoAlpha: 1 }, 0); tl.set(['#' + o[0] + 'l', '#' + o[0] + 'g'], { opacity: 1 }, 0); tl.set('#' + o[0] + 'E', { autoAlpha: 1 }, 0); }
+  B(0); return 0; }
 function nlDrift(sel, t, d = 9) { tl.fromTo(sel, { scale: 1, transformOrigin: '50% 45%' }, { scale: 1.03, duration: d, ease: 'none' }, t); }
 function nlNext(sel, phrase) { const t = go(phrase); OUT(NLCUR, t - .3, { d: .3 }); tl.set(sel, { autoAlpha: 1 }, t); IN(sel + 'T', t, { y: -20, d: .5 }); nlDrift(sel, t); NLCUR = sel; return t; }
 const nlDraw = (id, t, d = .6) => { tl.set('#' + id, { autoAlpha: 1 }, t); return DRAW('#' + id + ' .draw', t, { d }); };
@@ -306,6 +315,7 @@ function NEXT(sel, ph) {
 // lcheck CAPTION); LONG y 948. The words come from meta.json via lbuild (NLCAPW), the times from words.json (TW).
 const NLCAP = [];
 function nlCaptions(o = {}) {
+  if (NLDONE) { console.error('LIGHT: nlCaptions() after nlFinish() - call it at the end of BUILD (before return), not in the beats: every caption showed at once'); return; }
   if (typeof NLCAPW === 'undefined' || !NLCAPW) { console.error('LIGHT: nlCaptions() but the script words do not line up with words.json (lbuild CAPTIONS)'); return; }
   const top = o.top ?? (NLV ? 1012 : 948), fs = o.fs ?? (NLV ? 44 : 40), maxc = o.maxc ?? (NLV ? 24 : 34);
   const lay = D(stage, '', 'position:absolute;inset:0;pointer-events:none;z-index:25', 'nlCap');
@@ -350,7 +360,8 @@ function nlOrbLife() { if (!NL_ORB_LIFE) return;
   NLT.forEach(([sel, t0], i) => { const t1 = i + 1 < NLT.length ? NLT[i + 1][1] : END, o = ORBS.find(([, p]) => '#' + p === sel); if (!o) return; const id = o[0];
     for (let tb = t0 + 1.4 + rnd(i) * .8; tb < t1 - .6; tb += 2.6 + rnd(i * 7 + tb) * 1.6) ORB_BLINK(id, tb);
     [.35, .75].forEach((f, k) => { if (!k || t1 - t0 >= 11) ORB_CAM(id, t0 + (t1 - t0) * f); }); }); }
-function nlFinish() {
+let NLDONE = false;
+function nlFinish() { NLDONE = true;
   nlOrbLife(); if (NLCAP.length) nlCapBeats();
   if (NLCUR !== NLSC[NLSC.length - 1]) console.error(`LIGHT: video ends on ${NLCUR}, not on the last scene ${NLSC[NLSC.length - 1]} (a NEXT is missing)`);
   OUT(NLCUR, END + .1, { d: .3 }); nlOutroBeats();

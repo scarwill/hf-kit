@@ -1,2 +1,5 @@
 # Concepts that already have a Netlight ML video: one concept name per line, exactly as in concepts.txt.
 # The report flags them MADE so the same topic is not suggested again.
+State space models
+Recursive self-improvement
+Text to speech

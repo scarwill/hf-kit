@@ -12,7 +12,7 @@ The user's channel is **Netlight ML** (`netlight.ml`): data science, ML and AI e
 - **No preview MP4** unless the user asks. Check with lcheck + contact sheets.
 - **Ask before doing anything beyond what was asked** (changing the kit, other skills, pushing). The user: "kuch bhi karne se pahele pucha kar".
 
-**THIS SKILL ONLY.** When this skill is used, do NOT also follow `netlightml`, `kurzgesagt-explainer-video`, `hyperframes-explainer-video` or `finance-explainer-video`. Mixing looks broke a video before. LONG only (1920x1080). If the user wants a Short, say the kit is long-only for now and ask.
+**THIS SKILL ONLY.** When this skill is used, do NOT also follow `netlightml`, `kurzgesagt-explainer-video`, `hyperframes-explainer-video` or `finance-explainer-video`. Mixing looks broke a video before. LONG only (1920x1080). Shorts are made with the `net-shorts` skill (`lbuild.py --short`).
 
 ## Why this skill works the way it does
 Netlight videos broke on long scripts for three reasons, and this skill removes all three. Keep it that way:
@@ -22,6 +22,12 @@ Netlight videos broke on long scripts for three reasons, and this skill removes 
    - look ONLY at contact sheets (16 frames per image);
    - build in batches of about 6 scenes;
    - re-read `RULES.md` before every batch.
+
+## Lessons from YouTube analytics (`~/lkit/light/analytics.md`, read it once per video)
+- **Viewers leave at the first background lecture after the hook** (NCM at 0:47, REA / Mamba / RSI around 1:50-2:00), and **the title's promise came minutes late** (RSI "lied" at ~6:00, REA "63 bytes" at ~4:00). When the script arrives, run `python3 ~/lkit/light/scriptcheck.py script.txt --title "<title>" --promise "<words that pay off the title>"` and tell the user in 2-3 lines what it found (late promise, early jargon, old template lines) BEFORE building. Build what the user decides; never rewrite their script yourself.
+- In the plan, the promise of the title is ON SCREEN in the first minute, as early as the script allows: put the strongest real proof (screenshot, number, the moment itself) there.
+- Titles / thumbnails: no acronym a new viewer does not know, the same claim as the first line (NCM / RSI: 0.4-0.8 % clicks; "19 Neurons Beat Giant AI": 3.8 %).
+- After the video is published, save the final script to `~/lkit/light/scripts/<date>-<slug>.txt` (ask before pushing).
 
 ## Hard rules (full card: `~/lkit/light/RULES.md`)
 - **SHOW, DON'T WRITE** (the user: "audience sirf text dekh ke bor ho jayegi"):
