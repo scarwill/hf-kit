@@ -25,7 +25,7 @@ Never start the next stage on your own, never build a video "to save time". Ask 
 |---|---|---|
 | "news", "aaj ka kya hai", "aaj ki news" | Step 1 research | the news table + your pick of 2-3 Shorts (+ 🔴 BIG STORY flag if any) |
 | "1 aur 3 bana", "pehla short de" | Step 2 scripts | `script_N.txt` + `sources_N.md` per Short, a 1-line visual plan per line |
-| uploads TTS audio | Step 3 build | `index.html` + `bgm.m4a` + `assets/*` + `youtube.txt` |
+| uploads TTS audio | Step 3 build | `index.html` + `bgm.m4a` + `assets/*` + `youtube.txt` + `<slug>.srt` |
 | "weekly", "is hafte ka long video" | no weekly video (BRAND.md, 23 Oct 2026): say so, offer a Big Story long on one strong story instead | |
 | "big story bana" | Big Story long video plan | plan, script, 3 thumbnails, video (4-6 min) |
 | "thumbnail de" | `thumb.js` | 2-3 options + phone-size previews |
@@ -44,7 +44,7 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 - Playwright + Chromium are preinstalled; never run `playwright install`.
 
 ## Step 1: research (today's news)
-0. Follow BRAND.md "Daily research checklist" (28 Oct 2026): read scan.py's AI MARKETS / MONEY section, do the two extra searches (AI stocks / bubble, AI funding / IPO), apply the topic rule, and add a Skipped list under the table.
+0. Follow BRAND.md "Daily research checklist" (28 Oct 2026): read scan.py's **AI MARKETS / MONEY** section (AI bubble, stocks, funding, IPO, Reuters + CNBC) and the Bloomberg feeds, do two extra searches ("AI stocks / AI bubble today", "AI funding / AI IPO today"), apply the topic rule (strange fact / wow first; plain breach / outage / advisory max 1 a day), and put a **Skipped** list (story + why) under the table. AI money stories are in the niche (BRAND.md).
 1. `python3 ~/nkit/news/scan.py --hours 36` (Monday: `--hours 72`). It prints feed headlines (AI, dev, security, cloud, general tech), Hugging Face trending models + spaces, Hacker News top, GitHub trending. These are LEADS, not facts.
 2. Keep only the channel's niche (BRAND.md): AI ~60 %, coding / dev tools ~30 %, cloud / security ~10 %. Skip gadgets unless AI / dev, crypto prices, politics, unconfirmed leaks, tiny updates, and anything already in `log.md`.
 3. Open the 6-10 best leads (curl + text extraction) and verify each one: a primary source (company post, release notes, repo, model card, paper, official account, filing) + one independent reputable report, or two reputable reports. Note the exact numbers / names / quotes, and the publish date (inside the window).
@@ -53,8 +53,8 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 6. Reply with ONE table: #, story in one line, category, score, what we can show, source links. Then your pick: Short 1 / Short 2 (/ Short 3), and a Big Story long candidate if one deserves it (the user decides). Slow day: 3 evergreen ideas instead of weak stories. Upload time reminder (BRAND.md). **Stop.**
 
 ## Step 2: scripts (TTS-ready, one per Short)
-- Run `python3 ~/nkit/news/scriptcheck.py script_N.txt` (long: `--long`) on every script; it must PASS, paste its result under the script (BRAND.md "Click + watch rules").
-- Shorts: 30-45 s = about 95-120 words (Clipchamp voice: 137 words = 51 s). One story. Big Story long: 4-6 min.
+- Shorts: under 45 s (~135 words; Clipchamp voice measured 28 Oct: 110 words = 37.5 s). One story. Big Story long: 4-6 min, the story starts in the first 20 s.
+- **`python3 ~/nkit/news/scriptcheck.py script_N.txt` (long: `--long`) on every script; it must PASS. Paste its result under each script.** Rules and the data behind them: BRAND.md "Lessons from YouTube analytics" + "Click + watch rules", analytics.md.
 - Structure: **hook in the first 2 s** (the claim or the villain, no "hey guys") -> the story as a story (who, what, when) -> 1-2 proofs (number, quote, screenshot line) -> **the "but"** (catch / twist / honest caveat) -> **what it means for developers / you** (one line) -> short ending line that can loop.
 - Plain spoken English, short sentences, one idea per line, numbers written as spoken ("three hundred and sixty two"), no emoji / URLs / markdown. One sentence per line in `script_N.txt`.
 - Lists of names: few commas ("Lloyds HSBC and Royal Mail"): the TTS pauses at every comma and the aligner then misplaces the words.
@@ -94,8 +94,9 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 - Music: a NEW custom track per video (BRAND.md Music, `~/nkit/news/music/README.md`). Never the plain nmix moods, never the same style as the last video (check `log.md` / README table). Steps: `nmix.py index.html <audio> <any mood>` (only for sfx.wav) -> a generator in `music/` (reuse one with a clearly different feel, or write a new one) writing `music.wav` -> `python3 ~/nkit/news/music/remix.py <audio>` -> `bgm.m4a` + `preview_mix.m4a`. Put a hit / stop / drop on the script's twist word and a resolve on the end card. Send the preview (we cannot listen) and add the new style to the README table.
 
 ### 3d Deliver
-- Copy `index.html`, `bgm.m4a`, `assets/*` to `~/<slug>-hyperframes/` and send with SendUserFile (`display: 'attach'`).
+- Copy `index.html`, `bgm.m4a`, `assets/*`, `<slug>.srt` to `~/<slug>-hyperframes/` and send with SendUserFile (`display: 'attach'`).
 - `youtube.txt`: 3 honest titles (channel: Merge Report), description (2-3 lines + **Sources** with every URL), hashtags (`#shorts` for Shorts, #ai #technews #programming ...), tags.
+- **`<slug>.srt` every time** (decided 25 Oct 2026), Shorts and long videos: write `shown.txt` (the script as it should read: one sentence per line, numbers as digits, same `{n}` syntax as `sCaptions`, e.g. `GPT-6{2}`, `K3.1{4}`, `70%{2}`), then `python3 ~/nkit/news/srt.py <slug>.srt shown.txt` in the video folder (times = video time, cues <= 42 characters). Send it with the other files and tell the user: YouTube Studio -> Subtitles -> English -> Upload file -> With timing.
 - Hinglish message: length, scene list (what is shown), what is illustrative, render steps:
   `mkdir assets` · copy the voice as `assets\<audio name>` (the exact name in index.html) · `bgm.m4a` and every image into `assets\` · `dir assets` (watch for `.m4a.m4a`) · `npx hyperframes render --output <name>.mp4`.
 - Upload time (BRAND.md: ~8 pm IST, one hour later after 1 Nov).
@@ -104,7 +105,7 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 ## Big Story long video (only when the user picks the story)
 - No weekly / weekend video (decided 23 Oct 2026). Flag a candidate at most; the user decides which story gets a long video.
 - Plan with minutes per part (hook, how it works, the timeline, open questions, what it means for developers), 4-6 min. Short goes out first; pin the long video's link in the Short's comments.
-- Thumbnails: `node ~/nkit/news/thumb.js spec.json thumb_A.png` with layout `single`, badge BIG STORY. Give 2-3 options + the `_feed.png` previews.
+- Thumbnails: `node ~/nkit/news/thumb.js spec.json thumb_A.png` with layout `single`, badge BIG STORY. Always 3 options for YouTube Studio "Test & compare" (one big object / photo, max 3 big words, readable in the `_feed.png` phone preview) + 3 titles with the searched name first (BRAND.md "Click + watch rules").
 - Build in batches of ~6 scenes; `build.py ... --long`.
 
 ## Context budget
