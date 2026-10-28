@@ -12,6 +12,7 @@ Styles made so far (generators in this folder, numpy only):
 | techno.py | minimal techno 122 bpm: four-on-the-floor kick, offbeat hats, rolling sub bass, random data blips, full stop before the twist + sub drop, bell resolve | Cloudflare KV cache leak (27 Oct) |
 | synthwave.py | synthwave 100 bpm: filtered saw arpeggio, detuned pad, eighth-note bass, gated snare; full stop before the twist, back in half-time (calmer caveat), bell resolve | Qwen to Beijing (27 Oct) |
 | puzzle.py | curious puzzle: 96 bpm pizzicato ostinato, music-box melody, soft clock ticks, felt bass; boom on the hook claim, lift when the 2nd lab arrives, true silence before the caveat, sparse ticks after, D-major music-box resolve | ETH, two labs (28 Oct) |
+| trap.py | dark trap 140 bpm (half-time): sliding 808, rolling hats with triplet rolls, clap, E-minor bell stabs; boom on the hook, riser + drop on the twist, true silence before the 2nd twist, resolve | macOS git / eMudhra (28 Oct) |
 
 Ideas for next ones: lo-fi piano + vinyl, trap hats + 808, orchestral pizzicato, tabla / sitar-tinged groove (Indian viewers), acoustic guitar folk, music-box.
 
