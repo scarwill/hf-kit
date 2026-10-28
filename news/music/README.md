@@ -6,7 +6,7 @@ Check log.md for the last styles used and pick something different.
 Styles made so far (generators in this folder, numpy only):
 | file | style | used for |
 |---|---|---|
-| heist.py | spy / heist: plucked bass ostinato, clock ticks, marimba, riser + stop + boom on the twist, double-time after | PHP2Shell leak (23 Oct) |
+| heist.py | spy / heist: plucked bass ostinato, clock ticks, marimba, riser + stop + boom on the twist, double-time after | PHP2Shell leak (23 Oct), Gemini 4 Carbon (29 Oct, twist at 'Because it's scary good at hacking') |
 | chip.py | 8-bit chiptune: square arps, triangle bass, noise drums, glitch stutter on the hook, dreamy break | WorldTUI (23 Oct) |
 | pulse.py | tension pulse: sidechained sub, sonar pings, glassy plucks, hits on chosen times | eMudhra (23 Oct) |
 | techno.py | minimal techno 122 bpm: four-on-the-floor kick, offbeat hats, rolling sub bass, random data blips, full stop before the twist + sub drop, bell resolve | Cloudflare KV cache leak (27 Oct) |
