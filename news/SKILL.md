@@ -44,6 +44,7 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 - Playwright + Chromium are preinstalled; never run `playwright install`.
 
 ## Step 1: research (today's news)
+0. Follow BRAND.md "Daily research checklist" (28 Oct 2026): read scan.py's AI MARKETS / MONEY section, do the two extra searches (AI stocks / bubble, AI funding / IPO), apply the topic rule, and add a Skipped list under the table.
 1. `python3 ~/nkit/news/scan.py --hours 36` (Monday: `--hours 72`). It prints feed headlines (AI, dev, security, cloud, general tech), Hugging Face trending models + spaces, Hacker News top, GitHub trending. These are LEADS, not facts.
 2. Keep only the channel's niche (BRAND.md): AI ~60 %, coding / dev tools ~30 %, cloud / security ~10 %. Skip gadgets unless AI / dev, crypto prices, politics, unconfirmed leaks, tiny updates, and anything already in `log.md`.
 3. Open the 6-10 best leads (curl + text extraction) and verify each one: a primary source (company post, release notes, repo, model card, paper, official account, filing) + one independent reputable report, or two reputable reports. Note the exact numbers / names / quotes, and the publish date (inside the window).
@@ -52,6 +53,7 @@ cat ~/nkit/news/BRAND.md; tail -20 ~/nkit/news/log.md
 6. Reply with ONE table: #, story in one line, category, score, what we can show, source links. Then your pick: Short 1 / Short 2 (/ Short 3), and a Big Story long candidate if one deserves it (the user decides). Slow day: 3 evergreen ideas instead of weak stories. Upload time reminder (BRAND.md). **Stop.**
 
 ## Step 2: scripts (TTS-ready, one per Short)
+- Run `python3 ~/nkit/news/scriptcheck.py script_N.txt` (long: `--long`) on every script; it must PASS, paste its result under the script (BRAND.md "Click + watch rules").
 - Shorts: 30-45 s = about 95-120 words (Clipchamp voice: 137 words = 51 s). One story. Big Story long: 4-6 min.
 - Structure: **hook in the first 2 s** (the claim or the villain, no "hey guys") -> the story as a story (who, what, when) -> 1-2 proofs (number, quote, screenshot line) -> **the "but"** (catch / twist / honest caveat) -> **what it means for developers / you** (one line) -> short ending line that can loop.
 - Plain spoken English, short sentences, one idea per line, numbers written as spoken ("three hundred and sixty two"), no emoji / URLs / markdown. One sentence per line in `script_N.txt`.

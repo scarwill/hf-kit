@@ -43,6 +43,18 @@ require('./sheet.js').testPage(src, 'nl_test.html'); fs.mkdirSync('out', { recur
       if (sm > 0 && ix * iy / sm > .15) R.ovl.push((a.id || a.className) + ' x ' + (c.id || c.className)); }
     return R; };
   const seen = {}, scT = {};
+  // FIRSTFRAME (Shorts, 28 Oct 2026): the swipe decision is made in the first 1-2 s. A big drawing / photo must be on screen and
+  // text short. Source pills (.spill) and captions do not count. Guideline, not yet proven by our swipe data: WARN only.
+  if (VH > VW) {
+    await p.evaluate(t => window.__timelines.main.seek(t), meta.head + .3);
+    const ff = await p.evaluate(() => { const op = e => { let o = 1; for (let x = e; x && x !== document.body; x = x.parentElement) { const cs = getComputedStyle(x); if (cs.visibility === 'hidden' || cs.display === 'none') return 0; o *= +cs.opacity; } return o; };
+      const sc = [...document.querySelectorAll('.nsc')].find(s => op(s) > .5); if (!sc) return null; let words = 0;
+      const tw = document.createTreeWalker(sc, NodeFilter.SHOW_TEXT); let n; while ((n = tw.nextNode())) { const el = n.parentElement; if (!n.textContent.trim() || el.closest('.spill,.nttl') || op(el) < .3) continue; words += n.textContent.trim().split(/\s+/).length; }
+      const vis = [...sc.querySelectorAll('svg, img, .sshot, .sphoto')].filter(e => op(e) > .3 && e.getBoundingClientRect().width * e.getBoundingClientRect().height > 40000).length;
+      return { words, vis }; });
+    if (ff && ff.words > 12) warn(meta.head + .3, 'FIRSTFRAME', `${ff.words} words on the first frame: keep the hook text short, let one big visual carry it`);
+    if (ff && !ff.vis) warn(meta.head + .3, 'FIRSTFRAME', 'no big drawing / photo / screenshot on the first frame');
+  }
   for (let t = Math.max(meta.head + .5, FROM); t < Math.min(meta.end, TO); t += 1) {
     await p.evaluate(t => window.__timelines.main.seek(t), t); const r = await p.evaluate(probe, [VW, VH]); if (!r.sc) continue;
     (scT[r.sc] = scT[r.sc] || []).push(t); const once = (k, m) => { const key = r.sc + k + m; if (seen[key]) return; seen[key] = 1; warn(t, k, `[${r.sc}] ${m}`); };

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # SCAN: one command that lists the last N hours of AI + dev news candidates.
 #   python3 ~/nkit/news/scan.py [--hours 36] [--no-gh]
-# Prints, newest first: feed headlines (AI / dev / security sources) with time + link, then Hugging Face trending models + spaces,
+# Prints, newest first: feed headlines (AI / dev / security / Bloomberg tech + markets) with time + link, then AI MARKETS / MONEY
+# (Google News searches: AI bubble, AI stocks, funding, IPO, Reuters + CNBC AI; added 28 Oct 2026 after we missed China's AI selloff), then Hugging Face trending models + spaces,
 # Hacker News top stories (score), and GitHub trending repos (headless browser). It is a LIST OF LEADS, not facts:
 # open every story you shortlist and verify it (primary source + one independent report) before it goes in the table.
 # Goes through the session proxy with curl (WebFetch cannot resolve many hosts here). A source that fails is reported and skipped.
@@ -23,6 +24,8 @@ FEEDS = {
     'simonw': 'https://simonwillison.net/atom/everything/',
     'verge': 'https://www.theverge.com/rss/index.xml',
     'techcrunch': 'https://techcrunch.com/feed/',
+    'bloomberg-tech': 'https://feeds.bloomberg.com/technology/news.rss',
+    'bloomberg-mkts': 'https://feeds.bloomberg.com/markets/news.rss',
 }
 def get(url, t=25):
     r = subprocess.run(['curl', '-sL', '-m', str(t), '-A', UA, url], capture_output=True)
@@ -53,6 +56,24 @@ rows.sort(key=lambda r: r[0], reverse=True)
 print(f'== FEEDS: last {HOURS:g} h ({len(rows)} items), now {now:%Y-%m-%d %H:%M} UTC')
 for dt, n, t, l in rows: print(f'{dt:%m-%d %H:%M} {n:<13} | {t[:120]} | {l}')
 if failed: print('   (no items from: ' + ', '.join(failed) + ')')
+# AI MARKETS / MONEY: big AI market, funding and IPO stories that tech feeds often miss (Reuters / CNBC / Bloomberg via Google News)
+MQ = ['AI bubble', 'AI stocks selloff OR rally', 'AI startup funding round', 'AI IPO', 'site:reuters.com artificial intelligence', 'site:cnbc.com artificial intelligence']
+days = max(1, int(round(HOURS / 24)))
+mseen = set(); print(f'== AI MARKETS / MONEY (Google News, last {days} d) - read this section every day')
+for q in MQ:
+    x = get('https://news.google.com/rss/search?q=' + q.replace(' ', '+') + f'+when:{days}d&hl=en-US&gl=US&ceid=US:en')
+    items = re.findall(r'<item>.*?</item>', x, re.S)
+    if not items: print(f'  [{q}] failed'); continue
+    n = 0
+    for it in items:
+        t = re.search(r'<title>(.*?)</title>', it, re.S); src = re.search(r'<source[^>]*>(.*?)</source>', it, re.S)
+        l = re.search(r'<link>(.*?)</link>', it, re.S); d = re.search(r'<pubDate>(.*?)</pubDate>', it, re.S)
+        title = html.unescape(t.group(1)).strip() if t else ''; dt = when(d.group(1) if d else '')
+        key = re.sub(r'\W+', '', title.lower())[:50]
+        if not title or key in mseen or (dt and dt < cut): continue
+        mseen.add(key); n += 1
+        print(f"  [{q[:22]:<22}] {dt:%m-%d %H:%M} | {title[:115]} | {html.unescape(src.group(1)) if src else ''} | {l.group(1).strip() if l else ''}")
+        if n >= 6: break
 for kind in ('models', 'spaces'):
     try:
         d = json.loads(get(f'https://huggingface.co/api/{kind}?sort=trendingScore&limit=12') or '[]')
