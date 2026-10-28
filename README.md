@@ -16,7 +16,8 @@ Build: `cat ~/hf-kit/{premium.js,illus.js,life.js,helpers.js,icons.js,scenes.js,
 - `trends/` — `net-trends` skill for Netlight ML: `scout.py` checks what is rising in DS / ML / AI (Hugging Face papers + trending models, Hacker News, Wikipedia, PyPI) and the US / UK YouTube demand and gap per concept, then the skill turns it into ranked video topics. `concepts.txt` (~110 concepts), `made.txt`, `SKILL.md`. See `trends/README.md`.
 - `shorts/` — `net-shorts` skill for Netlight ML Shorts: `sscout.py` ranks concepts by Shorts demand + momentum and reads the channel's Shorts (no repeats) and latest long videos; Shorts are built with `light/lbuild.py --short` (1080x1920). See `shorts/README.md`.
 - `blue-lantern/` — Blue Lantern channel (guided breathing, sleep, focus, nature/noise ambience): tested example scripts + brand files; used by the `blue-lantern` skill. See `blue-lantern/README.md`.
-- `thumb/` — premium (video-kit) thumbnails: thumbx.js, tshot.js (example: examples/thumb-premium-example.js); old style: thumb.js, shot.js, page.html
+- `thumb/` — premium (video-kit) thumbnails: thumbx.js, tshot.js (example: examples/thumb-premium-example.js); old style: thumb.js, shot.js, page.html; Netlight ML thumbnails: `nlthumb.js` (`net-thumb` skill, `thumb/SKILL.md`)
+- `script/` — the `net-script` skill (`SKILL.md`): Netlight long-video scripts, checked by `light/scriptcheck.py`
 
 Kit safety built in (no per-video code needed):
 - `CAM` / `CUT` / `WHIP` (and so `ZOOMIN`, `intro`, `outro`) clamp the camera inside the painted room (`clampV`) -> the next room never shows at a frame edge.
