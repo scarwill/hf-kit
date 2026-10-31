@@ -243,6 +243,45 @@ function nlCode(par, id, x, y, w, lines, head = 'train.py', fs = 28) {
 }
 function CODE(id, t, dt = .35) { B(t); return tl.fromTo('.' + id + 'L', { autoAlpha: 0, x: -10 }, { autoAlpha: 1, x: 0, duration: .2, stagger: dt }, t); }
 
+// ---- code EDITOR for walkthroughs: line numbers + Rust / Python colours + ONE caret that types char by char (indent appears at once), auto-scrolls,
+// marks a line or a piece of a line while the voice explains it. par = a scene, or null = the top layer (stays on screen across scenes, glide it with HERO).
+// nlEditor(par,id,x,y,w,h,lines,file,fs=30,lang='rust'). Lines never typed / shown are visible with the window (code that is already there).
+// ED_TYPE(id,t,k0,k1=k0,dt=.045) types lines k0..k1 (adds the type cues, returns the end time) ; ED_SHOW(id,t,k0,k1) lines appear at once
+// ED_LINE(id,t,k,c,d=0) glow bar on line k (d>0 = hide after d s) ; ED_SPAN(id,t,k,'text',c,d=0) box around that exact text on line k
+// ED_CARET(id,t,k,col) moves the caret ; ED_SCROLL(id,t,top) top visible line ; ED_OFF(id,t) hides all marks
+const NLED = { rust: { kw: 'fn|let|mut|struct|impl|pub|use|for|in|while|loop|if|else|return|match|as|const|mod|enum|trait|where|move|ref|self|Self|crate|true|false', ty: 'f32|f64|i8|i16|i32|i64|u8|u16|u32|u64|usize|isize|bool|char|str|String|Vec|Option|Result|Box|Some|None|Ok|Err', cm: '//.*$' },
+  py: { kw: 'def|for|in|return|import|from|class|if|else|elif|while|with|as|lambda|None|True|False|self|not|and|or', ty: 'int|float|str|list|dict|tuple|bool', cm: '#.*$' } };
+function nlEdSeg(l, lang) { const L = NLED[lang] || NLED.rust, out = [], re = new RegExp(`(${L.cm})|("[^"]*"|'[^']*')|\\b(${L.kw})\\b|\\b(${L.ty})\\b|\\b(\\d+\\.?\\d*)\\b|(\\w+!)|(\\w+)(?=\\()`, 'g');
+  const col = [NL.dim, NL.out, NL.model, '#9fd4ff', NL.data, NL.out, '#ffffff']; let a = 0, m;
+  while ((m = re.exec(l))) { if (m.index > a) out.push([l.slice(a, m.index), null]); const g = m.slice(1).findIndex(v => v !== undefined); out.push([m[0], col[g]]); a = m.index + m[0].length; if (!m[0].length) re.lastIndex++; }
+  if (a < l.length) out.push([l.slice(a), null]); return out; }
+function nlEditor(par, id, x, y, w, h, lines, file = 'src/main.rs', fs = 30, lang = 'rust') {
+  const e = nlWin(par || nlInit.top, id, x, y, w, h, NL.model, file), lh = Math.round(fs * 1.6), cw = fs * .6, gw = Math.round(fs * 2.2), pad = 16, esc = ch => ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : ch === '&' ? '&amp;' : ch;
+  const bd = D(e, '', `position:absolute;left:0;right:0;top:50px;bottom:0;overflow:hidden`, id + 'bd'), tr = D(bd, '', `position:absolute;left:0;right:0;top:${pad}px;height:${lines.length * lh}px`, id + 'tr');
+  D(tr, '', `position:absolute;left:0;top:0;bottom:0;width:${gw + 8}px;border-right:1px solid ${NL.line}`);
+  lines.forEach((l, k) => { let c = 0; const code = nlEdSeg(l, lang).map(([tx, cl]) => [...tx].map(ch => `<span class="nchar ${id}c${k}" data-i="${c++}"${cl ? ` style="color:${cl}"` : ''}>${esc(ch)}</span>`).join('')).join('');
+    D(tr, `<span id="${id}n${k}" style="position:absolute;left:0;width:${gw}px;text-align:right;color:#47506a">${k + 1}</span><span style="position:absolute;left:${gw + 24}px;white-space:pre">${code}</span>`,
+      `position:absolute;left:0;right:0;top:${k * lh}px;height:${lh}px;font:500 ${fs}px/${lh}px ${NLMONO};color:${NL.ink};z-index:1`, id + 'L' + k, id + 'L ncode'); });
+  D(tr, '', `position:absolute;left:${gw + 24}px;top:${(lh - fs * 1.1) / 2}px;width:${Math.round(fs * .12) + 2}px;height:${Math.round(fs * 1.1)}px;border-radius:2px;background:${NL.data};box-shadow:0 0 14px ${NL.data};z-index:2`, id + 'k');
+  e.__ed = { lines, lh, cw, gw, rows: Math.floor((h - 50 - pad) / lh), top: 0, nm: 0 }; e.dataset.x = x; e.dataset.y = y; return e; }
+function ED_CARET(id, t, k, col = 0) { const E = document.getElementById(id).__ed; if (!E.kon) { E.kon = 1; tl.set('#' + id + 'k', { autoAlpha: 0 }, 0); } tl.set('#' + id + 'k', { autoAlpha: 1, x: col * E.cw, y: k * E.lh }, t); return t; }
+function ED_SCROLL(id, t, top, d = .4) { const E = document.getElementById(id).__ed; E.top = top; B(t); return tl.to('#' + id + 'tr', { y: -top * E.lh, duration: d, ease: 'power2.inOut' }, t); }
+function nlEdFit(id, t, k) { const E = document.getElementById(id).__ed; if (k >= E.top + E.rows) ED_SCROLL(id, t, k - E.rows + 1, .3); else if (k < E.top) ED_SCROLL(id, t, k, .3); }
+function ED_TYPE(id, t, k0, k1 = k0, dt = .045) { B(t); const E = document.getElementById(id).__ed; let tt = t;
+  for (let k = k0; k <= k1; k++) { const cs = [...document.querySelectorAll('.' + id + 'c' + k)], ind = E.lines[k].length - E.lines[k].trimStart().length; nlEdFit(id, tt, k);
+    tl.set('#' + id + 'n' + k, { autoAlpha: 0 }, 0); tl.set('#' + id + 'n' + k, { autoAlpha: 1 }, tt); cs.forEach(c => tl.set(c, { autoAlpha: 0 }, 0));
+    ED_CARET(id, tt, k, ind); const n = cs.length - ind; if (n > 0) CUE(tt, 'type', n, dt);
+    cs.forEach((c, i) => { const ti = i < ind ? tt : tt + (i - ind + 1) * dt; tl.set(c, { autoAlpha: 1 }, ti); if (i >= ind) tl.set('#' + id + 'k', { x: (i + 1) * E.cw }, ti); });
+    tt += Math.max(0, n) * dt + (k < k1 ? .12 : 0); }
+  return tt; }
+function ED_SHOW(id, t, k0, k1 = k0) { B(t); for (let k = k0; k <= k1; k++) { nlEdFit(id, t, k); const s = ['#' + id + 'n' + k, ...document.querySelectorAll('.' + id + 'c' + k)]; tl.set(s, { autoAlpha: 0 }, 0); tl.set(s, { autoAlpha: 1 }, t); } return t; }
+function nlEdMark(id, t, html, d) { const E = document.getElementById(id).__ed, mid = id + 'm' + E.nm++; D(document.getElementById(id + 'tr'), '', html, mid, id + 'mk'); tl.set('#' + mid, { autoAlpha: 0 }, 0); FADE('#' + mid, t, { d: .25 }); if (d > 0) tl.to('#' + mid, { autoAlpha: 0, duration: .25 }, t + d); return t; }
+function ED_LINE(id, t, k, c = NL.out, d = 0) { const E = document.getElementById(id).__ed; nlEdFit(id, t, k);
+  return nlEdMark(id, t, `position:absolute;left:${E.gw + 9}px;right:0;top:${k * E.lh}px;height:${E.lh}px;background:color-mix(in srgb,${c} 13%,transparent);border-left:4px solid ${c};z-index:0`, d); }
+function ED_SPAN(id, t, k, txt, c = NL.out, d = 0) { const E = document.getElementById(id).__ed, i = E.lines[k].indexOf(txt); if (i < 0) throw new Error(`ED_SPAN: "${txt}" is not on line ${k + 1} of ${id}`); nlEdFit(id, t, k);
+  return nlEdMark(id, t, `position:absolute;left:${E.gw + 24 + i * E.cw - 7}px;top:${k * E.lh + 3}px;width:${txt.length * E.cw + 14}px;height:${E.lh - 6}px;border:3px solid ${c};border-radius:8px;box-shadow:0 0 16px ${c};z-index:3`, d); }
+function ED_OFF(id, t) { B(t); return tl.to('.' + id + 'mk', { autoAlpha: 0, duration: .25 }, t); }
+
 // ---- probability / score bars inside a window. items = [[label, 0..1, colour?], ...]. BARS(id, t) grows them.
 function nlBars(par, id, x, y, w, items, head = 'next_token_probs', c = NL.out) {
   const e = nlWin(par, id, x, y, w, 80 + items.length * 70, c, head);

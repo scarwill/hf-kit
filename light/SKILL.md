@@ -135,6 +135,7 @@ When the script names a real paper, repo, site, post or doc, show the **real thi
   - confusion matrix: `nlConf(par,id,x,y,[[TP,FN],[FP,TN]],cs,labels)` + `POP('.idc',t,{st:.15})`
   - matrix x vector: `nlMatmul(par,id,x,y,A,v)` + `MATMUL(id,t,dt)`
   - code: `nlCode(par,id,x,y,w,lines,file,fs)` + `CODE(id,t,dt)`
+  - code walkthrough editor: `nlEditor(par|null,id,x,y,w,h,lines,file,fs,lang)` (null = top layer, stays across scenes; `OUT` it at `END + .1`) + `ED_TYPE(id,t,k0,k1,dt)` (types char by char, adds type cues), `ED_SHOW`, `ED_LINE(id,t,k,c,d)`, `ED_SPAN(id,t,k,'text',c,d)`, `ED_CARET`, `ED_SCROLL`, `ED_OFF`. Editor left + the maths of the typed line on the right.
   - probabilities: `nlBars(par,id,x,y,w,[[label,p],...],head)` + `BARS(id,t)`
   - tokens: `nlTokens(par,id,x,y,toks,c,fs,gap)` then `POP('#idt'+k, t)`; `el.cx(k)` is the centre of token k, `el.xs` = `[left,width]`
   - vector: `nlVec(par,id,x,y,vals,c,horiz,cs)` then `POP('.idv',t,{st:.08})`

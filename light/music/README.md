@@ -19,6 +19,7 @@ So, for every Netlight video (long `light` and `net-shorts`):
 | file | style | story hooks | first used |
 |---|---|---|---|
 | layers.py | builds one layer per scene (muffled pad -> bass pulse -> arpeggio -> hats), drop on the reveal, dead stop + ticking clock on the twist, major resolve on the ending | `--scenes --drop --stop --resolve` | NCM Short (25 Oct 2026) |
+| techno.py | minimal techno for coding / build-it stories: mechanical 16th key clicks, kick that grows, offbeat bass from the 1st scene change, saw stab opens on the drop, optional one-beat dead stop, major stab on the resolve | `--scenes --drop [--stop] [--resolve]` | Rust walkthrough test (31 Oct 2026) |
 
 ## Sound palettes (`sfx.py`)
 glass (airy, clean, futuristic) · analog (wood, paper, warm) · chip (8-bit) · pulse (sub thumps, sonar) · string (pizzicato, timpani)
