@@ -24,7 +24,7 @@ Long videos go wrong when these get forgotten halfway. `cat ~/lkit/light/RULES.m
 - Draw the script's own objects (game, phone, server, scissors, laptop...) with `nlBox` + SVG. 2-3 custom drawings per video.
 - Two scenes in a row never use the same main visual type. Window + rows + chips as the main visual: at most 1 scene in 3.
 - One `nlHero` = the story's main object, glides with `HERO(...)`. Never rebuild it, never `PULSE` it, never `IN` it after a `HERO` move (use `FADE`).
-- Wires: start at the centre of the source edge, end on the target edge, arrowhead `arw(g, x, y, c, 'r'|'l'|'u'|'d')` for flow. Re-check wires after moving a part.
+- Wires: start at the centre of the source edge, end on the target edge, arrowhead `arw(g, x, y, c, 'r'|'l'|'u'|'d')` for a straight end, `arwTo(g, fromX, fromY, x, y, c)` for a slanted end (the tip follows the line; lcheck ARWDIR). Re-check wires after moving a part.
 - Things inside a window/frame fit fully inside it. Text-like lines in a drawn page = `nlWords(...)` only (lcheck SVGOUT = a drawing spills out of its box). A moving ball/packet/dot never sits frozen: it moves continuously and lands ON its word.
 - Frame never > 75% empty. Fill a scene's first seconds with the coming parts at `{ to: .3 }`, then `TO(..., { autoAlpha: 1 })` on the word.
 

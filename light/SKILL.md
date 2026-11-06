@@ -51,7 +51,7 @@ Netlight videos broke on long scripts for three reasons, and this skill removes 
 - **Hero:** ONE `nlHero` = the story's main object, gliding between scenes with `HERO(...)`.
 - **Sync:** every beat fires on its words via `W('unique phrase')`; something new moves every 3-4 s.
 - **Wires and containers:**
-  - Wires start at the centre of the source edge, end on the target edge, and get an arrowhead `arw` for flow.
+  - Wires start at the centre of the source edge, end on the target edge, and get an arrowhead for flow: `arw` when the last segment is straight across / up / down, `arwTo` when it is slanted (lcheck `ARWDIR` catches a wrong one).
   - Anything inside a frame fits fully inside it.
   - After moving or resizing a part, re-check everything connected to it.
 - **Motion looks physical:** a ball, packet or dot never sits frozen; it moves continuously and lands on its word. A hit shows the hit.
@@ -118,7 +118,7 @@ When the script names a real paper, repo, site, post or doc, show the **real thi
   - `nlChip(par,id,x,y,txt,c,ico,fs)`, `nlLab(par,id,x,y,txt,c,center)`, `nlTag(par,id,cx,y,txt,c,fs)` (pill centred on cx).
   - `nlMark(par,id,x,y,c,ok)`, `nlUser`, `nlBig(par,id,y,txt,c,fs)`, `nlText`.
   - `nlRow(win,id,left,right,c)` + `nlRowHL(rowEl,id,c)` for a highlight frame inside a row.
-  - `nlSvg(par)` + `nlWire(v,id,d,c,dash,w)` (returns the group; pass it to `arw(g,x,y,c,'r'|'l'|'u'|'d')`), revealed by `nlDraw(id,t)`.
+  - `nlSvg(par)` + `nlWire(v,id,d,c,dash,w)` (returns the group; pass it to `arw(g,x,y,c,'r'|'l'|'u'|'d')` for a straight horizontal / vertical end, or `arwTo(g,fromX,fromY,x,y,c)` for a slanted end: tip at x,y, pointing away from the previous point of the path), revealed by `nlDraw(id,t)`.
   - `nlDocs(par,id,x,y,cols,rows,w,h,gap,c)` (show: `nlShow('#id',t)` + `FADE('.idd',t,{st:.01})`).
   - `nlBox(par,id,x,y,w,h)` returns `[div, svg]` for custom drawings.
 - **Hero:** `nlHero(id,x,y,w,html,c,head)`. `HERO(id,t,x,y,scale)` glides it. Show it first with `IN` at its base position; re-show with `FADE`, hide with `OUT`.

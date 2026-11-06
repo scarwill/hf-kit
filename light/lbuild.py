@@ -31,7 +31,7 @@ BAN = {r'k[A-Z]\w*|chat|pill|card|bubble|charB|charP|botB|botP|person|wtext|useT
        r'nlNext': "use NEXT('#sN', 'first words') - it adds the whoosh cue and the scene checks",
        r'nlInit|nlIntro|nlOutro': 'use nlSetup(s) once at the top of build',
        r'nlStart|nlIntroBeats|nlOutroBeats|houseBeats|houseEnd|houseStart': 'use nlBegin([...]) first and nlFinish() last in beats'}
-REDEF = r'(?:const|let|var|function)\s+(OX|OY|OR|ORBS|cOrb|arw|CUES|CUE|NEXT|nlShot|SHOT_FOCUS|nlShotHL|nlCursor|CURSOR|CLICK|houseStart|houseBeats|houseEnd|D|NL|HERO|HOOK|TYPE|W|go|tl)\b'
+REDEF = r'(?:const|let|var|function)\s+(OX|OY|OR|ORBS|cOrb|arw|arwTo|CUES|CUE|NEXT|nlShot|SHOT_FOCUS|nlShotHL|nlCursor|CURSOR|CLICK|houseStart|houseBeats|houseEnd|D|NL|HERO|HOOK|TYPE|W|go|tl)\b'
 code = []
 for i, l in enumerate(V0.split('\n'), 1):
     l2 = re.sub(r'//.*$', '', l); code.append(l2)

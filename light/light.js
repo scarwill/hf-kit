@@ -335,9 +335,26 @@ function nlOutroBeats() { if (NLV) { const t = END + .1; tl.set('#nlO', { autoAl
 const OX = NLV ? 735 : 1790, OY = NLV ? 175 : 962, OR = NLV ? 40 : 56, ORBS = [];   // SHORT: top-right, above the like/comment column
 // the host orb: always the same corner (LONG bottom-right, SHORT top-right), same size. Never call nlOrb in a video (lbuild bans it).
 const cOrb = (sc, id) => { ORBS.push([id, sc.id]); return nlOrb(sc, id, OX, OY, OR); };
-// arrowhead at (x,y) on a wire group g: dir 'r' right, 'l' left, 'd' down, 'u' up
+// arrowhead at (x,y) on a wire group g: dir 'r' right, 'l' left, 'd' down, 'u' up. ONLY for a wire whose last segment is straight
+// horizontal / vertical; a slanted (diagonal) last segment needs arwTo. arw checks this itself (LIGHT: ARWDIR).
+const NLARW = { r: 0, d: 90, l: 180, u: -90 };
+// direction (degrees) in which the wire in g arrives at its end point, or null (arc / no wire / tip not at the wire's end)
+function nlWireEndDir(g, x, y) { const p = g && g.querySelector && g.querySelector('path.draw'); if (!p) return null;
+  const d = p.getAttribute('d') || ''; if (/[aAhHvVsStTz]/.test(d.replace(/^M/, '')) || /[a-z]/.test(d)) return null;
+  const n = (d.match(/-?\d*\.?\d+(?:e-?\d+)?/g) || []).map(Number); if (n.length < 4) return null;
+  const ex = n[n.length - 2], ey = n[n.length - 1], fx = n[n.length - 4], fy = n[n.length - 3];
+  if (Math.hypot(ex - x, ey - y) > 4 || Math.hypot(ex - fx, ey - fy) < 1) return null;
+  return Math.atan2(ey - fy, ex - fx) * 180 / Math.PI; }
 const arw = (g, x, y, c, dir = 'r') => { const P = { r: [[-16, -11], [-16, 11]], l: [[16, -11], [16, 11]], d: [[-11, -16], [11, -16]], u: [[-11, 16], [11, 16]] }[dir];
+  const wd = nlWireEndDir(g, x, y);
+  if (wd != null) { const diff = Math.abs(((wd - NLARW[dir]) % 360 + 540) % 360 - 180);
+    if (diff > 20) console.error(`LIGHT: ARWDIR arw(${g.id || 'wire'}, ${x}, ${y}, '${dir}') but the wire arrives at ${wd.toFixed(0)} deg (${dir} = ${NLARW[dir]} deg): use arwTo(g, fromX, fromY, ${x}, ${y}, c) for a slanted segment`); }
   return S('path', { class: 'draw', d: `M${x + P[0][0]} ${y + P[0][1]} L${x} ${y} L${x + P[1][0]} ${y + P[1][1]}`, stroke: c, 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g); };
+// arrowhead at ANY angle: tip at (x,y), pointing along the wire's last segment that comes from (fx,fy) (the previous point of the path,
+// or the last control point of a curve). Same size and look as arw. Use it for every slanted / diagonal wire end.
+const arwTo = (g, fx, fy, x, y, c) => { const a = Math.atan2(y - fy, x - fx), L = Math.hypot(16, 11), w = Math.atan2(11, 16);
+  const p = k => `${(x - L * Math.cos(a + k * w)).toFixed(1)} ${(y - L * Math.sin(a + k * w)).toFixed(1)}`;
+  return S('path', { class: 'draw', d: `M${p(1)} L${x} ${y} L${p(-1)}`, stroke: c, 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g); };
 // sound cues -> window.__CUES -> lcheck writes cues.json -> lmix.py. kinds: whoosh hit chime blip tick err pop down type(n chars, dt)
 const CUES = []; window.__CUES = CUES;
 const CUE = (t, k, n = 1, dt = 0) => { if (t != null) CUES.push([+(+t).toFixed(3), k, n, dt]); return t; };
